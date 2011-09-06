@@ -1,0 +1,10 @@
+java.lang.NoClassDefFoundError: com/jogamp/newt/opengl/GLWindow
+Caused by: java.lang.ClassNotFoundException: com.jogamp.newt.opengl.GLWindow
+	at java.net.URLClassLoader$1.run(Unknown Source)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+Could not find the main class: com.jogamp.newt.opengl.GLWindow.  Program will exit.
+Exception in thread "main" 

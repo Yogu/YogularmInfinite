@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar"
+	name="Create Runnable Jar for Project de.yogularm with Jar-in-Jar Loader">
+	<!--this file was created by Eclipse Runnable JAR Export Wizard -->
+	<!--ANT 1.7 is required -->
+	<target name="create_run_jar">    
+		<property name="version.num" />
+		<jar destfile="P:/Yogularm/Infinite/exe/Yogularm.jar">
+			<manifest>
+				<attribute name="Main-Class"
+					value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
+				<attribute name="Rsrc-Main-Class" value="de.yogularm.launcher.SwingLauncher" />
+				<attribute name="Class-Path" value="." />
+				<attribute name="Rsrc-Class-Path"
+					value="./ gluegen-rt.jar jogl.all.jar nativewindow.all.jar" />
+			</manifest>
+			<zipfileset src="jar-in-jar-loader.zip" />
+			<fileset dir="P:/Yogularm/Infinite/bin" />
+		</jar>
+
+		<signjar alias="yogularmKeys" keystore="yogularmKeys" lazy="true"
+			storepass="6374a5890164f4a5854d2fbc4454d51f979b9a3fb0497bfea38e602f22cd2265">
+			<fileset dir="../exe/" includes="*.jar" />
+		</signjar>
+	</target>
+</project>
