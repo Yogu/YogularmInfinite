@@ -106,10 +106,10 @@ public class Rect {
 	
 	public boolean overlaps(Rect other) {
 		return
-			   other.getMaxVector().getX() > minVector.getX()
-			&& other.getMinVector().getX() < maxVector.getX()
-			&& other.getMaxVector().getY() > minVector.getY()
-			&& other.getMinVector().getY() < maxVector.getY();
+			   other.getMaxVector().getX() > minVector.getX() + Config.EPSILON
+			&& other.getMinVector().getX() < maxVector.getX() - Config.EPSILON
+			&& other.getMaxVector().getY() > minVector.getY() + Config.EPSILON
+			&& other.getMinVector().getY() < maxVector.getY() - Config.EPSILON;
 	}
 	
 	public boolean equals(Rect other) {

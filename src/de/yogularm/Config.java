@@ -16,7 +16,8 @@ public class Config {
 	public static final float PLAYER_JUMP_SPEED = 5;
 	public static final float GRAVITY_ACCELERATION = 9.81f;
 	public static final float ARROW_SPEED = 20f;
-	public static final float ADHESION = 5; 
+	public static final float ADHESION = 10;
+	public static final float EPSILON = 0.00001f;
 	
 	// Gameplay
 	public static final float MAX_FRAMETIME = 0.1f;

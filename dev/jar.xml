@@ -3,8 +3,7 @@
 	name="Create Runnable Jar for Project de.yogularm with Jar-in-Jar Loader">
 	<!--this file was created by Eclipse Runnable JAR Export Wizard -->
 	<!--ANT 1.7 is required -->
-	<target name="create_run_jar">    
-		<property name="version.num" />
+	<target name="create_run_jar">
 		<jar destfile="P:/Yogularm/Infinite/exe/Yogularm.jar">
 			<manifest>
 				<attribute name="Main-Class"

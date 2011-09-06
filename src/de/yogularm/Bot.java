@@ -1,7 +1,7 @@
 package de.yogularm;
 
 public abstract class Bot extends Character {
-	private static final float WALK_SPEED = 1;
+	private static final float WALK_SPEED = 4;
 	private static final float JUMP_SPEED = 8;
 	
 	private int direction;
@@ -9,13 +9,13 @@ public abstract class Bot extends Character {
 	
 	public Bot(World world) {
 		super(world);
-		//direction = Math.random() > 0.5 ? 1 : -1;
+		direction = Math.random() > 0.5 ? 1 : -1;
 	}
 	
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
 
-		//walk(elapsedTime);
+		walk(elapsedTime);
 	}
 	
 	private void walk(float elapsedTime) {
@@ -29,8 +29,8 @@ public abstract class Bot extends Character {
 			setWalkSpeed(direction * WALK_SPEED);
 		}
 			
-		/*if (shouldJump() && standsOnGround())
-			setSpeed(getSpeed().changeY(JUMP_SPEED));*/
+		if (shouldJump() && standsOnGround())
+			setSpeed(getSpeed().changeY(JUMP_SPEED));
 	}
 	
 	private boolean shouldStop() {
@@ -55,11 +55,11 @@ public abstract class Bot extends Character {
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
-		/*if (standsOnGround()) {
+		if (standsOnGround()) {
 			if (direction == Direction.LEFT)
 				this.direction = 1;
 			else if (direction == Direction.RIGHT)
 				this.direction = -1;
-		}*/
+		}
 	}
 }

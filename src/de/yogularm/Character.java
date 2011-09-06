@@ -8,6 +8,7 @@ public abstract class Character extends Entity {
 	private float life = 1;
 	private boolean isDead = false;
 	private float immuneTime;
+	private float walkSpeed = 0;
 	
 	public Character(World world) {
 		super(world);
@@ -17,6 +18,8 @@ public abstract class Character extends Entity {
 	
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
+
+		applyWalkSpeed(new Vector(walkSpeed, 0));
 		
 		if (immuneTime > 0)
 			immuneTime -= elapsedTime;
@@ -78,5 +81,9 @@ public abstract class Character extends Entity {
 				image.setOpactiy(old);
 			}
 		}
+	}
+	
+	protected void setWalkSpeed(float speed) {
+		walkSpeed = speed;
 	}
 }

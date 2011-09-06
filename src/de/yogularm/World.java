@@ -7,6 +7,7 @@ import java.util.List;
 import javax.media.opengl.GL2;
 
 import de.yogularm.building.JumpTest;
+import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
 
 public class World {
@@ -33,7 +34,7 @@ public class World {
 	
 	public World(int seed) {
 		this.seed = seed;
-		currentBuilder = new JumpTest();
+		currentBuilder = new Sky2();
 		
 		player = new Player(this);
 		components.add(player);
