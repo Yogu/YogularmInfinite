@@ -228,8 +228,8 @@ public class Game implements GLEventListener {
 		if (lastFrameTime != 0)
 			frameTime = (newTime - lastFrameTime) / 1000000000.0f; // ns to s
 		lastFrameTime = newTime;
+		System.out.println((1 / frameTime) + " FPS");
 		frameTime = Math.min(frameTime, Config.MAX_FRAMETIME);
-		// System.out.println((1 / frameTime) + " FPS");
 	}
 
 	private void restart() {
@@ -239,7 +239,7 @@ public class Game implements GLEventListener {
 		gameoverTime = 0;
 		isGameover = false;
 	}
-	
+
 	public void setExceptionHandler(ExceptionHandler handler) {
 		this.exceptionHandler = handler;
 	}
