@@ -21,11 +21,17 @@
 				-webkit-box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 			}
 			
-			p {
+			p,
+			li {
 				margin: 1em 0;
 				
 				line-height: 1.5em;
 				font-size: 12px;
+			}
+			
+			h3 {
+				font-size: 14px;
+				font-weight: bold;
 			}
 			
 			section {
@@ -69,6 +75,9 @@
 			.download a,
 			.download a:hover {
 				padding: 10px;
+				display: block;
+				width: 200px;
+				margin: 0 auto;
 				
 				background: #008000;
 				border: 3px solid #FFFFFF;
@@ -121,7 +130,7 @@
 				
 				<p class="download"><a href="http://www.yogularm.de/infinite/code/YogularmWebStart.jnlp">
 					<span>Start Yogularm Infinite</span>
-					<span class="version">Version 0.1.3.5 Alpha</span>
+					<span class="version">Version 0.1.4.0 Alpha</span>
 				</a></p>
 				
 				<p>
@@ -151,13 +160,39 @@
 			
 			<section>
 				<header>
+					<h2>Recent changes</h2>
+				</header>
+				
+				<h3>Version 0.1.4.0 Alpha</h3>
+				<ul>
+					<li>
+						<b>Physics Engine:</b> The physics was updated to be more realistic, allowing to push chicken or
+						even ride them for a short while.
+					</li>
+					
+					<li>
+						<b>Collision Fix:</b> In the previous version, the player sometimes seemed to jump to another
+						position on collision. This is (hopefully) fixed now.
+					</li>
+					
+					<li>
+						<b>Open Source:</b> The source code of Yogularm Infinite is now available on
+						<a href="https://github.com/Yogu/YogularmInfinite">github</a>. Happy coding!
+					</li>
+				</ul>
+			</section>
+			
+			<section>
+				<header>
 					<h2>Future</h2>
 				</header>
 				
 				<p>
 					The game in its current state is fully-playable, so maybe I'll close the project. But of course it can
 					be improved, and feature suggestions are always <a href="mailto:info@yogularm.de">welcome</a>. If you
-					can develop in Java, ask me for the source code and implement your ideas if you want to.
+					can develop in Java, get the
+					<a href="https://github.com/Yogu/YogularmInfinite">source code fromgithub</a> and feel free to
+					implement your ideas. 
 				</p>
 				
 				<p>
@@ -177,12 +212,17 @@
 				</header>
 				
 				<p>
-					The first version of Yogularm is dated back to 2006, written in
-					<a href="http://www.blitzbasic.com">BlitzBasic</a>. Since then, it accompanied me in my way through
-					different programming languages. 2009, I rewrote the complete game in
-					<a href="http://www.delphigl.com">Delphi and OpenGL</a>. 2010 I had the idea of making it 3d, and I
-					began writing code in Visual C# (and OpenGL), but I gave it up very early. Yogularm was not intended to
-					be three-dimensional.
+					The <a href="http://www.yogularm.de/download-yogularm.htm"
+					title="Description, screenshots and download of Yogularm 1">first version of Yogularm</a> is dated
+					back to 2006, written in <a href="http://www.blitzbasic.com" title="The official BlitzBasic homepage">
+					BlitzBasic</a>. Since then, it accompanied me in my way through different programming languages. 2009,
+					I <a href="http://www.yogularm.de/game" title="Download Yogularm 2">rewrote the complete game</a> in
+					<a href="http://www.delphigl.com" title="A forum for developers using Delphi and OpenGL">Delphi and
+					OpenGL</a>. 2010 I had the idea of making it 3d, and I began writing code in
+					<a href="http://msdn.microsoft.com/en-us/library/kx37x362.aspx" title="Starting point of Visual C#
+					in the Microsoft Developer Ntwork">Visual C#</a> (and <a href="http://www.mono-project.com/Tao"
+					title="The homepage of Tao, a .NET wrapper of OpenGL">OpenGL</a>), but I gave it up very early.
+					Yogularm was not intended to be three-dimensional.
 				</p>
 				
 				<p>
@@ -194,9 +234,10 @@
 				
 				<p>
 					This year, in 2011, I got a new favorite computer game:
-					<a href="http://www.minecraft.net">Minecraft</a>, a sandbox game - with an auto-generated world.
-					Each time staring a new world, it is completely difficult - but always very interesting. I wondered
-					if this would be applicable to a jump'n'run game. And so I started developing Yogularm Infinite.
+					<a href="http://www.minecraft.net" title="The offical homepage of Minecraft">Minecraft</a>, a sandbox
+					game - with an auto-generated world. Each time staring a new world, it is completely difficult -
+					but always very interesting. I wondered if this would be applicable to a jump'n'run game. And so I
+					started developing Yogularm Infinite.
 				</p>
 			</section>
 			
@@ -206,35 +247,3 @@
 		</div>
 	</body>
 </html>
-		
-		
-		<!--	<applet code="YogularmApplet"
-			      width=600
-			      height=400
-			      archive="applet-launcher.jar,
-			               newt.all.jar,
-			               nativewindow.all.jar,
-			               jogl.all.jar,
-			               gluegen-rt.jar,
-			               onetriangle.jar">
-			   <param name="codebase_lookup" value="false">
-			   <param name="subapplet.classname" value="name.wadewalker.jogl2tests.onetriangle.OneTriangleAWTApplet">
-			   <param name="subapplet.displayname" value="OneTriangle Applet">
-			   <param name="noddraw.check" value="true">
-			   <param name="progressbar" value="true">
-			   <param name="jnlpNumExtensions" value="1">
-			   <param name="jnlpExtension1" value="code/JOGL.jnlp">
-			   <param name="jnlp_href" value="code/YogularmApplet.jnlp">
-			</applet> -->
-		
-		<!-- <object classid="java:YogularmApplet.class" codetype="application/java-vm"
-          width="600" height="400">
-			<param name="codebase_lookup" value="false">
-			<param name="subapplet.classname" value="YogularmApplet">
-			<param name="subapplet.displayname" value="Yogularm Infinite">
-			<param name="noddraw.check" value="true">
-			<param name="progressbar" value="true">
-			<param name="jnlpNumExtensions" value="1">
-			<param name="jnlpExtension1" value="code/JOGL.jnlp">
-			<param name="jnlp_href" value="code/YogularmApplet.jnlp">
-		</object> -->
