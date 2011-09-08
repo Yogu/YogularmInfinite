@@ -27,16 +27,9 @@ public class Camera {
 	
 	public void scroll(Vector target, float elapsedTime) {
 		Vector distance = target.subtract(bounds.getCenter());
-		float xOffset = Math.min(bounds.getWidth() / 2 - Config.SCROLL_MIN_BUFFER, Config.SCROLL_OFFSET);
-		float yOffset = Math.min(bounds.getHeight() / 2 - Config.SCROLL_MIN_BUFFER, Config.SCROLL_OFFSET);
-		if (distance.getX() < 0)
-			distance = distance.changeX(Math.min(distance.getX() + xOffset, 0));
-		else
-			distance = distance.changeX(Math.max(distance.getX() - xOffset, 0));
-		if (distance.getY() < 0)
-			distance = distance.changeY(Math.min(distance.getY() + yOffset, 0));
-		else
-			distance = distance.changeY(Math.max(distance.getY() - yOffset, 0));
+		// let player move the center quarter of the screen witho ut scrolling
+		distance = distance.changeX(Math.signum(distance.getX()) * Math.max(0, Math.abs(distance.getX()) - bounds.getWidth()  / 8 ));
+		distance = distance.changeY(Math.signum(distance.getY()) * Math.max(0, Math.abs(distance.getY()) - bounds.getHeight() / 8 ));
 		bounds = bounds.add(distance.multiply(Config.SCROLL_SPEED * elapsedTime));
 	}
 }
