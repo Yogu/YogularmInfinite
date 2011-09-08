@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="build"
 	name="Create Runnable Jar for Project de.yogularm with Jar-in-Jar Loader">
-	<!--this file was created by Eclipse Runnable JAR Export Wizard -->
-	<!--ANT 1.7 is required -->
-	<target name="build">
+	
+	<target name="check-keys">
+	    <available file="yogularmKeys" property="keys.present"/>
+	</target>
+
+	
+	<target name="jar">
 		<jar destfile="../exe/Yogularm.jar">
 			<manifest>
 				<attribute name="Main-Class"
@@ -16,10 +20,26 @@
 			<zipfileset src="jar-in-jar-loader.zip" />
 			<fileset dir="../bin" />
 		</jar>
+	</target>
+	
+	<target name="sign-error" depends="check-keys" unless="keys.present">
+		<echo message="Warning: WebStart will not work because JAR could not be signed" />
+		<echo message="Generate the keys using the following jdk tool:" />
+		<echo message="keytool -genkey -keystore yogularmKeys -alias yogularmKeys " />
+		<echo message="Save the file as yogularmKeys in the dev folder" />
+		<echo message="Insert the password in this file in the line property &lt;name=&quot;keypass&quot; value=&quot;-here-&quot; /&gt;" />
+	</target>
 
-		<signjar alias="yogularmKeys" keystore="yogularmKeys" lazy="true"
-			storepass="6374a5890164f4a5854d2fbc4454d51f979b9a3fb0497bfea38e602f22cd2265">
+	
+	<target name="sign-ok" depends="check-keys" if="keys.present">
+		<!-- Insert your password in the value="" attribute: -->
+		<property name="keypass" value="--your-password-here--" />
+	
+		<signjar alias="yogularmKeys" keystore="yogularmKeys" lazy="true" storepass="${keypass}">
 			<fileset dir="../exe/" includes="*.jar" />
 		</signjar>
 	</target>
+	 
+	<target name="build" depends="jar" />
+	<target name="sign" depends="sign-ok, sign-error" />
 </project>
