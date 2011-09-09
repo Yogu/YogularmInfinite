@@ -8,16 +8,45 @@ public class Body extends Component {
 	private float mass = 1.0f;
 	private Vector momentum;
 	private Vector collectedForce;
+	private Vector totalForce;
 	private boolean isGravityAffected = false;
 	private boolean isSolid = true;
 	private boolean isShiftable = false;
 	private Vector walkSpeed = Vector.getZero();
 	private boolean hasWalkSpeed = false;
+	private List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
+	
+	private class ForceToSpeed {
+		private float speed;
+		private float force;
+		private boolean isY;
+		
+		public ForceToSpeed(float force, float speed, boolean isY) {
+			this.speed = speed;
+			this.force = force;
+			this.isY = isY;
+		}
+
+		/**
+		 * Gets the force that should be applied, depending on the body's current speed
+		 */
+		public Vector getForce() {
+			Direction dir = isY ? Direction.DOWN : Direction.LEFT;
+			float speedDiff = speed - getSpeed().getComponent(dir);
+			if (speedDiff != 0) {
+				float direction = speedDiff / Math.abs(speedDiff);
+				float theForce = Math.min(force, Math.abs(speedDiff * mass) / getWorld().getFrameTime());
+				return Vector.getZero().changeComponent(dir, direction * theForce);
+			}
+			return Vector.getZero();
+		}
+	}
 
 	public Body(World world) {
 		super(world);
 		bounds = new Rect(0, 0, 1, 1);
 		collectedForce = Vector.getZero();
+		totalForce = Vector.getZero();
 		momentum = Vector.getZero();
 	}
 	
@@ -101,22 +130,11 @@ public class Body extends Component {
 	}
 	
 	public void applyXForceToSpeed(float force, float speed) {
-		float speedDiff = speed - getSpeed().getX();
-		if (speedDiff != 0) {
-			float direction = speedDiff / Math.abs(speedDiff);
-			force = Math.min(force, Math.abs(speedDiff * mass) / getWorld().getFrameTime());
-			applyForce(new Vector(direction * force, 0));
-		}
+		forceToSpeed.add(new ForceToSpeed(force, speed, false));
 	}
 	
 	public void applyYForceToSpeed(float force, float speed) {
-		float speedDiff = speed - getSpeed().getY();
-		System.out.println(speedDiff);
-		if (speedDiff != 0) {
-			float direction = speedDiff / Math.abs(speedDiff);
-			force = Math.min(force, speedDiff * mass / getWorld().getFrameTime());
-			applyForce(new Vector(0, direction * force));
-		}
+		forceToSpeed.add(new ForceToSpeed(force, speed, true));
 	}
 	
 	public void update(float elapsedTime) {
@@ -127,6 +145,13 @@ public class Body extends Component {
 		//applyXForceToSpeed(getMass() * Config.GRAVITY_ACCELERATION * Config.ADHESION, groundSpeed + walkSpeed);
 		
 		momentum = momentum.add(collectedForce.multiply(elapsedTime));
+		for (ForceToSpeed info : forceToSpeed) {
+			Vector force = info.getForce();
+			applyForce(force);
+			momentum = momentum.add(force.multiply(getWorld().getFrameTime()));
+		}
+		forceToSpeed.clear();
+		totalForce = collectedForce;
 		collectedForce = Vector.getZero();
 		
 		if (!momentum.isZero()) {
