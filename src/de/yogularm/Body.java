@@ -303,7 +303,7 @@ public class Body extends Component {
 
 		// workaround for having grip in the air
 		if (hasWalkSpeed && (direction == Direction.DOWN || direction == Direction.UP) && !walkSpeedApplied)
-			applyXForceToSpeed(mass * Config.GRAVITY_ACCELERATION * Config.ADHESION, walkSpeed.getX());
+			applyXForceToSpeed(mass * Config.GRAVITY_ACCELERATION * Config.AIR_ADHESION, walkSpeed.getX());
 		
 		if (calledOnMove) {
 			if (collidedBodies != null) {
