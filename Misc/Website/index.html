@@ -101,6 +101,30 @@
 				font-weight: normal;
 				font-size: 10px;
 			}
+			
+			.important,
+			.note {
+				padding: 5px;
+				
+				border-radius: 5px;
+				border: 3px solid #FFFFFF;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				-o-border-radius: 5px;
+				box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+				-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+				-o-box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+			}
+			
+			.note {
+				background: #FFFF80;
+				color: #000000;
+			}
+			
+			.important {
+				background: #800000;
+				color: #FFFFFF;
+			}
 		</style>
 	</head>
 	
@@ -130,11 +154,24 @@
 				
 				<p class="download"><a href="http://www.yogularm.de/infinite/code/YogularmWebStart.jnlp">
 					<span>Start Yogularm Infinite</span>
-					<span class="version">Version 0.1.4.0 Alpha</span>
+					<span class="version">Version 0.1.4.1 Alpha</span>
 				</a></p>
 				
+				<p class="note">
+					<strong>Note:</strong> If you have started Yogularm in a previous version, make sure the old one is
+					deleted. You can delete YogularmInfinte by executing <i>javaws -viewer</i> and chosing
+					the application then.
+				</p>
+				
+				<p class="important">
+					<strong>Important</strong>: If you chose to always trust the author of Yogularm in version up to
+					0.1.4.0, please undo this. Unfortunately, they have become public and are no longer trustful. You can
+					edit the certificates by executing <i>javaws -viewer</i> in the command line and going to the
+					<i>Security</i> section. Please apologize my beginner's mistake.
+				</p>
+				
 				<p>
-					Note: You will be asked whether you really want to start the appliction, because id requires full access
+					Note: You will be asked whether you really want to start the appliction, because it requires full access
 					over your computer. Unfortunately, there is currently no alternative.
 				</p>
 			</section>
@@ -162,6 +199,28 @@
 				<header>
 					<h2>Recent changes</h2>
 				</header>
+				
+				<h3>Version 0.1.4.1 Alpha</h3>
+				<ul>
+					<li>
+						<b>Reduced air grip:</b> While flying in the air, the direction now changes more slowly than when
+						standing on ground. Much more realistic.
+					</li>
+					
+					<li>
+						<b>Yogu wiggle fix:</b> When the performance was inconsistent, Yogu sometimes began to jump in
+						little steps even when touching none of the controls.
+					</li>
+					
+					<li>
+						<b>Camera wiggle fix:</b> Previously, the camera began to shake when the window was too small.
+					</li>
+					
+					<li>
+						<b>New certificate:</b> I'm very sorry, but the certificates the game was signed up to the last
+						version became public, so they are no longer trustful. In this version, I have changed them.
+					</li>
+				</ul>
 				
 				<h3>Version 0.1.4.0 Alpha</h3>
 				<ul>
