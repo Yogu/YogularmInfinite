@@ -1,36 +1,46 @@
 Yogularm Infinite
 =================
 
-Yogu Yogularm Infinite is a Java game in which Yogu - the player - jumps and runs through an auto-generated
-2-dimensional world. As the name says, it is impossible to finish the game. However, the goal is to collect
-as many coins as possibly. Chicken make their own way through the dizzy air, and you have to take care of
-arrow shooters... 
+Yogu Yogularm Infinite is a Java game in which Yogu - the player - jumps and
+runs through an auto-generated 2-dimensional world. As the name says, it is
+impossible to finish the game. However, the goal is to collect as many coins as
+possibly. Chicken make their own way through the dizzy air, and you have to take
+care of arrow shooters... 
 
 How to start Yogularm Infinite
 ==============================
 
-This reporsitory does not contain the binary files of Yogularm. Either follow the steps below to set up Eclipse,
-or start Yogularm from the web at http://www.yogularm.de/infinite/.
+This reporsitory does not contain the binary files of Yogularm. Either follow
+the steps below to set up Eclipse, or start Yogularm from the web at
+http://www.yogularm.de/infinite/.
 
 How to develop
 ==============
 
-1. Eclipse (http://eclipse.org/) must be installed, and this reporsitory downloaded completely.
-2. Create a new Java project, but do not use the default location but the one this reporsitory is placed.
+1. Eclipse (http://eclipse.org/) must be installed, and this reporsitory
+   downloaded completely.
+2. Create a new Java project, but do not use the default location but the one
+   this reporsitory is placed.
 3. Setup the JOGL user library:
-   1. Select Window > Preferences > Java > Build Path > User Libraries > New and name it JOGL
-   2. Click Add JARs to add ./Thirdparty/jogl/jar/*.all.jar and ./Thirdparty/jogl/jar/*.your-platform.jar
-   3. Expand the platform specific jars, and set the library location to ./Thirdparty/jogl/your-platform
-   4. Select Project > Properties > Java Bild Path > Libraries and include the JOGL user library
-4. Build the project and launch it using the de.yogularm.launcher.SwingLauncher class
+   1. Select Window > Preferences > Java > Build Path > User Libraries > New and
+      name it JOGL
+   2. Click Add JARs to add ./Thirdparty/jogl/jar/*.all.jar and
+      ./Thirdparty/jogl/jar/*.your-platform.jar
+   3. Expand the platform specific jars, and set the library location to
+      ./Thirdparty/jogl/your-platform
+   4. Select Project > Properties > Java Bild Path > Libraries and include the
+      JOGL user library
+4. Build the project and launch it using the de.yogularm.launcher.SwingLauncher
+   class
 
 You can export the project to a jar file using File > Export.
 
-Java WebStart is a little bit more complicated to set up. Instructions can be found under
-http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start
+Java WebStart is a little bit more complicated to set up. Instructions can be
+found at http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start
 
-It is recommended to fork the git reporsitory available on http://github.com/Yogu/YogularmInfinite. If you do
-so, please .gitignore the Eclipse project files and binaries.
+It is recommended to fork the git reporsitory available on
+http://github.com/Yogu/YogularmInfinite. If you do so, please .gitignore the
+Eclipse project files and binaries.
 
 Links
 =====
