@@ -1,12 +1,16 @@
 Yogularm Infinite
 =================
 
-Yogu Yogularm Infinite is a Java game in which Yogu - the player - jumps and runs through an auto-generated 2-dimensional world. As the name says, it is impossible to finish the game. However, the goal is to collect as many coins as possibly. Chicken make their own way through the dizzy air, and you have to take care of arrow shooters... 
+Yogu Yogularm Infinite is a Java game in which Yogu - the player - jumps and runs through an auto-generated
+2-dimensional world. As the name says, it is impossible to finish the game. However, the goal is to collect
+as many coins as possibly. Chicken make their own way through the dizzy air, and you have to take care of
+arrow shooters... 
 
 How to start Yogularm Infinite
 ==============================
 
-If you have the latest version of Java installed, simply execute the file exe/YogularmWebStart.jnlp.
+This reporsitory does not contain the binary files of Yogularm. Either follow the steps below to set up Eclipse,
+or start Yogularm from the web at http://www.yogularm.de/infinite/.
 
 How to develop
 ==============
