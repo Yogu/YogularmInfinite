@@ -284,7 +284,7 @@ public class Body extends Component {
 								case UP:
 								case DOWN:
 									float speed = body.getSpeed().getX();
-									if (hasWalkSpeed) {
+									if (hasWalkSpeed && direction == Direction.DOWN) {
 										walkSpeedApplied = true;
 										speed += walkSpeed.getX();
 									}
