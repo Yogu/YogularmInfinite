@@ -11,22 +11,22 @@ If you have the latest version of Java installed, simply execute the file exe/Yo
 How to develop
 ==============
 
-1. Eclipse (http://eclipse.org/) must be installed.
-2. Select File > Import > General > Existing Projects into workspace and choose this folder
-3. Setup the JOGL user library
-3.1 Select Window > Preferences > Java > Build Path > User Libraries > New and name it JOGL
-3.2 Click Add JARs to add ./exe/*.all.jar and ./exe/*.your-platform.jar
-3.3 Expand the platform specific jars, and set the library location to ./Thirdparty/jogl-native-libraries/your-platform
-3.4 Select Project > Prperties > Java Bild Path > Libraries and make sure that the JOGL library is included here.
+1. Eclipse (http://eclipse.org/) must be installed, and this reporsitory downloaded completely.
+2. Create a new Java project, but do not use the default location but the one this reporsitory is placed.
+3. Setup the JOGL user library:
+   1. Select Window > Preferences > Java > Build Path > User Libraries > New and name it JOGL
+   2. Click Add JARs to add ./Thirdparty/jogl/jar/*.all.jar and ./Thirdparty/jogl/jar/*.your-platform.jar
+   3. Expand the platform specific jars, and set the library location to ./Thirdparty/jogl/your-platform
+   4. Select Project > Properties > Java Bild Path > Libraries and include the JOGL user library
 4. Build the project and launch it using the de.yogularm.launcher.SwingLauncher class
-5. The web starter as described above does no longer work because the file Yogularm.jar is not signed. To fix that problem, you have to generate a key file
-5.1 On Windows, you maybe have to add the jdk/bin folder to your PATH environment variable.
-5.2 Switch to the ./dev folder in this project
-5.3 run keytool -genkey -keystore yogularmKeys -alias yogularmKeys
-5.4 You will be asked to enter personal information, and to specify a password. Insert the password in this file in the line <property name="keypass" value="-here-" />
-5.5 Save the workspace and build (or run) again.
 
-It is recommended to fork the git reporsitory available on http://github.com/Yogu/YogularmInfinite.
+You can export the project to a jar file using File > Export.
+
+Java WebStart is a little bit more complicated to set up. Instructions can be found under
+http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start
+
+It is recommended to fork the git reporsitory available on http://github.com/Yogu/YogularmInfinite. If you do
+so, please .gitignore the Eclipse project files and binaries.
 
 Links
 =====
