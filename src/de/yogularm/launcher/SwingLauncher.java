@@ -1,6 +1,7 @@
 package de.yogularm.launcher;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -11,8 +12,10 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
@@ -23,6 +26,7 @@ public class SwingLauncher {
 	
 	private JFrame window;
 	private GLCanvas canvas;
+	private JLabel statusLabel;
 
 	public static void main(String[] args) {
 		System.out.println("Yoglarm started");
@@ -31,19 +35,31 @@ public class SwingLauncher {
 	}
 
 	public void run() {
+		canvas = createWindow();
+		
+		setStatus("Initializing Graphics Library");
 		GLProfile.initSingleton(true);
+		
+		setStatus("Initializing Game");
 		Game game = new Game();
 		game.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(Throwable e) {
 				SwingLauncher.this.handleException(e);
 			}
 		});
-		canvas = createWindow(game);
+
+		setStatus("Creating Render Canvas");
+		initCanvas(canvas, game);
+
+		setStatus("Starting Game");
 		game.start(canvas);
+
+		window.getContentPane().remove(statusLabel);
+		window.getContentPane().repaint();
 	}
 
-	public GLCanvas createWindow(final Game game) {
-		window = new JFrame("Yogularm Infinite");
+	private GLCanvas createWindow() {
+		window = new JFrame("Yogularm Infinite loading...");
 		window.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowevent) {
 				window.dispose();
@@ -57,12 +73,26 @@ public class SwingLauncher {
 		GLProfile glprofile = GLProfile.getDefault();
 		GLCapabilities glcapabilities = new GLCapabilities(glprofile);
 		GLCanvas canvas = new GLCanvas(glcapabilities);
-		canvas.addGLEventListener(game);
 		window.getContentPane().add(canvas, BorderLayout.CENTER);
-		canvas.addKeyListener(game.getKeyListener());
-		window.addKeyListener(game.getKeyListener());
+		
+		statusLabel = new JLabel("Loading Yogularm...");
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel.setVerticalAlignment(SwingConstants.CENTER);
+		//window.getContentPane().add(statusLabel, BorderLayout.CENTER);
 
 		return canvas;
+	}
+	
+	private void setStatus(String status) {
+		statusLabel.setText(status + "...");
+		window.repaint();
+	}
+	
+	private void initCanvas(GLCanvas canvas, Game game) {
+		canvas.addGLEventListener(game);
+		canvas.addKeyListener(game.getKeyListener());
+		window.addKeyListener(game.getKeyListener());
+		window.setTitle("Yogularm Infinite (Version " + Game.VERSION + ")");
 	}
 	
 	private void handleException(Throwable e) {
