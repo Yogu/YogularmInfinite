@@ -8,7 +8,7 @@ public class Player extends Character {
 	
 	public Player(World world) {
 		super(world);
-		setImage(new Image(Res.textures.yogu, new Rect(0, 0, 1, 1)));
+		setImage(Res.images.yogu);
 		setBounds(new Rect(0.0505f, 0.080890625f, 0.932375f, 0.9359375f));
 		setLife(Config.MAX_LIFE);
 		setMass(20);

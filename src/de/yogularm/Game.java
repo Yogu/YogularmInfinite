@@ -179,13 +179,9 @@ public class Game implements GLEventListener {
 			OpenGLHelper.renderRect(gl, width, height);
 		}
 
-		Image coin = new Image(Res.textures.blocks,
-			new Rect(0, 0.5f, 0.25f, 0.75f), new Vector(50, 50));
-		coin.draw(gl, new Vector(20, height - 70));
+		Res.images.coin.draw(gl, new Vector(20, height - 70));
 
-		Image heart = new Image(Res.textures.blocks,
-			new Rect(0.5f, 0.5f, 0.75f, 0.75f), new Vector(50, 50));
-		heart.draw(gl, new Vector(20, height - 140));
+		Res.images.heart.draw(gl, new Vector(20, height - 140));
 
 		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glPopMatrix();
