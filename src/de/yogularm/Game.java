@@ -59,7 +59,7 @@ public class Game implements GLEventListener {
 			// limit to maximum block counts in each direction
 			float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH,
 					(float) height / Config.MAX_VIEW_HEIGHT);
-			resolution = Math.max(resolution, Config.MIN_RESOLUTION);
+			//resolution = Math.max(resolution, Config.MIN_RESOLUTION);
 			float w = width / resolution;
 			float h = height / resolution;
 	

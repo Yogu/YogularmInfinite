@@ -2,12 +2,9 @@ package de.yogularm;
 
 public class Config {
 	// Display
-	public final static float MAX_VIEW_WIDTH = 38;
-	public final static float MAX_VIEW_HEIGHT = 18;
-	public final static float MIN_RESOLUTION = 50;
+	public final static float MAX_VIEW_WIDTH = 25;
+	public final static float MAX_VIEW_HEIGHT = 15;
 	public final static float SCROLL_SPEED = 2; // scroll meter/second per meter distance
-	public final static float SCROLL_OFFSET = 4; // distance of player from center to begin scrolling
-	public final static float SCROLL_MIN_BUFFER = 5; // minimum target distance from player to window border
 	public final static float GAMEOVER_LENGTH = 3; // [s]
 
 	// Physics
