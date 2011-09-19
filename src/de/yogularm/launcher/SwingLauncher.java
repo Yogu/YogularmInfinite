@@ -7,12 +7,16 @@ import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.management.monitor.Monitor;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+
+import org.omg.CORBA.Environment;
 
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
@@ -23,6 +27,8 @@ public class SwingLauncher {
 	
 	private JFrame window;
 	private GLCanvas canvas;
+	private JLabel statusLabel;
+	private Game game;
 
 	public static void main(String[] args) {
 		System.out.println("Yoglarm started");
@@ -31,19 +37,36 @@ public class SwingLauncher {
 	}
 
 	public void run() {
-		GLProfile.initSingleton(true);
-		Game game = new Game();
+		// If after createWindow(), the window must be resized to show the canvas
+		
+		createWindow();
+
+		setStatus("Creating Rendering Context");
+		createCanvas();
+		
+		setStatus("Initializing Game");
+		game = new Game();
 		game.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(Throwable e) {
 				SwingLauncher.this.handleException(e);
 			}
 		});
-		canvas = createWindow(game);
-		game.start(canvas);
-	}
 
-	public GLCanvas createWindow(final Game game) {
-		window = new JFrame("Yogularm Infinite");
+		setStatus("Creating Render Canvas");
+		GLProfile.initSingleton(true);
+		initCanvas();
+
+		setStatus("Starting Game");
+		game.start(canvas);
+		
+		window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+
+		/*window.getContentPane().remove(statusLabel);
+		window.getContentPane().repaint();*/
+	}
+	
+	private void createWindow() {
+		window = new JFrame("Yogularm Infinite loading...");
 		window.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowevent) {
 				window.dispose();
@@ -52,17 +75,30 @@ public class SwingLauncher {
 		});
 		window.setSize(INIT_WIDTH, INIT_HEIGHT);
 		window.setVisible(true);
-		window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		
+		/*statusLabel = new JLabel("Loading Yogularm...");
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel.setVerticalAlignment(SwingConstants.CENTER);*/
+		//window.getContentPane().add(statusLabel, BorderLayout.CENTER);
+	}
 
+	private void createCanvas() {
 		GLProfile glprofile = GLProfile.getDefault();
 		GLCapabilities glcapabilities = new GLCapabilities(glprofile);
-		GLCanvas canvas = new GLCanvas(glcapabilities);
-		canvas.addGLEventListener(game);
+		canvas = new GLCanvas(glcapabilities);
 		window.getContentPane().add(canvas, BorderLayout.CENTER);
+	}
+	
+	private void setStatus(String status) {
+		/*statusLabel.setText(status + "...");
+		window.repaint();*/
+	}
+	
+	private void initCanvas() {
+		canvas.addGLEventListener(game);
 		canvas.addKeyListener(game.getKeyListener());
 		window.addKeyListener(game.getKeyListener());
-
-		return canvas;
+		window.setTitle("Yogularm Infinite (Version " + Game.VERSION + ")");
 	}
 	
 	private void handleException(Throwable e) {

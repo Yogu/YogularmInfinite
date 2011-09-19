@@ -26,13 +26,15 @@ public class Game implements GLEventListener {
 	private float gameoverTime = 0;
 	private FPSAnimator animator;
 	private ExceptionHandler exceptionHandler;
+	private boolean isFirstRender = true;;
+	private Runnable firstRenderHandler;
 
 	public static final String VERSION = "0.1.4.2";
 
 	public void init(GLAutoDrawable drawable) {
 		try {
 			GL2 gl = drawable.getGL().getGL2();
-	
+
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glDisable(GL.GL_CULL_FACE);
 			gl.glEnable(GL.GL_TEXTURE_2D);
@@ -40,7 +42,7 @@ public class Game implements GLEventListener {
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			OpenGLHelper.checkErrors(gl);
-	
+
 			Res.init();
 
 			restart();
@@ -48,6 +50,9 @@ public class Game implements GLEventListener {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);
 		}
+		if (firstRenderHandler != null)
+			firstRenderHandler.run();
+
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
@@ -55,32 +60,33 @@ public class Game implements GLEventListener {
 		try {
 			GL2 gl = drawable.getGL().getGL2();
 			GLU glu = new GLU();
-	
+
 			// limit to maximum block counts in each direction
 			float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH,
 					(float) height / Config.MAX_VIEW_HEIGHT);
 			resolution = Math.max(resolution, Config.MIN_RESOLUTION);
 			float w = width / resolution;
 			float h = height / resolution;
-	
+
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
-	
-			// coordinate system origin at lower left with width and height same as the
+
+			// coordinate system origin at lower left with width and height same
+			// as the
 			// window
 			glu.gluOrtho2D(0.0f, w, 0.0f, h);
-	
+
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glLoadIdentity();
-	
+
 			gl.glViewport(0, 0, width, height);
-	
+
 			viewSize = new Vector(w, h);
 			world.getCamera().setBounds(
 					world.getCamera().getBounds().changeSize(viewSize));
-	
+
 			OpenGLHelper.checkErrors(gl);
-	
+
 			this.width = width;
 			this.height = height;
 		} catch (Exception e) {
@@ -96,9 +102,9 @@ public class Game implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		try {
 			GL2 gl = drawable.getGL().getGL2();
-	
+
 			captureFrameTime();
-	
+
 			if (!isGameover)
 				update();
 			else {
@@ -106,11 +112,11 @@ public class Game implements GLEventListener {
 				if (gameoverTime < 0)
 					restart();
 			}
-	
+
 			render(gl);
 			renderGUI(gl);
 			renderText(gl);
-	
+
 			// run gc every minute
 			if (frameCount % (60 * 60) == 0)
 				System.gc();
@@ -183,8 +189,8 @@ public class Game implements GLEventListener {
 				0.25f), new Vector(50, 50));
 		coin.draw(gl, new Vector(20, height - 70));
 
-		Image heart = new Image(Res.textures.blocks,
-				new Rect(0.75f, 0.0f, 1, 0.25f), new Vector(50, 50));
+		Image heart = new Image(Res.textures.blocks, new Rect(0.75f, 0.0f, 1,
+				0.25f), new Vector(50, 50));
 		heart.draw(gl, new Vector(20, height - 140));
 
 		gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -199,8 +205,8 @@ public class Game implements GLEventListener {
 		try {
 			renderer.beginRendering(width, height);
 			renderer.setColor(0, 0, 0, 0.8f);
-			renderer
-					.draw("" + world.getPlayer().getCollectedCoins(), 80, height - 60);
+			renderer.draw("" + world.getPlayer().getCollectedCoins(), 80,
+					height - 60);
 
 			int life = Math.max(0, Math.round(world.getPlayer().getLife() - 1));
 			renderer.draw("" + life, 80, height - 130);
@@ -216,7 +222,8 @@ public class Game implements GLEventListener {
 		try {
 			renderer.beginRendering(width, height);
 			renderer.setColor(0, 0, 0, 1);
-			renderer.draw("Yogularm Infinite " + VERSION, width - 180, height - 20);
+			renderer.draw("Yogularm Infinite " + VERSION, width - 180,
+					height - 20);
 		} finally {
 			renderer.endRendering();
 			renderer.dispose();
@@ -242,5 +249,9 @@ public class Game implements GLEventListener {
 
 	public void setExceptionHandler(ExceptionHandler handler) {
 		this.exceptionHandler = handler;
+	}
+
+	public void setFirstRenderHandler(Runnable handler) {
+		this.firstRenderHandler = handler;
 	}
 }
