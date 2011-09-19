@@ -6,7 +6,7 @@ public class Component implements Locatable {
 	private Vector position;
 	private World world;
 	private boolean isRemoved = false;
-	private Image image;
+	private Drawable drawable;
 	
 	public Component(World world) {
 		if (world == null)
@@ -42,16 +42,16 @@ public class Component implements Locatable {
 		return isRemoved;
 	}
 	
-	protected void setImage(Image image) {
-		this.image = image;
+	protected void setDrawable(Drawable drawable) {
+		this.drawable = drawable;
 	}
 	
-	protected Image getImage() {
-		return image;
+	protected Drawable getDrawable() {
+		return drawable;
 	}
 	
 	public void draw(GL2 gl) {
-		if (image != null)
-			image.draw(gl);
+		if (drawable != null)
+			drawable.draw(gl);
 	}
 }
