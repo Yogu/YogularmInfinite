@@ -15,7 +15,7 @@ public class Arrow extends Entity {
 	
 	public Arrow(World world) {
 		super(world);
-		setImage(new Image(Res.textures.blocks, new Rect(0.75f, 0.5f, 1, 0.75f)));
+		setImage(Res.images.arrow);
 		setBounds(new Rect(0.3f, 0.3f, 0.7f, 0.7f));
 		setIsGravityAffected(true);
 		setIsSolid(false);

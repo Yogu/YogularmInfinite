@@ -13,7 +13,7 @@ import de.yogularm.World;
 public class Chicken extends Bot {
 	public Chicken(World world) {
 		super(world);
-		setImage(new Image(Res.textures.blocks, new Rect(0.25f, 0.5f, 0.5f, 0.75f)));
+		setImage(Res.images.chicken);
 		setBounds(new Rect(0.109375f, 0.06075f, 0.890625f, 0.9392421875f));
 		setMass(20);
 	}

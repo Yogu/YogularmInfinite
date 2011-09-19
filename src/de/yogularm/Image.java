@@ -29,6 +29,10 @@ public class Image {
 		this(texture, range, new Vector(1, 1));
 	}
 	
+	public Image(Texture texture) {
+		this(texture, new Rect(0, 0, 1, 1));
+	}
+	
 	public boolean isMirrored() {
 		return isMirrored;
 	}
