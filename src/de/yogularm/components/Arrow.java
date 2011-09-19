@@ -12,10 +12,12 @@ import de.yogularm.World;
 
 public class Arrow extends Entity {
 	private Body sender;
+	private Image image;
 	
 	public Arrow(World world) {
 		super(world);
-		setImage(Res.images.arrow);
+		image = Res.images.arrow.clone();
+		setDrawable(image);
 		setBounds(new Rect(0.3f, 0.3f, 0.7f, 0.7f));
 		setIsGravityAffected(true);
 		setIsSolid(false);
@@ -28,7 +30,7 @@ public class Arrow extends Entity {
 	
 	public void draw(GL2 gl) {
 		float angle = getSpeed().getAngleToXAxis();
-		getImage().setAngle(angle);
+		image.setAngle(angle);
 		super.draw(gl);
 	}
 

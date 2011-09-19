@@ -18,7 +18,7 @@ public class Shooter extends Block {
 	
 	public Shooter(World world) {
 		super(world);
-		setImage(Res.images.shooter);
+		setDrawable(Res.images.shooter);
 		setBounds(new Rect(0, 0, 1, 0.6015625f));
 	}
 	

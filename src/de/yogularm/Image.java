@@ -4,7 +4,7 @@ import javax.media.opengl.GL2;
 
 import com.jogamp.opengl.util.texture.Texture;
 
-public class Image {
+public class Image implements Cloneable, Drawable {
 	private Texture texture;
 	private Rect range;
 	private Vector size;
@@ -68,10 +68,18 @@ public class Image {
 	}
 	
 	public void draw(GL2 gl) {
-		draw(gl, Vector.getZero());
+		draw(gl, Vector.getZero(), 1);
+	}
+	
+	public void draw(GL2 gl, float opacity) {
+		draw(gl, Vector.getZero(), opacity);
 	}
 	
 	public void draw(GL2 gl, Vector position) {
+		draw(gl, position, 1);
+	}
+	
+	public void draw(GL2 gl, Vector position, float opacity) {
 		gl.glPushMatrix();
 		gl.glTranslatef(position.getX(), position.getY(), 0);
 		gl.glRotatef(angle, 0, 0, 1);
@@ -80,7 +88,7 @@ public class Image {
 		float min = isMirrored ? range.getMaxVector().getX() : range.getMinVector().getX();
 		
 		texture.bind();
-		gl.glColor4f(1, 1, 1, opacity);
+		gl.glColor4f(1, 1, 1, this.opacity * opacity);
 		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(min, range.getMaxVector().getY());
 		gl.glVertex3f(0, 0, 0);
@@ -94,5 +102,20 @@ public class Image {
 
 		gl.glPopMatrix();
 		OpenGLHelper.checkErrors(gl);
+	}
+	
+	public Image clone() {
+		Image clone;
+		try {
+			clone = (Image)super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+		clone.texture = texture;
+		clone.range = range;
+		clone.size = size;
+		clone.isMirrored = isMirrored;
+		clone.angle = angle;
+		return clone;
 	}
 }

@@ -11,18 +11,21 @@ import de.yogularm.Res;
 import de.yogularm.World;
 
 public class Chicken extends Bot {
+	Image image;
+	
 	public Chicken(World world) {
 		super(world);
-		setImage(Res.images.chicken);
+		image = Res.images.chicken.clone();
+		setDrawable(image);
 		setBounds(new Rect(0.109375f, 0.06075f, 0.890625f, 0.9392421875f));
 		setMass(20);
 	}
 	
 	public void draw(GL2 gl) {
 		if (getDirection() < 0)
-			getImage().setIsMirrored(false);
+			image.setIsMirrored(false);
 		else if(getDirection() > 0)
-			getImage().setIsMirrored(true);
+			image.setIsMirrored(true);
 		super.draw(gl);
 	}
 

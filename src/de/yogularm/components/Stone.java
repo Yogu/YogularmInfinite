@@ -9,6 +9,6 @@ import de.yogularm.World;
 public class Stone extends Block {
 	public Stone(World world) {
 		super(world);
-		setImage(Res.images.stone);
+		setDrawable(Res.images.stone);
 	}
 }

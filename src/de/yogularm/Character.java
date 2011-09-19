@@ -73,13 +73,7 @@ public abstract class Character extends Entity {
 		if (immuneTime <= 0)
 			super.draw(gl);
 		else {
-			Image image = getImage();
-			if (image != null) {
-				float old = image.getOpacity();
-				image.setOpactiy(0.5f);
-				super.draw(gl);
-				image.setOpactiy(old);
-			}
+			getDrawable().draw(gl, 0.5f);
 		}
 	}
 	

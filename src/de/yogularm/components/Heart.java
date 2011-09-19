@@ -9,6 +9,6 @@ import de.yogularm.World;
 public class Heart extends Item {
 	public Heart(World world) {
 		super(world);
-		setImage(Res.images.heart);
+		setDrawable(Res.images.heart);
 	}
 }

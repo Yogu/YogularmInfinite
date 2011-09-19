@@ -9,6 +9,6 @@ import de.yogularm.World;
 public class Coin extends Item {
 	public Coin(World world) {
 		super(world);
-		setImage(Res.images.coin);
+		setDrawable(Res.images.coin);
 	}
 }
