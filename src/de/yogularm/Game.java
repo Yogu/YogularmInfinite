@@ -27,7 +27,7 @@ public class Game implements GLEventListener {
 	private FPSAnimator animator;
 	private ExceptionHandler exceptionHandler;
 
-	public static final String VERSION = "0.1.4.2";
+	public static final String VERSION = "0.1.4.3";
 
 	public void init(GLAutoDrawable drawable) {
 		try {
