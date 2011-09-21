@@ -72,12 +72,19 @@
 				margin: 2em 0;
 			}
 			
+			.download div {
+				margin: 0 auto;
+				overflow: hidden;
+				max-width: 600px;
+			}
+			
 			.download a,
 			.download a:hover {
 				padding: 10px;
 				display: block;
 				width: 200px;
-				margin: 0 auto;
+				margin: 20px;
+				float: left;
 				
 				background: #008000;
 				border: 3px solid #FFFFFF;
@@ -96,8 +103,11 @@
 			}
 			
 			.download a .version {
+				display: block;
+				padding-top: 5px;
+			
 				color: #808080;
-				color: rgba(255, 255, 255, 0.5);
+				color: rgba(255, 255, 255, 0.7);
 				font-weight: normal;
 				font-size: 10px;
 			}
@@ -152,16 +162,19 @@
 					green button and open it with the <b>Java(TM) Web Start Launcher</b>.
 				</p>
 				
-				<p class="download"><a href="http://www.yogularm.de/infinite/code/YogularmWebStart.jnlp">
-					<span>Start Yogularm Infinite</span>
-					<span class="version">Version 0.1.4.1 Alpha</span>
-				</a></p>
-				
-				<p class="note">
-					<strong>Note:</strong> If you have started Yogularm in a previous version, make sure the old one is
-					deleted. You can delete YogularmInfinte by executing <i>javaws -viewer</i> and chosing
-					the application then.
-				</p>
+				<section class="download">
+					<div>
+						<a href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
+							<span>Start Yogularm Infinite</span>
+							<span class="version">Version 0.1.5 Alpha</span>
+						</a>
+						
+						<a href="https://github.com/Yogu/YogularmInfinite">
+							<span>View Source Code</span>
+							<span class="version">on github.com</span>
+						</a>
+					</div>
+				</section>
 				
 				<p class="important">
 					<strong>Important</strong>: If you chose to always trust the author of Yogularm in version up to
@@ -199,6 +212,24 @@
 				<header>
 					<h2>Recent changes</h2>
 				</header>
+				
+				<h3>Version 0.1.5 Alpha</h3>
+				<ul>
+					<li>
+						<b>Animations:</b> Yogu and the chicken are now animated! Whether walking, flying or being hurt - the characters
+						now are more lively.
+					</li>
+					
+					<li>
+						<b>Yogu gets thinner:</b> In previous versions, you could stand half on air when the hand was over a stone. Note
+						that although you'll have to get used to the new behavior, it is now more realistic. 
+					</li>
+					
+					<li>
+						<b>Yogularm on small screens:</b> If your desktop resolution is smaller than 1024x768 (or if you like
+						to run the game in a smaller window), the game is now better to play.
+					</li>
+				</ul>
 				
 				<h3>Version 0.1.4.1 Alpha</h3>
 				<ul>
