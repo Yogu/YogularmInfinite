@@ -41,11 +41,14 @@ public abstract class Character extends Entity {
 	public void die() {
 		onDie();
 		isDead = true;
-		remove();
 	}
 	
 	protected void onDie() {
-		
+		remove();
+	}
+	
+	public boolean isImmune() {
+		return immuneTime > 0;
 	}
 	
 	public void setLife(float life) {
@@ -62,7 +65,8 @@ public abstract class Character extends Entity {
 			if (life == 0)
 				die();
 		}
-		immuneTime = Config.IMMUNE_TIME;
+		if (life > 0)
+			immuneTime = Config.IMMUNE_TIME;
 	}
 	
 	public boolean isDead() {
@@ -86,10 +90,13 @@ public abstract class Character extends Entity {
 	}
 	
 	protected float getHeightOverGround() {
-		Body blockBelow = getWorld().getBlockBelow(getPosition());
-		if (blockBelow != null)
-			return getOuterBounds().getBottom() - blockBelow.getOuterBounds().getTop();
-		else
-			return Float.POSITIVE_INFINITY;
+		Body blockBelowLeft = getWorld().getBlockBelow(getPosition().changeX((float)Math.floor(getPosition().getX())));
+		Body blockBelowRight = getWorld().getBlockBelow(getPosition().changeX((float)Math.ceil(getPosition().getX())));
+		float height = Float.POSITIVE_INFINITY;
+		if (blockBelowLeft != null)
+			height = Math.min(height, getOuterBounds().getBottom() - blockBelowLeft.getOuterBounds().getTop());
+		if (blockBelowRight != null)
+			height = Math.min(height, getOuterBounds().getBottom() - blockBelowRight.getOuterBounds().getTop());
+		return height;
 	}
 }

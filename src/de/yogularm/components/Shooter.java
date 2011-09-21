@@ -2,7 +2,6 @@ package de.yogularm.components;
 
 import de.yogularm.Block;
 import de.yogularm.Config;
-import de.yogularm.Image;
 import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;

@@ -31,10 +31,8 @@ public class Component implements Locatable {
 	}
 	
 	public void update(float elapsedTime) {
-		if (drawable instanceof AnimatedImage) {
-			AnimatedImage animation = (AnimatedImage)drawable;
-			animation.update(elapsedTime);
-		}
+		if (drawable != null)
+			drawable.update(elapsedTime);
 	}
 	
 	public void remove() {

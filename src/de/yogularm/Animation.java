@@ -1,8 +1,5 @@
 package de.yogularm;
 
-import java.util.Map;
-
-import javax.media.opengl.GL2;
 
 public class Animation {
 	private Image[] images;
@@ -47,7 +44,7 @@ public class Animation {
 			if (time <= 0)
 				return images[i];
 		}
-		return images[0];
+		return images[images.length];
 	}
 	
 	public float getLength() {

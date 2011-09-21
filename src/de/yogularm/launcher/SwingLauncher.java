@@ -20,9 +20,10 @@ import de.yogularm.Game;
 public class SwingLauncher {
 	private final static int INIT_WIDTH = 800;
 	private final static int INIT_HEIGHT = 450;
-	
+
 	private JFrame window;
 	private GLCanvas canvas;
+	private boolean exceptionShown;
 
 	public static void main(String[] args) {
 		System.out.println("Yoglarm started");
@@ -64,20 +65,27 @@ public class SwingLauncher {
 
 		return canvas;
 	}
-	
+
 	private void handleException(Throwable e) {
+		// Down't show exceptions caused by other exceptions
+		if (!exceptionShown) {
 			StringWriter sw = new StringWriter();
 			PrintWriter writer = new PrintWriter(sw);
 			e.printStackTrace(writer);
 			String stackTrace = sw.toString();
-			String message = String.format("Sorry, an error occured: %s\n\nPlease send this error report to " + 
-				"info@yogularm.de. Thanks!\n\n%s\n\nVersion: %s", e.getMessage(), stackTrace, Game.VERSION);
-			
+			String message = String.format(
+					"Sorry, an error occured: %s\n\nPlease send this error report to "
+							+ "info@yogularm.de. Thanks!\n\n%s\n\nVersion: %s", e.getMessage(),
+					stackTrace, Game.VERSION);
+	
 			JTextArea text = new JTextArea(message);
 			text.setEditable(false);
 			text.setBackground(SystemColor.control);
-			JOptionPane.showMessageDialog(window, text, "Runtime Error", JOptionPane.ERROR_MESSAGE);
-			
+			JOptionPane.showMessageDialog(window, text, "Runtime Error",
+					JOptionPane.ERROR_MESSAGE);
+			exceptionShown = true;
+		}
+
 		if (window != null)
 			window.dispose();
 		System.exit(1);

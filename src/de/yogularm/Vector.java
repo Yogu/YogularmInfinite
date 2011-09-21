@@ -76,6 +76,14 @@ public class Vector {
 		return new Vector(Math.round(x), Math.round(y));
 	}
 
+	public Vector floor() {
+		return new Vector((float)Math.floor(x), (float)Math.floor(y));
+	}
+
+	public Vector ceil() {
+		return new Vector((float)Math.ceil(x), (float)Math.ceil(y));
+	}
+
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
 	}

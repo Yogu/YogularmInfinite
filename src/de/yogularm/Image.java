@@ -8,9 +8,6 @@ public class Image implements Cloneable, Drawable {
 	private Texture texture;
 	private Rect range;
 	private Vector size;
-	private boolean isMirrored;
-	private float angle;
-	private float opacity = 1;
 	
 	public Image(Texture texture, Rect range, Vector size) {
 		if (texture == null)
@@ -33,69 +30,20 @@ public class Image implements Cloneable, Drawable {
 		this(texture, new Rect(0, 0, 1, 1));
 	}
 	
-	public boolean isMirrored() {
-		return isMirrored;
-	}
-	
-	public void setIsMirrored(boolean value) {
-		isMirrored = value;
-	}
-	
-	public float getAngle() {
-		return angle;
-	}
-	
-	public void setAngle(float value) {
-		angle = value;
-	}
-	
-	public Vector getSize() {
-		return size;
-	}
-	
-	public void setSize(Vector value) {
-		if (value == null)
-			throw new NullPointerException("value is null");
-		size = value;
-	}
-	
-	public float getOpacity() {
-		return opacity;
-	}
-	
-	public void setOpactiy(float value) {
-		opacity = value;
-	}
-	
 	public void draw(GL2 gl) {
-		draw(gl, Vector.getZero(), 1);
+		draw(gl, 1);
 	}
 	
 	public void draw(GL2 gl, float opacity) {
-		draw(gl, Vector.getZero(), opacity);
-	}
-	
-	public void draw(GL2 gl, Vector position) {
-		draw(gl, position, 1);
-	}
-	
-	public void draw(GL2 gl, Vector position, float opacity) {
-		gl.glPushMatrix();
-		gl.glTranslatef(position.getX(), position.getY(), 0);
-		gl.glRotatef(angle, 0, 0, 1);
-		
 		texture.bind();
-		drawQuad(gl, opacity);
-
-		gl.glPopMatrix();
-		OpenGLHelper.checkErrors(gl);
+		gl.glColor4f(1, 1, 1, opacity);
+		drawQuad(gl);
 	}
 	
-	protected void drawQuad(GL2 gl, float opacity) {
-		float max = isMirrored ? range.getMinVector().getX() : range.getMaxVector().getX();
-		float min = isMirrored ? range.getMaxVector().getX() : range.getMinVector().getX();
+	protected void drawQuad(GL2 gl) {
+		float max = range.getMaxVector().getX();
+		float min = range.getMinVector().getX();
 		
-		gl.glColor4f(1, 1, 1, this.opacity * opacity);
 		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(min, range.getMaxVector().getY());
 		gl.glVertex3f(0, 0, 0);
@@ -108,18 +56,7 @@ public class Image implements Cloneable, Drawable {
 		gl.glEnd();
 	}
 	
-	public Image clone() {
-		Image clone;
-		try {
-			clone = (Image)super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-		clone.texture = texture;
-		clone.range = range;
-		clone.size = size;
-		clone.isMirrored = isMirrored;
-		clone.angle = angle;
-		return clone;
+	public void update(float elapsedTime) {
+		
 	}
 }

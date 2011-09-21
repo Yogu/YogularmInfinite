@@ -29,6 +29,11 @@ public class Player extends Character {
 			setLife(getLife() + 1);
 	}
 	
+	protected void onDie() {
+		// do not remove
+		setDrawable(Res.images.yoguFalling);
+	}
+	
 	public int getCollectedCoins() {
 		return collectedCoins;
 	}
@@ -39,11 +44,11 @@ public class Player extends Character {
 	
 	private void updateDrawable(float elapsedTime) {
 		if (getSpeed().getY() < 0) {
-			if (getHeightOverGround() > 2)
+			if (getHeightOverGround() > 3)
 				fallTime += elapsedTime;
 		} else
 			fallTime = 0;
-		if (fallTime >= 0.5f)
+		if (isDead() || isImmune() || fallTime >= 0.5f)
 			setDrawable(Res.images.yoguFalling);
 		else if (getWalkSpeed() != 0)
 			setAnimation(Res.animations.yoguWalking);
