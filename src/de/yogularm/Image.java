@@ -83,11 +83,18 @@ public class Image implements Cloneable, Drawable {
 		gl.glPushMatrix();
 		gl.glTranslatef(position.getX(), position.getY(), 0);
 		gl.glRotatef(angle, 0, 0, 1);
+		
+		texture.bind();
+		drawQuad(gl, opacity);
 
+		gl.glPopMatrix();
+		OpenGLHelper.checkErrors(gl);
+	}
+	
+	protected void drawQuad(GL2 gl, float opacity) {
 		float max = isMirrored ? range.getMinVector().getX() : range.getMaxVector().getX();
 		float min = isMirrored ? range.getMaxVector().getX() : range.getMinVector().getX();
 		
-		texture.bind();
 		gl.glColor4f(1, 1, 1, this.opacity * opacity);
 		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(min, range.getMaxVector().getY());
@@ -99,9 +106,6 @@ public class Image implements Cloneable, Drawable {
 		gl.glTexCoord2f(min, range.getMinVector().getY());
 		gl.glVertex3f(0, size.getY(), 0);
 		gl.glEnd();
-
-		gl.glPopMatrix();
-		OpenGLHelper.checkErrors(gl);
 	}
 	
 	public Image clone() {

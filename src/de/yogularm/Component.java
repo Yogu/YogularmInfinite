@@ -31,7 +31,10 @@ public class Component implements Locatable {
 	}
 	
 	public void update(float elapsedTime) {
-		
+		if (drawable instanceof AnimatedImage) {
+			AnimatedImage animation = (AnimatedImage)drawable;
+			animation.update(elapsedTime);
+		}
 	}
 	
 	public void remove() {
@@ -44,6 +47,15 @@ public class Component implements Locatable {
 	
 	protected void setDrawable(Drawable drawable) {
 		this.drawable = drawable;
+	}
+	
+	protected void setAnimation(Animation animation) {
+		if ((this.drawable instanceof AnimatedImage)) {
+			AnimatedImage animatedImage = (AnimatedImage)drawable;
+			if (animatedImage.getAnimation() == animation)
+				return;
+		}
+		drawable = animation.getInstance();
 	}
 	
 	protected Drawable getDrawable() {

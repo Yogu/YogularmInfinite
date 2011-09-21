@@ -5,6 +5,7 @@ import de.yogularm.components.Heart;
 
 public class Player extends Character {
 	private int collectedCoins;
+	private float fallTime;
 	
 	public Player(World world) {
 		super(world);
@@ -16,6 +17,7 @@ public class Player extends Character {
 	
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
+		updateDrawable(elapsedTime);
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
@@ -33,5 +35,19 @@ public class Player extends Character {
 	
 	public void setDirection(int direction) {
 		setWalkSpeed(direction * Config.PLAYER_SPEED);
+	}
+	
+	private void updateDrawable(float elapsedTime) {
+		if (getSpeed().getY() < 0) {
+			if (getHeightOverGround() > 2)
+				fallTime += elapsedTime;
+		} else
+			fallTime = 0;
+		if (fallTime >= 0.5f)
+			setDrawable(Res.images.yoguFalling);
+		else if (getWalkSpeed() != 0)
+			setAnimation(Res.animations.yoguWalking);
+		else
+			setDrawable(Res.images.yogu);
 	}
 }

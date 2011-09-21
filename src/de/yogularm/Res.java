@@ -12,11 +12,13 @@ import com.jogamp.opengl.util.texture.TextureIO;
 public class Res {
 	public static final Textures textures = new Textures();
 	public static final Images images = new Images();
+	public static final Animations animations = new Animations();
 	
 	public static void init() {
 		try {
 			textures.load();
 			images.load();
+			animations.load();
 		} catch (Exception e) {
 			throw new RuntimeException ("Failed to load resources", e);
 		}
@@ -49,11 +51,16 @@ public class Res {
 		public Image heart;
 		public Image shooter;
 		public Image stone;
-		public Image yogu;
 		public Image ladder;
+		public Image yogu;
+		public Image yoguWalkingL1;
+		public Image yoguWalkingL2;
+		public Image yoguWalkingR1;
+		public Image yoguWalkingR2;
+		public Image yoguFalling;
 		
 		public void load() {
-			TiledImage tiles = new TiledImage(Res.textures.blocks, 4);
+			TiledImage tiles = new TiledImage(Res.textures.blocks, 4, 4);
 			
 			stone =   tiles.get(0, 0);
 			ladder =  tiles.get(1, 0);
@@ -63,7 +70,26 @@ public class Res {
 			heart =   tiles.get(2, 2);
 			arrow =   tiles.get(3, 2);
 			shooter = tiles.get(0, 3);
-			yogu = new Image(Res.textures.yogu);
+
+			tiles = new TiledImage(Res.textures.yogu, 3, 3);
+			yogu = tiles.get(0, 0);
+			yoguWalkingL1 = tiles.get(1, 0);
+			yoguWalkingL2 = tiles.get(2, 0);
+			yoguWalkingR1 = tiles.get(0, 1);
+			yoguWalkingR2 = tiles.get(1, 1);
+			yoguFalling = tiles.get(2, 1);
+		}
+	}
+	
+	public static class Animations {
+		public Animation yoguWalking;
+		
+		public void load() {
+			yoguWalking = new Animation(new Image[] {
+				Res.images.yogu, Res.images.yoguWalkingL1, Res.images.yoguWalkingL2,
+				Res.images.yoguWalkingL1, Res.images.yogu, Res.images.yoguWalkingR1,
+				Res.images.yoguWalkingR2, Res.images.yoguWalkingR1, Res.images.yogu },
+				0.1f);
 		}
 	}
 }

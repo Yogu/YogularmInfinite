@@ -15,6 +15,7 @@ public class Body extends Component {
 	private Vector walkSpeed = Vector.getZero();
 	private boolean hasWalkSpeed = false;
 	private List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
+	private Boolean standsOnGround; // cache
 	
 	private class ForceToSpeed {
 		private float speed;
@@ -166,6 +167,7 @@ public class Body extends Component {
 		
 		walkSpeed = Vector.getZero();
 		hasWalkSpeed = false;
+		standsOnGround = null;
 	}
 	
 	public boolean canMoveTo(Vector targetPosition) {
@@ -342,7 +344,9 @@ public class Body extends Component {
 	}
 	
 	public boolean standsOnGround() {
-		return !canMoveTo(getPosition().add(new Vector(0, -0.001f)));
+		if (standsOnGround == null)
+			standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -0.001f)));
+		return standsOnGround;
 	}
 	
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
