@@ -80,4 +80,16 @@ public abstract class Character extends Entity {
 	protected void setWalkSpeed(float speed) {
 		walkSpeed = speed;
 	}
+	
+	protected float getWalkSpeed() {
+		return walkSpeed;
+	}
+	
+	protected float getHeightOverGround() {
+		Body blockBelow = getWorld().getBlockBelow(getPosition());
+		if (blockBelow != null)
+			return getOuterBounds().getBottom() - blockBelow.getOuterBounds().getTop();
+		else
+			return Float.POSITIVE_INFINITY;
+	}
 }

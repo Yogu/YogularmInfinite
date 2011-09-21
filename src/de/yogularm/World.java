@@ -169,7 +169,7 @@ public class World {
 		return false;
 	}
 
-	public boolean hasBlockBelow(Vector position) {
+	public Body getBlockBelow(Vector position) {
 		Vector rounded = position.round();
 		for (Component component : components) {
 			if (component instanceof Block) {
@@ -177,9 +177,13 @@ public class World {
 				if ((Math.round(component.getPosition().getX()) == rounded
 						.getX())
 						&& (block.getPosition().getY() <= position.getY()))
-					return true;
+					return block;
 			}
 		}
-		return false;
+		return null;
+	}
+	
+	public boolean hasBlockBelow(Vector position) {
+		return getBlockBelow(position) != null;
 	}
 }
