@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
-import de.yogularm.building.Sky2;
+import de.yogularm.building.ClimbTest;
 import de.yogularm.components.Stone;
 
 public class World {
@@ -42,7 +42,7 @@ public class World {
 		this.seed = seed;
 		this.hasSecondPlayer = hasSecondPlayer;
 		
-		currentBuilder = new Sky2();
+		currentBuilder = new ClimbTest();
 
 		player = new Player(this);
 		components.add(player);
@@ -151,6 +151,18 @@ public class World {
 		for (Component component : components) {
 			if (component.getPosition().round().equals(rounded))
 				list.add(component);
+		}
+		return list;
+	}
+
+	public Iterable<Body> getOverlappingBodies(Rect range) {
+		List<Body> list = new ArrayList<Body>();
+		for (Component component : components) {
+			if (component instanceof Body) {
+				Body body = (Body)component;
+				if (body.getOuterBounds().overlaps(range))
+						list.add(body);
+			}
 		}
 		return list;
 	}

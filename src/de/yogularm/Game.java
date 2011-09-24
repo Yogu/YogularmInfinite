@@ -223,7 +223,7 @@ public class Game implements GLEventListener {
 		if (lastFrameTime != 0)
 			frameTime = (newTime - lastFrameTime) / 1000000000.0f; // ns to s
 		lastFrameTime = newTime;
-		System.out.println((1 / frameTime) + " FPS");
+		//System.out.println((1 / frameTime) + " FPS");
 		frameTime = Math.min(frameTime, Config.MAX_FRAMETIME);
 	}
 

@@ -12,10 +12,13 @@ public class Body extends Component {
 	private boolean isGravityAffected = false;
 	private boolean isSolid = true;
 	private boolean isShiftable = false;
-	private Vector walkSpeed = Vector.getZero();
+	private boolean isClimbable = false;
+	private float walkSpeed = 0;
+	private float climbSpeed = 0;
 	private boolean hasWalkSpeed = false;
 	private List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
 	private Boolean standsOnGround; // cache
+	private boolean canClimb;
 	
 	private class ForceToSpeed {
 		private float speed;
@@ -93,6 +96,18 @@ public class Body extends Component {
 		isShiftable = value;
 	}
 	
+	public boolean isClimbable() {
+		return isClimbable;
+	}
+	
+	public void setIsClimbable(boolean value) {
+		isClimbable = value;
+	}
+	
+	public boolean canClimb() {
+		return canClimb;
+	}
+	
 	public float getMass() {
 		return mass;
 	}
@@ -111,11 +126,13 @@ public class Body extends Component {
 		return momentum.divide(mass);
 	}
 	
-	public void applyWalkSpeed(Vector speed) {
-		if (speed == null)
-			throw new NullPointerException("speed is null");
-		walkSpeed = walkSpeed.add(speed);
+	public void applyWalkSpeed(float speed) {
+		walkSpeed += speed;
 		hasWalkSpeed = true;
+	}
+	
+	public void applyClimbSpeed(float speed) {
+		climbSpeed += speed;
 	}
 	
 	public void setMomentum(Vector momentum) {
@@ -141,9 +158,18 @@ public class Body extends Component {
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
 		
+		applyForces(elapsedTime);
+		move(elapsedTime);
+		checkClimbing();
+	}
+	
+	private void applyForces(float elapsedTime) {
 		if (isGravityAffected)
 			applyForce(new Vector(0, - Config.GRAVITY_ACCELERATION * mass));
-		//applyXForceToSpeed(getMass() * Config.GRAVITY_ACCELERATION * Config.ADHESION, groundSpeed + walkSpeed);
+		
+		if (canClimb)
+			applyYForceToSpeed(Config.CLIMB_ACCELERATION * getMass(), climbSpeed);
+		climbSpeed = 0;
 		
 		momentum = momentum.add(collectedForce.multiply(elapsedTime));
 		for (ForceToSpeed info : forceToSpeed) {
@@ -154,20 +180,33 @@ public class Body extends Component {
 		forceToSpeed.clear();
 		totalForce = collectedForce;
 		collectedForce = Vector.getZero();
-		
+	}
+	
+	private void move(float elapsedTime) {
 		if (!momentum.isZero()) {
 			Vector delta = getSpeed().multiply(elapsedTime);
 			// Must handle x and y move separate, otherwise there are strange effects
 			Vector targetPosition = getPosition().add(delta.changeY(0));
-			tryMoveTo(targetPosition);
+			tryMoveTo(targetPosition, false);
 
 			targetPosition = getPosition().add(delta.changeX(0));
-			tryMoveTo(targetPosition);
+			tryMoveTo(targetPosition, true);
 		}
 		
-		walkSpeed = Vector.getZero();
+		walkSpeed = 0;
 		hasWalkSpeed = false;
 		standsOnGround = null;
+	}
+	
+	private void checkClimbing() {
+		Iterable<Body> overlaps = getWorld().getOverlappingBodies(getOuterBounds());
+		for (Body body : overlaps) {
+			if (body.isClimbable) {
+				canClimb = true;
+				return;
+			}
+		}
+		canClimb = false;
 	}
 	
 	public boolean canMoveTo(Vector targetPosition) {
@@ -196,10 +235,10 @@ public class Body extends Component {
 	}
 	
 	public Vector getImpactOnMove(Vector targetPosition) {
-		return getImpactOnMove(targetPosition, false);
+		return getImpactOnMove(targetPosition, false, false);
 	}
 	
-	private Vector getImpactOnMove(Vector targetPosition, boolean calledOnMove) {
+	private Vector getImpactOnMove(Vector targetPosition, boolean calledOnMove, boolean applyWalkSpeed) {
 		Rect source = bounds.add(getPosition());
 		Rect target = bounds.add(targetPosition);
 		Rect path = new Rect(
@@ -225,7 +264,7 @@ public class Body extends Component {
 		List<Body> collidedBodies = null;
 		
 		// workaround for having grip in the air
-		boolean walkSpeedApplied = false;
+		boolean walkSpeedApplied = false;// = canClimb; // walk speed is applied earlier when climbing
 		
 		for (Component component : getWorld().getComponents()) {
 			if ((component instanceof Body) && !component.isToRemove() && (component != this)) {
@@ -233,7 +272,7 @@ public class Body extends Component {
 				Rect obstacle = body.getOuterBounds();
 				// Ignore Bodies already colliding with this body (otherwise this body would be stuck)
 				// disabled because allowed collision on rounding errors
-				if (!obstacle.overlaps(source)) {
+				if (body.isSolid && !obstacle.overlaps(source)) {
 					// test collision and update target if collides
 					float lastX = x;
 					float lastY = y;
@@ -276,19 +315,12 @@ public class Body extends Component {
 								Vector force = momentum.subtract(body.momentum)
 									.multiply(Config.ADHESION / getWorld().getFrameTime());
 								 
-								switch (direction) {
-								case LEFT:
-								case RIGHT:
-									// allows climbing on walls (when being pushed to the wall), but is very inconsistent
-									//applyYForceToSpeed(Math.abs(force.getX()), body.getSpeed().getY() + walkSpeed.getY());
-									break;
-
-								case UP:
-								case DOWN:
+								
+								if (applyWalkSpeed) {
 									float speed = body.getSpeed().getX();
 									if (hasWalkSpeed && direction == Direction.DOWN) {
 										walkSpeedApplied = true;
-										speed += walkSpeed.getX();
+										speed += walkSpeed;
 									}
 									
 									applyXForceToSpeed(Math.abs(force.getY()), speed);
@@ -304,8 +336,10 @@ public class Body extends Component {
 		}
 
 		// workaround for having grip in the air
-		if (hasWalkSpeed && (direction == Direction.DOWN || direction == Direction.UP) && !walkSpeedApplied)
-			applyXForceToSpeed(mass * Config.GRAVITY_ACCELERATION * Config.AIR_ADHESION, walkSpeed.getX());
+		if (hasWalkSpeed && applyWalkSpeed && !walkSpeedApplied) {
+			float adhesion = canClimb ? Config.ADHESION : Config.AIR_ADHESION;
+			applyXForceToSpeed(mass * Config.GRAVITY_ACCELERATION * adhesion, walkSpeed);
+		}
 		
 		if (calledOnMove) {
 			if (collidedBodies != null) {
@@ -335,8 +369,8 @@ public class Body extends Component {
 		return new Vector(x, y).subtract(bounds.getMinVector());
 	}
 
-	public void tryMoveTo(Vector targetPosition) {
-		Vector impact = getImpactOnMove(targetPosition, true);
+	public void tryMoveTo(Vector targetPosition, boolean applyWalkSpeed) {
+		Vector impact = getImpactOnMove(targetPosition, true, applyWalkSpeed);
 		if (isSolid)
 			setPosition(impact);
 		else

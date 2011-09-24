@@ -9,6 +9,7 @@ public abstract class Character extends Entity {
 	private boolean isDead = false;
 	private float immuneTime;
 	private float walkSpeed = 0;
+	private float climbSpeed;
 	
 	public Character(World world) {
 		super(world);
@@ -17,9 +18,15 @@ public abstract class Character extends Entity {
 	}
 	
 	public void update(float elapsedTime) {
+		System.out.println("Climb: " + climbSpeed);
+		
+		boolean climbing = canClimb() && climbSpeed > 0;
 		super.update(elapsedTime);
+		if (climbing && !canClimb())
+			jump(true);
 
-		applyWalkSpeed(new Vector(walkSpeed, 0));
+		applyWalkSpeed(walkSpeed);
+		applyClimbSpeed(climbSpeed);
 		
 		if (immuneTime > 0)
 			immuneTime -= elapsedTime;
@@ -81,12 +88,29 @@ public abstract class Character extends Entity {
 		}
 	}
 	
-	protected void setWalkSpeed(float speed) {
+	public void setWalkSpeed(float speed) {
 		walkSpeed = speed;
 	}
 	
-	protected float getWalkSpeed() {
+	public float getWalkSpeed() {
 		return walkSpeed;
+	}
+	
+	public void setClimbSpeed(float speed) {
+		climbSpeed = speed;
+	}
+	
+	public float getClimbSpeed() {
+		return climbSpeed;
+	}
+	
+	public void jump() {
+		jump(false);
+	}
+	
+	public void jump(boolean unconditional) {
+		if (standsOnGround() || canClimb() || unconditional)
+			setSpeed(getSpeed().changeY(Config.PLAYER_JUMP_SPEED));
 	}
 	
 	protected float getHeightOverGround() {

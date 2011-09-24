@@ -7,9 +7,11 @@ public class Input {
 	private boolean isLeft;
 	private boolean isRight;
 	private boolean isUp;
+	private boolean isDown;
 	private boolean isLeft2;
 	private boolean isRight2;
 	private boolean isUp2;
+	private boolean isDown2;
 	private KeyListener keyListener;
 	
 	public Input() {
@@ -42,6 +44,9 @@ public class Input {
 		case KeyEvent.VK_UP:
 			isUp = isPressed;
 			break;
+		case KeyEvent.VK_DOWN:
+			isDown = isPressed;
+			break;
 
 		case KeyEvent.VK_A:
 			isLeft2 = isPressed;
@@ -52,6 +57,9 @@ public class Input {
 		case KeyEvent.VK_W:
 			isUp2 = isPressed;
 			break;
+		case KeyEvent.VK_S:
+			isDown2 = isPressed;
+			break;
 		}
 	}
 	
@@ -59,8 +67,13 @@ public class Input {
 		int direction = (isLeft && !isRight) ? -1 : (isRight && !isLeft) ? 1 : 0;
 		world.getPlayer().setDirection(direction);
 		
-		if (isUp && world.getPlayer().standsOnGround())
-			world.getPlayer().setSpeed(world.getPlayer().getSpeed().changeY(Config.PLAYER_JUMP_SPEED));
+		if (isUp && !world.getPlayer().canClimb())
+			world.getPlayer().jump();
+		
+		if (world.getPlayer().canClimb()) {
+			direction = (isDown && !isUp) ? -1 : (isUp && !isDown) ? 1 : 0;
+			world.getPlayer().setClimbSpeed(direction * Config.PLAYER_CLIMB_SPEED);
+		}
 
 		if (world.getPlayer2() != null) {
 			direction = (isLeft2 && !isRight2) ? -1 : (isRight2 && !isLeft2) ? 1 : 0;
