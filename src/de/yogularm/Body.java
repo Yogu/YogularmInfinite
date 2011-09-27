@@ -272,7 +272,7 @@ public class Body extends Component {
 				Rect obstacle = body.getOuterBounds();
 				// Ignore Bodies already colliding with this body (otherwise this body would be stuck)
 				// disabled because allowed collision on rounding errors
-				if (body.isSolid && !obstacle.overlaps(source)) {
+				if (!obstacle.overlaps(source)) {
 					// test collision and update target if collides
 					float lastX = x;
 					float lastY = y;

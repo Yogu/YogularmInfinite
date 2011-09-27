@@ -11,7 +11,7 @@ public class Ladder extends Block {
 	public Ladder(World world) {
 		super(world);
 		setDrawable(Res.images.ladder);
-		setBounds(new Rect(0, 0, 1, 1));
+		setBounds(new Rect(0.16125f, 0, 0.90125f, 1));
 		setIsClimbable(true);
 		setIsSolid(false);
 	}

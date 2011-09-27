@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
-import de.yogularm.building.ClimbTest;
+import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
 
 public class World {
@@ -42,7 +42,7 @@ public class World {
 		this.seed = seed;
 		this.hasSecondPlayer = hasSecondPlayer;
 		
-		currentBuilder = new ClimbTest();
+		currentBuilder = new Sky2();
 
 		player = new Player(this);
 		components.add(player);

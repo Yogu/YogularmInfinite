@@ -63,13 +63,24 @@ public class Vector {
 
 	public Vector normalize() {
 		float length = getLength();
-		return new Vector(x / length, y / length);
+		if (length == 1)
+			return this;
+		else
+			return new Vector(x / length, y / length);
 	}
 
 	public float getAngleToXAxis() {
 		Vector norm = normalize();
 		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x)
 				- Math.atan2(0, -1));
+	}
+	
+	public static float getAngle(Vector v1, Vector v2) {
+    return (float)Math.toDegrees(Math.acos(getDotProduct(v1.normalize(), v2.normalize())));
+	}
+	
+	public static float getDotProduct(Vector v1, Vector v2) {
+		return v1.x * v2.x + v1.y * v2.y;
 	}
 
 	public Vector round() {
