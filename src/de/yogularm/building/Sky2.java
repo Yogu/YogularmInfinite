@@ -4,6 +4,7 @@ import java.util.Random;
 
 import de.yogularm.BuilderBase;
 import de.yogularm.Vector;
+import de.yogularm.components.Checkpoint;
 import de.yogularm.components.Chicken;
 import de.yogularm.components.Coin;
 import de.yogularm.components.Platform;
@@ -36,6 +37,9 @@ public class Sky2 extends BuilderBase {
 			buildBridge();
 		
 		place(Coin.class, 0, 1);
+		
+		if (getCurrentIndex() % 20 == 9)
+			place(Checkpoint.class, -1, 1);
 	}
 	
 	private void buildGap() {
