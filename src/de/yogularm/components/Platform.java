@@ -118,8 +118,9 @@ public class Platform extends Block {
 	
 	private void headTo(Vector target) {
 		Vector diff = target.subtract(getPosition());
-		applyXForceToSpeed(acceleration * getMass(), Math.signum(diff.getX()) * speed);
-		applyYForceToSpeed(acceleration * getMass(), Math.signum(diff.getY()) * speed);
+		Vector direction = diff.normalize();
+		applyXForceToSpeed(acceleration * getMass(), direction.getX() * speed);
+		applyYForceToSpeed(acceleration * getMass(), direction.getY() * speed);
 	}
 	
 	private void doBreaking() {

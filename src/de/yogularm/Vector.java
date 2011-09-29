@@ -112,6 +112,17 @@ public class Vector {
 		}
 	}
 
+	public float getComponent(Axis axis) {
+		switch (axis) {
+		case HORIZONTAL:
+			return getX();
+		case VERTICAL:
+			return getY();
+		default:
+			return 0;
+		}
+	}
+
 	public Vector changeComponent(Direction direction, float value) {
 		switch (direction) {
 		case LEFT:
@@ -119,6 +130,17 @@ public class Vector {
 			return changeX(value);
 		case UP:
 		case DOWN:
+			return changeY(value);
+		default:
+			return this;
+		}
+	}
+
+	public Vector changeComponent(Axis axis, float value) {
+		switch (axis) {
+		case HORIZONTAL:
+			return changeX(value);
+		case VERTICAL:
 			return changeY(value);
 		default:
 			return this;

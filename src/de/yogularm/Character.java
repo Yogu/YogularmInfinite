@@ -18,8 +18,6 @@ public abstract class Character extends Entity {
 	}
 	
 	public void update(float elapsedTime) {
-		System.out.println("Climb: " + climbSpeed);
-		
 		boolean climbing = canClimb() && climbSpeed > 0;
 		super.update(elapsedTime);
 		if (climbing && !canClimb())
