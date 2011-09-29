@@ -3,6 +3,7 @@ package de.yogularm.building;
 import java.util.Random;
 
 import de.yogularm.BuilderBase;
+import de.yogularm.components.Checkpoint;
 import de.yogularm.components.Chicken;
 import de.yogularm.components.Shooter;
 import de.yogularm.components.Stone;
@@ -32,5 +33,8 @@ public class Sky2 extends BuilderBase {
 		
 		if (length == 4 && random.nextInt(3) == 0)
 			place(Chicken.class, -1, 1);
+		
+		if (getCurrentIndex() % 20 == 9)
+			place(Checkpoint.class, -1, 1);
 	}
 }

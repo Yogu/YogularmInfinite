@@ -1,11 +1,13 @@
 package de.yogularm;
 
+import de.yogularm.components.Checkpoint;
 import de.yogularm.components.Coin;
 import de.yogularm.components.Heart;
 
 public class Player extends Character {
 	private int collectedCoins;
 	private float fallTime;
+	private Vector checkpoint;
 	
 	public Player(World world) {
 		super(world);
@@ -13,6 +15,7 @@ public class Player extends Character {
 		setBounds(new Rect(0.18721875f, 0.080890625f, 0.801515625f, 0.9359375f));
 		setLife(Config.MAX_LIFE);
 		setMass(20);
+		checkpoint = getPosition();
 	}
 	
 	public void update(float elapsedTime) {
@@ -27,6 +30,8 @@ public class Player extends Character {
 			collectedCoins++;
 		else if (other instanceof Heart)
 			setLife(getLife() + 1);
+		else if (other instanceof Checkpoint)
+			checkpoint = other.getPosition();
 	}
 	
 	protected void onDie() {
@@ -54,5 +59,10 @@ public class Player extends Character {
 			setAnimation(Res.animations.yoguWalking);
 		else
 			setDrawable(Res.images.yogu);
+	}
+	
+	protected void onDeathFall() {
+		setPosition(checkpoint);
+		decLife(1);
 	}
 }

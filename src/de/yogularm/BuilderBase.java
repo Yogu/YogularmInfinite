@@ -57,4 +57,8 @@ public abstract class BuilderBase implements Builder {
 	protected Random getRandom() {
 		return getRandom(0);
 	}
+	
+	protected int getCurrentIndex() {
+		return index;
+	}
 }

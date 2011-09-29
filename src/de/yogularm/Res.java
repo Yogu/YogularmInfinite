@@ -49,6 +49,7 @@ public class Res {
 		public Image arrow;
 		public Image bricks;
 		public Image coin;
+		public Image checkpoint;
 		public Image heart;
 		public Image shooter;
 		public Image stone;
@@ -74,13 +75,14 @@ public class Res {
 		public void load() {
 			TiledImage tiles = new TiledImage(Res.textures.blocks, 4, 4);
 			
-			stone =   tiles.get(0, 0);
-			ladder =  tiles.get(1, 0);
-			bricks =  tiles.get(2, 0);
-			coin =    tiles.get(0, 2);
-			heart =   tiles.get(2, 2);
-			arrow =   tiles.get(3, 2);
-			shooter = tiles.get(0, 3);
+			stone =      tiles.get(0, 0);
+			ladder =     tiles.get(1, 0);
+			bricks =     tiles.get(2, 0);
+			coin =       tiles.get(0, 2);
+			checkpoint = tiles.get(1, 2);
+			heart =      tiles.get(2, 2);
+			arrow =      tiles.get(3, 2);
+			shooter =    tiles.get(0, 3);
 
 			tiles = new TiledImage(Res.textures.yogu, 3, 3);
 			yogu = tiles.get(0, 0);
