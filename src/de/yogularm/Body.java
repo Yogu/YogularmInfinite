@@ -477,7 +477,7 @@ public class Body extends Component {
 
 	public boolean standsOnGround() {
 		// if (standsOnGround == null)
-		standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -0.1f)));
+		standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -Config.ON_GROUND_EPSILON)));
 		return standsOnGround;
 	}
 

@@ -35,11 +35,11 @@ public class Sky2 extends BuilderBase {
 			buildPlatform();
 		else
 			buildBridge();
-		
-		place(Coin.class, 0, 1);
-		
-		if (getCurrentIndex() % 20 == 9)
-			place(Checkpoint.class, -1, 1);
+
+		if (!isCheckpoint(0))
+			place(Checkpoint.class, 0, 1);
+		else
+			place(Coin.class, 0, 1);
 	}
 	
 	private void buildGap() {
@@ -88,5 +88,10 @@ public class Sky2 extends BuilderBase {
 	private boolean isPlatform(int indexOffset) {
 		Random random = getRandom(0x390401E0, indexOffset);
 		return (random.nextFloat() < 0.25f) && !isPlatform(indexOffset - 1);
+	}
+	
+	private boolean isCheckpoint(int indexOffset) {
+		int index = getCurrentIndex() + indexOffset;
+		return (index % 20 == 9 && !isCheckpoint(0)) || (index - 1) % 20 == 9 && isCheckpoint(-1); 
 	}
 }

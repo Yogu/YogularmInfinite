@@ -4039,9 +4039,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="63.876012"
-     inkscape:cy="229.71102"
+     inkscape:zoom="1.7486445"
+     inkscape:cx="290.31592"
+     inkscape:cy="270.64268"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -5693,7 +5693,7 @@
        width="16" />
     <g
        id="g4674"
-       transform="matrix(0.54503742,0,0,0.54503742,580.68574,-173.25187)">
+       transform="matrix(-0.54503742,0,0,0.54503742,339.31425,-173.25187)">
       <path
          style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4525);enable-background:accumulate"
          d="m -324,50 51.625,-18 0,36 z"

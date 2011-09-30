@@ -8,6 +8,7 @@ public class RenderTransformation implements Drawable {
 	private Vector scale = new Vector(1, 1);
 	private float angle;
 	private boolean isVerticallyMirrored;
+	private Vector rotationCenter = Vector.getZero();
 	
 	public RenderTransformation(Drawable drawable) {
 		if (drawable == null)
@@ -33,6 +34,16 @@ public class RenderTransformation implements Drawable {
 		if (value == null)
 			throw new NullPointerException("value is null");
 		offset = value;
+	}
+	
+	public Vector getRotationCenter() {
+		return rotationCenter;
+	}
+	
+	public void setRotationCenter(Vector value) {
+		if (value == null)
+			throw new NullPointerException("value is null");
+		rotationCenter = value;
 	}
 	
 	public float getAngle() {
@@ -68,7 +79,11 @@ public class RenderTransformation implements Drawable {
 	public void draw(GL2 gl, float opacity) {
 		gl.glPushMatrix();
 		gl.glTranslatef(offset.getX() + (isVerticallyMirrored ? 1 : 0), offset.getY(), 0);
+		if (angle != 0)
+			gl.glTranslatef(rotationCenter.getX(), rotationCenter.getY(), 0);
 		gl.glRotatef(angle, 0, 0, 1);
+		if (angle != 0)
+			gl.glTranslatef(-rotationCenter.getX(), -rotationCenter.getY(), 0);
 		gl.glScalef(scale.getX() * (isVerticallyMirrored ? -1 : 1), scale.getY(), 1);
 		
 		drawable.draw(gl, opacity);

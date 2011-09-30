@@ -8,6 +8,7 @@ import de.yogularm.World;
 public class Platform extends Block {
 	private static final float DEFAULT_SPEED = 3;
 	private static final float DEFAULT_ACCELERATION = 10;
+	private static final float DEFAULT_PAUSE_TIME = 0.4f;
 	
 	private Vector[] targets = new Vector[0];
 	private float speed = DEFAULT_SPEED;
@@ -15,6 +16,8 @@ public class Platform extends Block {
 	private int currentTarget;
 	private Vector origin;
 	private boolean enableBreaking;
+	private float pauseTime = DEFAULT_PAUSE_TIME;
+	private float elapsedPauseTime;
 	
 	public Platform(World world) {
 		super(world);
@@ -85,9 +88,15 @@ public class Platform extends Block {
 			Vector source = currentTarget >= targets.length - 1 ? targets[0] : targets[currentTarget + 1];
 			source = source.add(origin);
 			if (hasArrived(source, target)) {
-				currentTarget++;
-				if (currentTarget >= targets.length)
-					currentTarget = 0;
+				if (enableBreaking && elapsedPauseTime < pauseTime) {
+					elapsedPauseTime += elapsedTime;
+					doBreaking();
+				} else {
+					elapsedPauseTime = 0;
+					currentTarget++;
+					if (currentTarget >= targets.length)
+						currentTarget = 0;
+				}
 			} else {
 				if (enableBreaking && needsToBreak(target))
 					doBreaking();

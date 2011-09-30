@@ -18,6 +18,7 @@ public class Config {
 	public static final float ADHESION = 10;
 	public static final float AIR_ADHESION = 1;
 	public static final float EPSILON = 0.00001f;
+	public static final float ON_GROUND_EPSILON = 0.1f;
 	
 	// Gameplay
 	public static final float MAX_FRAMETIME = 0.1f;
