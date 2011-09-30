@@ -48,7 +48,7 @@ public class Player extends Character {
 	}
 	
 	private void updateDrawable(float elapsedTime) {
-		if (getSpeed().getY() < 3 && !canClimb()) {
+		if (getActualSpeed().getY() < -3 && !canClimb()) {
 			if (getHeightOverGround() > 3)
 				fallTime += elapsedTime;
 		} else
