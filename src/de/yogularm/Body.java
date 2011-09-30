@@ -3,6 +3,8 @@ package de.yogularm;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.media.opengl.GL2;
+
 public class Body extends Component {
 	private Rect bounds;
 	private float mass = 1.0f;
@@ -24,6 +26,10 @@ public class Body extends Component {
 	private boolean walkSpeedApplied = false;
 	private Vector shiftSpeed;
 	private Vector actualShiftSpeed;
+	private List<Vector> collectedForces; // debug
+	private List<Vector> forces; // debug
+
+	private static final float UNSHIFTABLE_MASS = 1e15f;
 
 	private class ForceToSpeed {
 		private float speed;
@@ -62,6 +68,10 @@ public class Body extends Component {
 		setIsShiftable(false);
 		shiftSpeed = Vector.getZero();
 		actualShiftSpeed = shiftSpeed;
+		if (Config.DISPLAY_FORCES) {
+			forces = new ArrayList<Vector>();
+			collectedForces = new ArrayList<Vector>();
+		}
 	}
 
 	public Rect getBounds() {
@@ -99,14 +109,14 @@ public class Body extends Component {
 	}
 
 	public boolean isShiftable() {
-		return mass < Float.POSITIVE_INFINITY;// isShiftable;
+		return mass < UNSHIFTABLE_MASS;// isShiftable;
 	}
 
 	public void setIsShiftable(boolean value) {
 		if (value)
 			mass = massCache;
 		else
-			mass = 1e30f;
+			mass = UNSHIFTABLE_MASS;
 		// isShiftable = value;
 	}
 
@@ -179,6 +189,8 @@ public class Body extends Component {
 		if (force == null)
 			throw new NullPointerException("force is null");
 		collectedForce = collectedForce.add(force);
+		if (collectedForces != null)
+			collectedForces.add(force);
 	}
 
 	public void applyForceToSpeed(Vector force, Vector speed) {
@@ -213,6 +225,21 @@ public class Body extends Component {
 		checkClimbing();
 	}
 
+	public void draw(GL2 gl) {
+		super.draw(gl);
+
+		if (forces != null)
+			drawForces(gl);
+	}
+
+	private void drawForces(GL2 gl) {
+		Vector center = getBounds().getCenter();
+		for (Vector force : forces) {
+			if (force.getLength() > 0)
+				SimpleArrow.render(gl, center, force.getLength() / mass, force.getAngleToXAxis());
+		}
+	}
+
 	private void applyForces(float elapsedTime) {
 		if (isGravityAffected)
 			applyForce(new Vector(0, -Config.GRAVITY_ACCELERATION * mass));
@@ -232,6 +259,10 @@ public class Body extends Component {
 		collectedForce = Vector.getZero();
 		actualShiftSpeed = shiftSpeed;
 		shiftSpeed = Vector.getZero();
+		if (collectedForces != null) {
+			forces = collectedForces;
+			collectedForces = new ArrayList<Vector>();
+		}
 	}
 
 	private void move(float elapsedTime) {
@@ -373,12 +404,12 @@ public class Body extends Component {
 							body.shiftSpeed = body.shiftSpeed.changeComponent(axis, getActualSpeed().getComponent(axis));
 
 							// Orthogonal force (when pressed to ground, apply x force
-							if (axis == Axis.VERTICAL) {
-								Vector force = totalForce.subtract(body.totalForce).multiply(Config.ADHESION);
-								float speed = (body.momentum.getX() + momentum.getX()) / (mass + body.mass);
-								applyGroundSpeed(force.getY(), speed);
-								body.applyGroundSpeed(force.getY(), speed);
-							}
+							/* if (axis == Axis.VERTICAL) { */
+							Vector force = totalForce.subtract(body.totalForce).multiply(Config.ADHESION);
+							float speed = (body.momentum.getX() + momentum.getX()) / (mass + body.mass);
+							applyGroundSpeed(force.getY(), speed);
+							body.applyGroundSpeed(force.getY(), speed);
+							// }
 						}
 
 						onCollision(body, direction, true);

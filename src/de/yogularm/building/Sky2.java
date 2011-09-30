@@ -44,7 +44,8 @@ public class Sky2 extends BuilderBase {
 	
 	private void buildGap() {
 		Random random = getRandom(0x1180E669);
-		int[] xByY = isPlatform(0) ? MAX_X_OFFSET_BY_Y_OFFSET_PLATFORM : MAX_X_OFFSET_BY_Y_OFFSET;
+		int[] xByY = (isPlatform(0) || isPlatform(-1)) ?
+			MAX_X_OFFSET_BY_Y_OFFSET_PLATFORM : MAX_X_OFFSET_BY_Y_OFFSET;
 			
 		int maxYOffset = xByY.length - 2;
 		int yOffset = Math.min(random.nextInt(maxYOffset * 2 + 1) - maxYOffset, 1);
@@ -74,7 +75,7 @@ public class Sky2 extends BuilderBase {
 		float speed = random.nextFloat() * (MAX_PLATFORM_SPEED - MIN_PLATFORM_SPEED) + MIN_PLATFORM_SPEED;
 
 		// due to physics problems, upwards moving platforms are hard to ride on
-		int yOffset = - random.nextInt(MAX_PLATFORM_Y_OFFSET + 1);
+		int yOffset = random.nextInt(2 * MAX_PLATFORM_Y_OFFSET + 1) - MAX_PLATFORM_Y_OFFSET;
 		
 		Platform platform = new Platform(getWorld());
 		platform.setPlatformSpeed(speed);
@@ -86,6 +87,6 @@ public class Sky2 extends BuilderBase {
 	
 	private boolean isPlatform(int indexOffset) {
 		Random random = getRandom(0x390401E0, indexOffset);
-		return (random.nextFloat() < 0.8f/*0.25f*/) && !isPlatform(indexOffset - 1);
+		return (random.nextFloat() < 0.25f) && !isPlatform(indexOffset - 1);
 	}
 }

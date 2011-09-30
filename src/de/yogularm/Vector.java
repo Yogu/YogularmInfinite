@@ -71,8 +71,8 @@ public class Vector {
 
 	public float getAngleToXAxis() {
 		Vector norm = normalize();
-		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x)
-				- Math.atan2(0, -1));
+		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x));
+				//- Math.atan2(0, -1));
 	}
 	
 	public static float getAngle(Vector v1, Vector v2) {

@@ -10,9 +10,11 @@ public class PlatformTest extends BuilderBase {
 		moveBuildingPosition(7, 0);
 		Platform platform = new Platform(getWorld());
 		platform.setTargets(new Vector[] { 
-				Vector.getZero(), new Vector(-4, 0)
+				new Vector(0, 10), new Vector(-4, 0)
 		});
+		platform.setPlatformSpeed(2);
 		place(platform);
 		platform.setOrigin();
+		moveBuildingPosition(0, 10000);
 	}
 }

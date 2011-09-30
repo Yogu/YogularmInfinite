@@ -12,7 +12,7 @@ public class Config {
 	public static final float PLAYER_CLIMB_SPEED = 2;
 	public static final float CLIMB_ACCELERATION = 20;
 	//public static final float PLAYER_ACCELERATION = 20;
-	public static final float PLAYER_JUMP_SPEED = 5;
+	public static final float PLAYER_JUMP_SPEED = 5.2f;
 	public static final float GRAVITY_ACCELERATION = 9.81f;
 	public static final float ARROW_SPEED = 20f;
 	public static final float ADHESION = 10;
@@ -24,4 +24,7 @@ public class Config {
 	public static final float DEATH_FALL_SPEED = 20;
 	public static final float MAX_LIFE = 3;
 	public static final float IMMUNE_TIME = 2;
+	
+	// Debug
+	public static final boolean DISPLAY_FORCES = false;
 }
