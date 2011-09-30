@@ -7,6 +7,7 @@ public class Body extends Component {
 	private Rect bounds;
 	private float mass = 1.0f;
 	private Vector momentum;
+	private Vector actualSpeed; // cached
 	private Vector collectedForce;
 	private Vector totalForce;
 	private boolean isGravityAffected = false;
@@ -21,6 +22,8 @@ public class Body extends Component {
 	private boolean canClimb;
 	private float massCache = mass;
 	private boolean walkSpeedApplied = false;
+	private Vector shiftSpeed;
+	private Vector actualShiftSpeed;
 
 	private class ForceToSpeed {
 		private float speed;
@@ -55,7 +58,10 @@ public class Body extends Component {
 		collectedForce = Vector.getZero();
 		totalForce = Vector.getZero();
 		momentum = Vector.getZero();
+		actualSpeed = getSpeed();
 		setIsShiftable(false);
+		shiftSpeed = Vector.getZero();
+		actualShiftSpeed = shiftSpeed;
 	}
 
 	public Rect getBounds() {
@@ -136,6 +142,24 @@ public class Body extends Component {
 		return momentum.divide(mass);
 	}
 
+	/**
+	 * Gets the speed the body effectifely has made in the last frame
+	 * 
+	 * @return the actual speed
+	 */
+	public Vector getActualSpeed() {
+		return actualSpeed;
+	}
+
+	/**
+	 * Gets the speed with that other bodies shift this body (cached from last frame)
+	 * 
+	 * @return the shift speed
+	 */
+	public Vector getShiftSpeed() {
+		return actualShiftSpeed;
+	}
+
 	public void applyWalkSpeed(float speed) {
 		walkSpeed += speed;
 		hasWalkSpeed = true;
@@ -206,18 +230,20 @@ public class Body extends Component {
 		forceToSpeed.clear();
 		totalForce = collectedForce;
 		collectedForce = Vector.getZero();
+		actualShiftSpeed = shiftSpeed;
+		shiftSpeed = Vector.getZero();
 	}
 
 	private void move(float elapsedTime) {
+		Vector lastPosition = getPosition();
 		if (!momentum.isZero()) {
 			Vector delta = getSpeed().multiply(elapsedTime);
 			// Must handle x and y move separate, otherwise there are strange effects
-			Vector targetPosition = getPosition().add(delta.changeY(0));
-			tryMoveTo(targetPosition, Axis.HORIZONTAL);
+			tryMoveTo(getPosition().add(delta.changeY(0)), Axis.HORIZONTAL);
+			tryMoveTo(getPosition().add(delta.changeX(0)), Axis.VERTICAL);
 
-			targetPosition = getPosition().add(delta.changeX(0));
-			tryMoveTo(targetPosition, Axis.VERTICAL);
 		}
+		actualSpeed = getPosition().subtract(lastPosition).divide(elapsedTime);
 
 		walkSpeed = 0;
 		hasWalkSpeed = false;
@@ -251,7 +277,8 @@ public class Body extends Component {
 					// test collision and update target if collides
 					if (path.overlaps(obstacle))
 						return false;
-				}
+				} else
+					System.out.println("stuck!");
 			}
 		}
 		return true;
@@ -270,17 +297,8 @@ public class Body extends Component {
 
 		float x = target.getLeft();
 		float y = target.getBottom();
-		Direction direction;
-		if (targetPosition.getX() > getPosition().getX())
-			direction = Direction.RIGHT;
-		else if (targetPosition.getX() < getPosition().getX())
-			direction = Direction.LEFT;
-		else if (targetPosition.getY() > getPosition().getY())
-			direction = Direction.UP;
-		else if (targetPosition.getY() < getPosition().getY())
-			direction = Direction.DOWN;
-		else
-			direction = Direction.NONE;
+		Vector delta = targetPosition.subtract(getPosition());
+		Direction direction = delta.getDirection();
 
 		List<Body> collidedBodies = null;
 
@@ -325,17 +343,38 @@ public class Body extends Component {
 							}
 						}
 
-						// Parallel force (when collided in y direction, apply y force)
-						if (collided & body.isSolid) {
-							Vector force = momentum.subtract(body.momentum).multiply(1 / getWorld().getFrameTime());
-							Vector speed = body.momentum.add(momentum).divide(mass + body.mass);
-							applyForceToSpeed(force.getComponent(axis), speed.getComponent(axis), axis);
-						}
+						if (calledOnMove && collided && isSolid && body.isSolid) {
+							// Parallel force (when collided in y direction, apply y force)
+							// (momentum-based, delayed)
+							/*
+							 * if (collidedBodies == null)
+							 * collidedBodies = new ArrayList<Body>();
+							 * collidedBodies.add(body);
+							 */
 
-						// Orthogonal force (when pressed to ground, apply x force
-						if (calledOnMove && collided) {
-							if (isSolid && body.isSolid && axis == Axis.VERTICAL) {
-								Vector force = momentum.subtract(body.momentum).multiply(Config.ADHESION / getWorld().getFrameTime());
+							// parallel force (momentum-based, instantly applied)
+							float totalMomentum = momentum.add(body.momentum).getComponent(axis);
+							float totalMass = mass + body.mass;
+
+							for (Body b : new Body[] { this, body }) {
+								float minMomentum = totalMomentum * (b.mass / totalMass);
+								float currentMomentum = b.momentum.getComponent(axis);
+								// if this one is moving upward, reduce momentum of this, but
+								// enlarge the one of the other.
+								boolean enlarge = delta.getComponent(axis) < 0 || b != this;
+								if (enlarge)
+									currentMomentum = Math.max(currentMomentum, minMomentum);
+								else
+									currentMomentum = Math.min(currentMomentum, minMomentum);
+								b.momentum = b.momentum.changeComponent(axis, currentMomentum);
+							}
+
+							shiftSpeed = shiftSpeed.changeComponent(axis, body.getActualSpeed().getComponent(axis));
+							body.shiftSpeed = body.shiftSpeed.changeComponent(axis, getActualSpeed().getComponent(axis));
+
+							// Orthogonal force (when pressed to ground, apply x force
+							if (axis == Axis.VERTICAL) {
+								Vector force = totalForce.subtract(body.totalForce).multiply(Config.ADHESION);
 								float speed = (body.momentum.getX() + momentum.getX()) / (mass + body.mass);
 								applyGroundSpeed(force.getY(), speed);
 								body.applyGroundSpeed(force.getY(), speed);
@@ -358,9 +397,37 @@ public class Body extends Component {
 			walkSpeedApplied = false;
 		}
 
+		// Parallel force (when collided in y direction, apply y force)
+		/*
+		 * if (calledOnMove && collidedBodies != null) {
+		 * collidedBodies.add(this);
+		 * float totalMomentum = 0;
+		 * float totalMass = 0;
+		 * for (Body body : collidedBodies) {
+		 * totalMass += body.mass;
+		 * totalMomentum += body.momentum.getComponent(axis);
+		 * }
+		 * 
+		 * if (totalMass > 0) {
+		 * for (Body body : collidedBodies) {
+		 * // braces to avoid +INF
+		 * float minMomentum = totalMomentum * (body.mass / totalMass);
+		 * 
+		 * // If body
+		 * //float currentMomentum = body.momentum.getComponent(axis);
+		 * //if (minMomentum) currentMomentum = Math.min(minMomentum,
+		 * // * currentMomentum); else currentMomentum = Math.max(minMomentum,
+		 * // * currentMomentum);
+		 * currentMomentum = minMomentum;
+		 * body.momentum = body.momentum.changeComponent(axis, currentMomentum);
+		 * }
+		 * }
+		 * }
+		 */
+
 		return new Vector(x, y).subtract(bounds.getMinVector());
 	}
-	
+
 	private void applyGroundSpeed(float force, float speed) {
 		if (hasWalkSpeed) {
 			walkSpeedApplied = true;
@@ -378,53 +445,12 @@ public class Body extends Component {
 	}
 
 	public boolean standsOnGround() {
-		if (standsOnGround == null)
-			standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -0.01f)));
+		// if (standsOnGround == null)
+		standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -0.1f)));
 		return standsOnGround;
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
-		/*
-		 * if (isCauser && direction == Direction.DOWN && other.isSolid &&
-		 * isGravityAffected) { groundSpeed = other.getSpeed().getX(); }
-		 */
 
-		// applyXForceToSpeed(groundSpeed + walkSpeed, getMass() *
-		// Config.GRAVITY_ACCELERATION * Config.ADHESION);
-
-		/*
-		 * if (other.isSolid) { if (isShiftable && other.isShiftable) { //
-		 * Distribute momentum Vector totalMomentum = momentum.add(other.momentum);
-		 * float totalMass = mass + other.mass; Vector resultingSpeed =
-		 * totalMomentum.divide(totalMass);
-		 * 
-		 * switch (direction) { case LEFT: case RIGHT:
-		 * applyXForceToSpeed(other.momentum.getX() / getWorld().getFrameTime(),
-		 * resultingSpeed.getX()); other.applyXForceToSpeed(momentum.getX() /
-		 * getWorld().getFrameTime(), resultingSpeed.getX()); break; case UP: case
-		 * DOWN: applyYForceToSpeed(other.momentum.getX() /
-		 * getWorld().getFrameTime(), resultingSpeed.getX());
-		 * other.applyYForceToSpeed(momentum.getX() / getWorld().getFrameTime(),
-		 * resultingSpeed.getX()); break; } } else { switch (direction) { case LEFT:
-		 * case RIGHT: applyXForceToSpeed(other.momentum.getX() /
-		 * getWorld().getFrameTime(), resultingSpeed.getX());
-		 * other.applyXForceToSpeed(momentum.getX() / getWorld().getFrameTime(),
-		 * resultingSpeed.getX()); break; case UP: case DOWN:
-		 * applyYForceToSpeed(other.momentum.getX() / getWorld().getFrameTime(),
-		 * resultingSpeed.getX()); other.applyYForceToSpeed(momentum.getX() /
-		 * getWorld().getFrameTime(), resultingSpeed.getX()); break; } }
-		 */
-
-		// momentum = totalMomentum.multiply(mass / totalMass);
-		// other.momentum = totalMomentum.multiply(other.mass / totalMass);
-
-		/*
-		 * if (direction == Direction.UP || direction == Direction.DOWN) {
-		 * applyXForceToSpeed(other.momentum.getX() / getWorld().getFrameTime(),
-		 * other.getSpeed().getX()); } if (direction == Direction.RIGHT || direction
-		 * == Direction.LEFT) applyXForceToSpeed(other.momentum.getY() /
-		 * getWorld().getFrameTime(), other.getSpeed().getY());
-		 */
-		// }
 	}
 }

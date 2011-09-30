@@ -10,7 +10,7 @@ public abstract class Character extends Entity {
 	private float immuneTime;
 	private float walkSpeed = 0;
 	private float climbSpeed;
-	
+
 	public Character(World world) {
 		super(world);
 		setIsGravityAffected(true);
@@ -25,7 +25,7 @@ public abstract class Character extends Entity {
 
 		applyWalkSpeed(walkSpeed);
 		applyClimbSpeed(climbSpeed);
-		
+
 		if (immuneTime > 0)
 			immuneTime -= elapsedTime;
 
@@ -85,32 +85,32 @@ public abstract class Character extends Entity {
 			getDrawable().draw(gl, 0.5f);
 		}
 	}
-	
+
 	public void setWalkSpeed(float speed) {
 		walkSpeed = speed;
 	}
-	
+
 	public float getWalkSpeed() {
 		return walkSpeed;
 	}
-	
+
 	public void setClimbSpeed(float speed) {
 		climbSpeed = speed;
 	}
-	
+
 	public float getClimbSpeed() {
 		return climbSpeed;
 	}
-	
+
 	public void jump() {
 		jump(false);
 	}
-	
+
 	public void jump(boolean unconditional) {
 		if (standsOnGround() || canClimb() || unconditional)
-			setSpeed(getSpeed().changeY(Config.PLAYER_JUMP_SPEED));
+			setSpeed(getSpeed().changeY(getShiftSpeed().getY() + Config.PLAYER_JUMP_SPEED));
 	}
-	
+
 	protected float getHeightOverGround() {
 		Body blockBelowLeft = getWorld().getBlockBelow(getPosition().changeX((float) Math.floor(getPosition().getX())));
 		Body blockBelowRight = getWorld().getBlockBelow(getPosition().changeX((float) Math.ceil(getPosition().getX())));
@@ -121,7 +121,7 @@ public abstract class Character extends Entity {
 			height = Math.min(height, getOuterBounds().getBottom() - blockBelowRight.getOuterBounds().getTop());
 		return height;
 	}
-	
+
 	protected void onDeathFall() {
 		die();
 	}

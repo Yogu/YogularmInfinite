@@ -87,31 +87,39 @@ public class Vector {
 		return new Vector(Math.round(x), Math.round(y));
 	}
 
+	/**
+	 * Rounds both components down and returns the new vector
+	 * 
+	 * @return the vector with both components rounded down
+	 */
 	public Vector floor() {
 		return new Vector((float)Math.floor(x), (float)Math.floor(y));
 	}
 
+	/**
+	 * Rounds both components up and returns the new vector
+	 * 
+	 * @return the vector with both components rounded up
+	 */
 	public Vector ceil() {
 		return new Vector((float)Math.ceil(x), (float)Math.ceil(y));
 	}
 
+	/**
+	 * Formats this vector to a string, including x and y component
+	 * 
+	 * @return a string that represents this vector
+	 */
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
 	}
 
-	public float getComponent(Direction direction) {
-		switch (direction) {
-		case LEFT:
-		case RIGHT:
-			return getX();
-		case UP:
-		case DOWN:
-			return getY();
-		default:
-			return 0;
-		}
-	}
-
+	/**
+	 * Gets the value of the given component
+	 * 
+	 * @param axis the axis that specifies the component (x or y)
+	 * @return the value of the component
+	 */
 	public float getComponent(Axis axis) {
 		switch (axis) {
 		case HORIZONTAL:
@@ -123,19 +131,13 @@ public class Vector {
 		}
 	}
 
-	public Vector changeComponent(Direction direction, float value) {
-		switch (direction) {
-		case LEFT:
-		case RIGHT:
-			return changeX(value);
-		case UP:
-		case DOWN:
-			return changeY(value);
-		default:
-			return this;
-		}
-	}
-
+	/**
+	 * Changes the value of the given axis and returns the new vector
+	 * 
+	 * @param axis the axis whose component to change
+	 * @param value the component's new value
+	 * @return the new vector with the changed component
+	 */
 	public Vector changeComponent(Axis axis, float value) {
 		switch (axis) {
 		case HORIZONTAL:
@@ -145,5 +147,24 @@ public class Vector {
 		default:
 			return this;
 		}
+	}
+	
+	/**
+	 * Gets the direction this vector points to, if it is parallel to one of the axes
+	 * 
+	 * @return the direction of this vector, or Direction.NONE, if this vector is
+	 *   neither parallel to x axis, nor to y axis.
+	 */
+	public Direction getDirection() {
+		if (x == 0 && y < 0)
+			return Direction.DOWN;
+		else if (x == 0 && y > 0)
+			return Direction.UP;
+		else if (y == 0 && x > 0)
+			return Direction.RIGHT;
+		else if (y == 0 & x < 0)
+			return Direction.LEFT;
+		else
+			return Direction.NONE;
 	}
 }
