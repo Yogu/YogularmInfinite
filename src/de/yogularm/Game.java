@@ -29,7 +29,7 @@ public class Game implements GLEventListener {
 	private FPSAnimator animator;
 	private ExceptionHandler exceptionHandler;
 
-	public static final String VERSION = "0.1.5";
+	public static final String VERSION = "0.2";
 
 	public void init(GLAutoDrawable drawable) {
 		try {
@@ -216,7 +216,7 @@ public class Game implements GLEventListener {
 		try {
 			renderer.beginRendering(width, height);
 			renderer.setColor(0, 0, 0, 1);
-			renderer.draw("Yogularm Infinite " + VERSION, width - 180, height - 20);
+			renderer.draw("Yogularm Infinite " + VERSION, width - 165, height - 20);
 		} finally {
 			renderer.endRendering();
 			renderer.dispose();
