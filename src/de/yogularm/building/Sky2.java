@@ -50,7 +50,7 @@ public class Sky2 extends BuilderBase {
 		Random random = getRandom(0x1180E669);
 		boolean isPlatform =
 			(getSubBuilder(0) instanceof PlatformBuilder)
-			|| (getSubBuilder(-1) instanceof PlatformBuilder);
+			|| !(getSubBuilder(-1) instanceof BridgeBuilder); // include ladders
 		int[] xByY = isPlatform ? MAX_X_OFFSET_BY_Y_OFFSET_PLATFORM : MAX_X_OFFSET_BY_Y_OFFSET;
 			
 		int maxYOffset = xByY.length - 2;
