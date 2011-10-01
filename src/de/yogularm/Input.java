@@ -67,10 +67,10 @@ public class Input {
 		int direction = (isLeft && !isRight) ? -1 : (isRight && !isLeft) ? 1 : 0;
 		world.getPlayer().setDirection(direction);
 		
-		if (isUp && !world.getPlayer().canClimb())
+		if (isUp && !world.getPlayer().isClimbing())
 			world.getPlayer().jump();
 		
-		if (world.getPlayer().canClimb()) {
+		if (world.getPlayer().isClimbing()) {
 			direction = (isDown && !isUp) ? -1 : (isUp && !isDown) ? 1 : 0;
 			world.getPlayer().setClimbSpeed(direction * Config.PLAYER_CLIMB_SPEED);
 		}

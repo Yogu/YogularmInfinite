@@ -20,12 +20,13 @@ public class Body extends Component {
 	private boolean isSolid = true;
 	private boolean isShiftable = false;
 	private boolean isClimbable = false;
+	private boolean canClimb = false;
 	private float walkSpeed = 0;
 	private float climbSpeed = 0;
 	private boolean hasWalkSpeed = false;
 	private List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
 	private Boolean standsOnGround; // cache
-	private boolean canClimb;
+	private boolean isClimbing;
 	private float massCache = mass;
 	private boolean walkSpeedApplied = false;
 	private Vector shiftSpeed;
@@ -134,6 +135,14 @@ public class Body extends Component {
 
 	public boolean canClimb() {
 		return canClimb;
+	}
+
+	public void setCanClimb(boolean value) {
+		canClimb = value;
+	}
+
+	public boolean isClimbing() {
+		return isClimbing;
 	}
 
 	public float getMass() {
@@ -257,7 +266,7 @@ public class Body extends Component {
 		if (isGravityAffected)
 			applyForce(new Vector(0, -Config.GRAVITY_ACCELERATION * mass));
 
-		if (canClimb)
+		if (isClimbing)
 			applyYForceToSpeed(Config.CLIMB_ACCELERATION * getMass(), climbSpeed);
 		climbSpeed = 0;
 
@@ -295,14 +304,16 @@ public class Body extends Component {
 	}
 
 	private void checkClimbing() {
-		Iterable<Body> overlaps = getWorld().getOverlappingBodies(getOuterBounds());
-		for (Body body : overlaps) {
-			if (body.isClimbable) {
-				canClimb = true;
-				return;
+		if (canClimb) {
+			Iterable<Body> overlaps = getWorld().getOverlappingBodies(getOuterBounds());
+			for (Body body : overlaps) {
+				if (body.isClimbable) {
+					isClimbing = true;
+					return;
+				}
 			}
 		}
-		canClimb = false;
+		isClimbing = false;
 	}
 
 	public boolean canMoveTo(Vector targetPosition) {
@@ -344,7 +355,7 @@ public class Body extends Component {
 		Vector delta = targetPosition.subtract(getPosition());
 		Direction direction = delta.getDirection();
 
-		List<Body> collidedBodies = null;
+		//List<Body> collidedBodies = null;
 
 		for (Component component : getWorld().getComponents()) {
 			if ((component instanceof Body) && !component.isToRemove() && (component != this)) {
@@ -435,7 +446,7 @@ public class Body extends Component {
 		// workaround for having grip in the air
 		if (hasWalkSpeed && axis == Axis.VERTICAL) {
 			if (!walkSpeedApplied) {
-				float adhesion = canClimb ? Config.ADHESION : Config.AIR_ADHESION;
+				float adhesion = isClimbing ? Config.ADHESION : Config.AIR_ADHESION;
 				applyXForceToSpeed(mass * Config.GRAVITY_ACCELERATION * adhesion, walkSpeed);
 			}
 			walkSpeedApplied = false;

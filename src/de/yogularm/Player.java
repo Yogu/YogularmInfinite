@@ -15,6 +15,7 @@ public class Player extends Character {
 		setBounds(new Rect(0.18721875f, 0.080890625f, 0.801515625f, 0.9359375f));
 		setLife(Config.MAX_LIFE);
 		setMass(20);
+		setCanClimb(true);
 		checkpoint = getPosition();
 	}
 	
@@ -48,7 +49,7 @@ public class Player extends Character {
 	}
 	
 	private void updateDrawable(float elapsedTime) {
-		if (getActualSpeed().getY() < -3 && !canClimb()) {
+		if (getActualSpeed().getY() < -3 && !isClimbing()) {
 			if (getHeightOverGround() > 3)
 				fallTime += elapsedTime;
 		} else

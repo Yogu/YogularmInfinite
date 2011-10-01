@@ -21,9 +21,9 @@ public abstract class Character extends Entity {
 	}
 
 	public void update(float elapsedTime) {
-		boolean climbing = canClimb() && climbSpeed > 0;
+		boolean climbing = isClimbing() && climbSpeed > 0;
 		super.update(elapsedTime);
-		if (climbing && !canClimb())
+		if (climbing && !isClimbing())
 			jump(true);
 
 		applyWalkSpeed(walkSpeed);
@@ -110,7 +110,7 @@ public abstract class Character extends Entity {
 	}
 
 	public void jump(boolean unconditional) {
-		if (standsOnGround() || canClimb() || unconditional)
+		if (standsOnGround() || isClimbing() || unconditional)
 			setSpeed(getSpeed().changeY(getShiftSpeed().getY() + Config.PLAYER_JUMP_SPEED));
 	}
 
