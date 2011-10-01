@@ -289,7 +289,8 @@ public class Body extends Component {
 
 	private void move(float elapsedTime) {
 		Vector lastPosition = getPosition();
-		if (!momentum.isZero()) {
+		// walk speed is only applied in collision test, so move must be done
+		if (!momentum.isZero() || hasWalkSpeed) {
 			Vector delta = getSpeed().multiply(elapsedTime);
 			// Must handle x and y move separate, otherwise there are strange effects
 			tryMoveTo(getPosition().add(delta.changeY(0)), Axis.HORIZONTAL);
