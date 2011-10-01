@@ -1,6 +1,9 @@
-package de.yogularm;
+package de.yogularm.drawing;
 
 import javax.media.opengl.GL2;
+
+import de.yogularm.OpenGLHelper;
+import de.yogularm.Vector;
 
 public class RenderTransformation implements Drawable {
 	private Drawable drawable;
@@ -14,6 +17,20 @@ public class RenderTransformation implements Drawable {
 		if (drawable == null)
 			throw new NullPointerException("drawable is null");
 		this.drawable = drawable;
+	}
+	
+	public RenderTransformation(Drawable drawable, Vector offset, Vector scale, float angle) {
+		this(drawable);
+		
+		if (offset == null)
+			throw new NullPointerException("offset is null");
+		this.offset = offset;
+
+		if (scale == null)
+			throw new NullPointerException("scale is null");
+		this.scale = scale;
+		
+		this.angle = angle;
 	}
 	
 	public Drawable getDrawable() {
@@ -58,6 +75,12 @@ public class RenderTransformation implements Drawable {
 		return scale;
 	}
 	
+	public void setScale(Vector value) {
+		if (value == null)
+			throw new NullPointerException("value is null");
+		scale = value;
+	}
+	
 	public void setIsVerticallyMirrored(boolean value) {
 		isVerticallyMirrored = value;
 	}
@@ -65,18 +88,8 @@ public class RenderTransformation implements Drawable {
 	public boolean isVerticallyMirrored() {
 		return isVerticallyMirrored;
 	}
-	
-	public void setScale(Vector value) {
-		if (value == null)
-			throw new NullPointerException("value is null");
-		scale = value;
-	}
 
 	public void draw(GL2 gl) {
-		draw(gl, 1);
-	}
-
-	public void draw(GL2 gl, float opacity) {
 		gl.glPushMatrix();
 		gl.glTranslatef(offset.getX() + (isVerticallyMirrored ? 1 : 0), offset.getY(), 0);
 		if (angle != 0)
@@ -86,7 +99,7 @@ public class RenderTransformation implements Drawable {
 			gl.glTranslatef(-rotationCenter.getX(), -rotationCenter.getY(), 0);
 		gl.glScalef(scale.getX() * (isVerticallyMirrored ? -1 : 1), scale.getY(), 1);
 		
-		drawable.draw(gl, opacity);
+		drawable.draw(gl);
 
 		gl.glPopMatrix();
 		OpenGLHelper.checkErrors(gl);

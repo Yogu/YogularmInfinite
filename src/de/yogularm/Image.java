@@ -4,6 +4,8 @@ import javax.media.opengl.GL2;
 
 import com.jogamp.opengl.util.texture.Texture;
 
+import de.yogularm.drawing.Drawable;
+
 public class Image implements Cloneable, Drawable {
 	private Texture texture;
 	private Rect range;
@@ -31,12 +33,7 @@ public class Image implements Cloneable, Drawable {
 	}
 	
 	public void draw(GL2 gl) {
-		draw(gl, 1);
-	}
-	
-	public void draw(GL2 gl, float opacity) {
 		texture.bind();
-		gl.glColor4f(1, 1, 1, opacity);
 		drawQuad(gl);
 	}
 	

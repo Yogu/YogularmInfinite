@@ -8,6 +8,8 @@ import javax.media.opengl.GL2;
 
 import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
+import de.yogularm.drawing.Renderable;
+import de.yogularm.drawing.Renderer;
 
 public class World {
 	// private static List<Builder> builders = new ArrayList<Builder>();

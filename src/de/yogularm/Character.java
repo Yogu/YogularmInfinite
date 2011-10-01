@@ -3,6 +3,9 @@ package de.yogularm;
 import javax.media.opengl.GL2;
 
 import de.yogularm.components.Arrow;
+import de.yogularm.drawing.Color;
+import de.yogularm.drawing.ColoredDrawable;
+import de.yogularm.drawing.Drawable;
 
 public abstract class Character extends Entity {
 	private float life = 1;
@@ -78,12 +81,12 @@ public abstract class Character extends Entity {
 		return isDead;
 	}
 
-	public void draw(GL2 gl) {
-		if (immuneTime <= 0)
-			super.draw(gl);
-		else {
-			getDrawable().draw(gl, 0.5f);
-		}
+	public Drawable getDrawable() {
+		Drawable drawable = super.getDrawable();
+		if (immuneTime > 0)
+			return new ColoredDrawable(drawable, new Color(1, 1, 1, 0.5f));
+		else
+			return drawable;
 	}
 
 	public void setWalkSpeed(float speed) {

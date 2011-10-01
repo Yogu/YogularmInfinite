@@ -13,6 +13,8 @@ import javax.media.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
+import de.yogularm.drawing.RenderTransformation;
+
 public class Game implements GLEventListener {
 	private World world;
 	private Input input = new Input();
@@ -166,6 +168,8 @@ public class Game implements GLEventListener {
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
 
+		gl.glColor4f(1, 1, 1, 1);
+
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
@@ -174,9 +178,10 @@ public class Game implements GLEventListener {
 		glu.gluOrtho2D(0.0f, width, 0.0f, height);
 
 		if (isGameover) {
-			gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 			gl.glColor4f(0, 0, 0, 0.5f);
+			gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
 			OpenGLHelper.renderRect(gl, width, height);
+			gl.glColor4f(1, 1, 1, 1);
 		}
 
 		RenderTransformation.draw(gl, Res.images.coin, 20, height - 70, 50, 50);

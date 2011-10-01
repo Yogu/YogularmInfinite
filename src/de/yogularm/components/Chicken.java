@@ -2,15 +2,15 @@ package de.yogularm.components;
 
 import javax.media.opengl.GL2;
 
-import de.yogularm.AnimatedImage;
 import de.yogularm.Body;
 import de.yogularm.Bot;
 import de.yogularm.Direction;
 import de.yogularm.Rect;
-import de.yogularm.RenderTransformation;
 import de.yogularm.Res;
 import de.yogularm.Vector;
 import de.yogularm.World;
+import de.yogularm.drawing.AnimatedImage;
+import de.yogularm.drawing.RenderTransformation;
 
 public class Chicken extends Bot {
 	private AnimatedImage walkingAnimation;
@@ -47,10 +47,6 @@ public class Chicken extends Bot {
 			else if(getDirection() > 0)
 				transformation.setIsVerticallyMirrored(true);
 		}
-	}
-	
-	public void draw(GL2 gl) {
-		super.draw(gl);
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {

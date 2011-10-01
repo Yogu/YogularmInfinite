@@ -1,9 +1,13 @@
 package de.yogularm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import javax.media.opengl.GL2;
+import de.yogularm.drawing.CombinedDrawable;
+import de.yogularm.drawing.Drawable;
+import de.yogularm.drawing.RenderTransformation;
+import de.yogularm.drawing.SimpleArrow;
 
 public class Body extends Component {
 	private Rect bounds;
@@ -225,19 +229,28 @@ public class Body extends Component {
 		checkClimbing();
 	}
 
-	public void draw(GL2 gl) {
-		super.draw(gl);
+	public Drawable getDrawable() {
+		Drawable drawable = super.getDrawable();
 
-		if (forces != null)
-			drawForces(gl);
+		if (forces != null) {
+			CombinedDrawable combination = new CombinedDrawable();
+			combination.add(drawable);
+			combination.addAll(getForceDrawables());
+			return combination;
+		}
+		return drawable;
 	}
 
-	private void drawForces(GL2 gl) {
+	private Collection<Drawable> getForceDrawables() {
 		Vector center = getBounds().getCenter();
+		List<Drawable> drawables = new ArrayList<Drawable>();
 		for (Vector force : forces) {
-			if (force.getLength() > 0)
-				SimpleArrow.render(gl, center, force.getLength() / mass, force.getAngleToXAxis());
+			if (force.getLength() > 0) {
+				drawables.add(new RenderTransformation(new SimpleArrow(),
+					center, new Vector(force.getLength() / mass, 1), force.getAngleToXAxis()));
+			}
 		}
+		return drawables;
 	}
 
 	private void applyForces(float elapsedTime) {

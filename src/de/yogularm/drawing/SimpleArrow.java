@@ -1,7 +1,10 @@
-package de.yogularm;
+package de.yogularm.drawing;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
+
+import de.yogularm.OpenGLHelper;
+import de.yogularm.Vector;
 
 public class SimpleArrow implements Drawable {
 	private static final float HEAD_SIZE = 0.2f;
@@ -15,7 +18,6 @@ public class SimpleArrow implements Drawable {
 	}
 
 	public void draw(GL2 gl, float opacity) {
-		gl.glColor4f(1, 0, 0, 1);
 		gl.glLineWidth(2);
 		gl.glBegin(GL2.GL_LINE_STRIP);
 		gl.glVertex2f(0, 0);

@@ -7,10 +7,11 @@ import de.yogularm.Direction;
 import de.yogularm.Entity;
 import de.yogularm.Item;
 import de.yogularm.Rect;
-import de.yogularm.RenderTransformation;
 import de.yogularm.Res;
 import de.yogularm.Vector;
 import de.yogularm.World;
+import de.yogularm.drawing.Drawable;
+import de.yogularm.drawing.RenderTransformation;
 
 public class Arrow extends Entity {
 	private Body sender;
@@ -31,10 +32,10 @@ public class Arrow extends Entity {
 		this.sender = sender;
 	}
 	
-	public void draw(GL2 gl) {
+	public void update(float elapsedTime) {
+		super.update(elapsedTime);	
 		float angle = getSpeed().getAngleToXAxis();
 		transformation.setAngle(angle);
-		super.draw(gl);
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {

@@ -9,6 +9,9 @@ import javax.media.opengl.GLException;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
+import de.yogularm.drawing.Animation;
+import de.yogularm.drawing.TiledImage;
+
 public class Res {
 	public static final Textures textures = new Textures();
 	public static final Images images = new Images();

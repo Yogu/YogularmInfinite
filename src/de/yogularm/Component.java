@@ -2,6 +2,10 @@ package de.yogularm;
 
 import javax.media.opengl.GL2;
 
+import de.yogularm.drawing.AnimatedImage;
+import de.yogularm.drawing.Animation;
+import de.yogularm.drawing.Drawable;
+
 public class Component implements Locatable {
 	private Vector position;
 	private World world;
@@ -56,12 +60,7 @@ public class Component implements Locatable {
 		drawable = animation.getInstance();
 	}
 	
-	protected Drawable getDrawable() {
+	public Drawable getDrawable() {
 		return drawable;
-	}
-	
-	public void draw(GL2 gl) {
-		if (drawable != null)
-			drawable.draw(gl);
 	}
 }
