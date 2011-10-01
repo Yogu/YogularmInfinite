@@ -1,14 +1,18 @@
 package de.yogularm.components;
 
 import de.yogularm.Block;
-import de.yogularm.Vector;
+import de.yogularm.Rect;
 import de.yogularm.Res;
+import de.yogularm.Vector;
 import de.yogularm.World;
+import de.yogularm.drawing.CombinedDrawable;
+import de.yogularm.drawing.RenderTransformation;
 
 public class Platform extends Block {
 	private static final float DEFAULT_SPEED = 3;
 	private static final float DEFAULT_ACCELERATION = 10;
 	private static final float DEFAULT_PAUSE_TIME = 0.4f;
+	private static final float ANIMATION_FREQUENCY_PER_PLATFORM_SPEED = 0.5f; // [Hz/(m/s)] = [1/m]
 	
 	private Vector[] targets = new Vector[0];
 	private float speed = DEFAULT_SPEED;
@@ -18,10 +22,19 @@ public class Platform extends Block {
 	private boolean enableBreaking;
 	private float pauseTime = DEFAULT_PAUSE_TIME;
 	private float elapsedPauseTime;
+	private RenderTransformation propellerTransformation;
+	private float animationTime;
 	
 	public Platform(World world) {
 		super(world);
-		setDrawable(Res.images.stone);
+		propellerTransformation = new RenderTransformation(Res.images.platformPropeller);
+		propellerTransformation.setRotationCenter(new Vector(0.5f, 0.5f));
+		CombinedDrawable drawable = new CombinedDrawable();
+		drawable.add(propellerTransformation);
+		drawable.add(Res.images.platform);
+		setDrawable(drawable);
+		setBounds(new Rect(0, 0.8125f, 1, 1));
+		
 		origin = getPosition();
 		enableBreaking = true;
 	}
@@ -104,6 +117,11 @@ public class Platform extends Block {
 					headTo(target);
 			}
 		}
+		
+		animationTime += elapsedTime;
+		float length = 1 / (ANIMATION_FREQUENCY_PER_PLATFORM_SPEED * speed);
+		animationTime %= length;
+		propellerTransformation.setScale(new Vector((float)Math.cos(animationTime / length * 2 * Math.PI), 1));
 	}
 	
 	private boolean hasArrived(Vector source, Vector target) {

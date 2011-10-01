@@ -16,22 +16,22 @@ public class Res {
 	public static final Textures textures = new Textures();
 	public static final Images images = new Images();
 	public static final Animations animations = new Animations();
-	
+
 	public static void init() {
 		try {
 			textures.load();
 			images.load();
 			animations.load();
 		} catch (Exception e) {
-			throw new RuntimeException ("Failed to load resources", e);
+			throw new RuntimeException("Failed to load resources", e);
 		}
 	}
-	
+
 	public static class Textures {
 		public Texture blocks;
 		public Texture yogu;
 		public Texture chicken;
-		
+
 		public void load() throws GLException, IOException {
 			blocks = loadTexture("blocks");
 			yogu = loadTexture("yogu");
@@ -40,14 +40,14 @@ public class Res {
 
 		private Texture loadTexture(String name) throws GLException, IOException {
 			InputStream stream = getClass().getResourceAsStream("/res/textures/" + name + ".png");
-			Texture texture =  TextureIO.newTexture(stream, false, "png");
+			Texture texture = TextureIO.newTexture(stream, false, "png");
 			texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
 			texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
 
 			return texture;
 		}
 	}
-	
+
 	public static class Images {
 		public Image arrow;
 		public Image bricks;
@@ -57,6 +57,8 @@ public class Res {
 		public Image shooter;
 		public Image stone;
 		public Image ladder;
+		public Image platform;
+		public Image platformPropeller;
 		public Image yogu;
 		public Image yoguWalkingLeft1;
 		public Image yoguWalkingLeft2;
@@ -74,18 +76,20 @@ public class Res {
 		public Image chickenExploding2;
 		public Image chickenExploding3;
 		public Image chickenExploding4;
-		
+
 		public void load() {
 			TiledImage tiles = new TiledImage(Res.textures.blocks, 4, 4);
-			
-			stone =      tiles.get(0, 0);
-			ladder =     tiles.get(1, 0);
-			bricks =     tiles.get(2, 0);
-			coin =       tiles.get(0, 2);
+
+			stone = tiles.get(0, 0);
+			ladder = tiles.get(1, 0);
+			bricks = tiles.get(2, 0);
+			platform = tiles.get(0, 1);
+			platformPropeller = tiles.get(1, 1);
+			coin = tiles.get(0, 2);
 			checkpoint = tiles.get(1, 2);
-			heart =      tiles.get(2, 2);
-			arrow =      tiles.get(3, 2);
-			shooter =    tiles.get(0, 3);
+			heart = tiles.get(2, 2);
+			arrow = tiles.get(3, 2);
+			shooter = tiles.get(0, 3);
 
 			tiles = new TiledImage(Res.textures.yogu, 3, 3);
 			yogu = tiles.get(0, 0);
@@ -109,33 +113,28 @@ public class Res {
 			chickenExploding4 = tiles.get(3, 0);
 		}
 	}
-	
+
 	public static class Animations {
 		public Animation yoguWalking;
 		public Animation chickenWalking;
 		public Animation chickenFluttering;
 		public Animation chickenExploding;
-		
+
 		public void load() {
-			yoguWalking = new Animation(new Image[] {
-				Res.images.yogu, Res.images.yoguWalkingLeft1, Res.images.yoguWalkingLeft2,
-				Res.images.yoguWalkingLeft1, Res.images.yogu, Res.images.yoguWalkingRight1,
-				Res.images.yoguWalkingRight2, Res.images.yoguWalkingRight1, Res.images.yogu },
-				0.1f);
+			yoguWalking = new Animation(new Image[] { Res.images.yogu, Res.images.yoguWalkingLeft1,
+				Res.images.yoguWalkingLeft2, Res.images.yoguWalkingLeft1, Res.images.yogu, Res.images.yoguWalkingRight1,
+				Res.images.yoguWalkingRight2, Res.images.yoguWalkingRight1, Res.images.yogu }, 0.1f);
 
-			chickenWalking = new Animation(new Image[] {
-				Res.images.chicken, Res.images.chickenWalkingLeft1, Res.images.chickenWalkingLeft2,
-				Res.images.chickenWalkingLeft1, Res.images.chicken, Res.images.chickenWalkingRight1,
-				Res.images.chickenWalkingRight2, Res.images.chickenWalkingRight1, Res.images.chicken },
-				0.05f);
+			chickenWalking = new Animation(new Image[] { Res.images.chicken, Res.images.chickenWalkingLeft1,
+				Res.images.chickenWalkingLeft2, Res.images.chickenWalkingLeft1, Res.images.chicken,
+				Res.images.chickenWalkingRight1, Res.images.chickenWalkingRight2, Res.images.chickenWalkingRight1,
+				Res.images.chicken }, 0.05f);
 
-			chickenFluttering = new Animation(new Image[] {
-				Res.images.chicken, Res.images.chickenFluttering1, Res.images.chicken,
-				Res.images.chickenFluttering2 }, 0.05f);
+			chickenFluttering = new Animation(new Image[] { Res.images.chicken, Res.images.chickenFluttering1,
+				Res.images.chicken, Res.images.chickenFluttering2 }, 0.05f);
 
-			chickenExploding = new Animation(new Image[] {
-				Res.images.chickenExploding1, Res.images.chickenExploding2,
-				Res.images.chickenExploding3, Res.images.chickenExploding4}, 0.05f);
+			chickenExploding = new Animation(new Image[] { Res.images.chickenExploding1, Res.images.chickenExploding2,
+				Res.images.chickenExploding3, Res.images.chickenExploding4 }, 0.05f);
 		}
 	}
 }

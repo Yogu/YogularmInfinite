@@ -9,6 +9,16 @@ import javax.media.opengl.GL2;
 public class CombinedDrawable implements Drawable {
 	private List<Drawable> drawables = new ArrayList<Drawable>();
 	
+	public CombinedDrawable() {
+		
+	}
+	
+	public CombinedDrawable(List<Drawable> drawables) {
+		if (drawables == null)
+			throw new NullPointerException("drawables is null");
+		this.drawables = drawables;
+	}
+	
 	public void add(Drawable drawable) {
 		if (drawable != null)
 			drawables.add(drawable);

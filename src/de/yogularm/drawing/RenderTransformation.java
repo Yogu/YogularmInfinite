@@ -92,12 +92,10 @@ public class RenderTransformation implements Drawable {
 	public void draw(GL2 gl) {
 		gl.glPushMatrix();
 		gl.glTranslatef(offset.getX() + (isVerticallyMirrored ? 1 : 0), offset.getY(), 0);
-		if (angle != 0)
-			gl.glTranslatef(rotationCenter.getX(), rotationCenter.getY(), 0);
+		gl.glTranslatef(rotationCenter.getX(), rotationCenter.getY(), 0);
 		gl.glRotatef(angle, 0, 0, 1);
-		if (angle != 0)
-			gl.glTranslatef(-rotationCenter.getX(), -rotationCenter.getY(), 0);
 		gl.glScalef(scale.getX() * (isVerticallyMirrored ? -1 : 1), scale.getY(), 1);
+		gl.glTranslatef(-rotationCenter.getX(), -rotationCenter.getY(), 0);
 		
 		drawable.draw(gl);
 
