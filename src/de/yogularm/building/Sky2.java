@@ -27,6 +27,7 @@ public class Sky2 extends BuilderBase {
 	private static final int MAX_PLATFORM_Y_OFFSET = 4;
 	private static final float MIN_PLATFORM_SPEED = 2;
 	private static final float MAX_PLATFORM_SPEED = 5;
+	private static final int CHECKPOINT_RANGE = 20; // every x structures a checkpoint
 	
 	public void doBuild() {
 		buildGap();
@@ -36,7 +37,7 @@ public class Sky2 extends BuilderBase {
 		else
 			buildBridge();
 
-		if (!isCheckpoint(0))
+		if (isCheckpoint(0))
 			place(Checkpoint.class, 0, 1);
 		else
 			place(Coin.class, 0, 1);
@@ -92,6 +93,7 @@ public class Sky2 extends BuilderBase {
 	
 	private boolean isCheckpoint(int indexOffset) {
 		int index = getCurrentIndex() + indexOffset;
-		return (index % 20 == 9 && !isCheckpoint(0)) || (index - 1) % 20 == 9 && isCheckpoint(-1); 
+		return (index % CHECKPOINT_RANGE == CHECKPOINT_RANGE - 1 && !isPlatform(indexOffset))
+			|| ((index - 1) % CHECKPOINT_RANGE == CHECKPOINT_RANGE - 1 && isPlatform(indexOffset - 1)); 
 	}
 }

@@ -19,6 +19,7 @@ public class Shooter extends Block {
 		super(world);
 		setDrawable(Res.images.shooter);
 		setBounds(new Rect(0, 0, 1, 0.6015625f));
+		rechargeTime = getRechargeTime();
 	}
 	
 	public void update(float elapsedTime) {
@@ -32,7 +33,7 @@ public class Shooter extends Block {
 	
 	private void shoot() {
 		Arrow arrow = new Arrow(getWorld(), this);
-		arrow.setPosition(getPosition());
+		arrow.setPosition(getPosition().add(new Vector(0, -0.2f))); // arrow shoots out of pipe
 		float angle = (float)Math.toRadians(180 - getAngle());
 		arrow.setSpeed(new Vector((float)Math.cos(angle), (float)Math.sin(angle)).multiply(Config.ARROW_SPEED));
 		getWorld().addComponent(arrow);
