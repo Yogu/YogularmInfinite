@@ -1,8 +1,5 @@
 package de.yogularm.drawing;
 
-import com.jogamp.opengl.util.texture.Texture;
-
-import de.yogularm.Image;
 import de.yogularm.Rect;
 
 public class TiledImage {

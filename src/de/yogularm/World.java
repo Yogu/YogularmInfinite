@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.media.opengl.GL2;
-
 import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
+import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Renderable;
 import de.yogularm.drawing.Renderer;
 
@@ -28,32 +27,19 @@ public class World {
 	private List<Component> componentsToAdd = new ArrayList<Component>();
 	private Camera camera = new Camera();
 	private Player player;
-	private Player player2;
 	private int seed;
 	private int structureCounter = 0;
 	private Vector buildingPosition = Vector.getZero();
 	private Builder currentBuilder;
 	private float frameTime;
-	private boolean hasSecondPlayer;
-
-	public World(int seed) {
-		this(seed, false);
-	}
 	
-	public World(int seed, boolean hasSecondPlayer) {
+	public World(int seed) {
 		this.seed = seed;
-		this.hasSecondPlayer = hasSecondPlayer;
 		
 		currentBuilder = new Sky2();
 
 		player = new Player(this);
 		components.add(player);
-		
-		if (hasSecondPlayer) {
-			player2 = new Player(this);
-			components.add(player2);
-			player2.setPosition(new Vector(0, 1));
-		}
 
 		// First place
 		Stone stone = new Stone(this);
@@ -61,12 +47,12 @@ public class World {
 		components.add(0, stone);
 	}
 
-	public void render(GL2 gl) {
-		camera.applyMatrix(gl);
+	public void render(RenderContext context) {
+		camera.applyMatrix(context);
 
 		for (Component component : components) {
 			if (component instanceof Renderable) {
-				Renderer.render(gl, (Renderable) component);
+				Renderer.render(context, (Renderable) component);
 			}
 		}
 	}
@@ -109,10 +95,6 @@ public class World {
 
 	public Player getPlayer() {
 		return player;
-	}
-
-	public Player getPlayer2() {
-		return player2;
 	}
 
 	public Camera getCamera() {

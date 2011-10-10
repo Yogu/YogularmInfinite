@@ -3,13 +3,10 @@ package de.yogularm;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLException;
-
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-
 import de.yogularm.drawing.Animation;
+import de.yogularm.drawing.Image;
+import de.yogularm.drawing.RenderContext;
+import de.yogularm.drawing.Texture;
 import de.yogularm.drawing.TiledImage;
 
 public class Res {
@@ -17,9 +14,9 @@ public class Res {
 	public static final Images images = new Images();
 	public static final Animations animations = new Animations();
 
-	public static void init() {
+	public static void init(RenderContext context) {
 		try {
-			textures.load();
+			textures.load(context);
 			images.load();
 			animations.load();
 		} catch (Exception e) {
@@ -32,19 +29,15 @@ public class Res {
 		public Texture yogu;
 		public Texture chicken;
 
-		public void load() throws GLException, IOException {
-			blocks = loadTexture("blocks");
-			yogu = loadTexture("yogu");
-			chicken = loadTexture("chicken");
+		public void load(RenderContext context) throws IOException {
+			blocks = loadTexture(context, "blocks");
+			yogu = loadTexture(context, "yogu");
+			chicken = loadTexture(context, "chicken");
 		}
 
-		private Texture loadTexture(String name) throws GLException, IOException {
+		private Texture loadTexture(RenderContext context, String name) throws IOException {
 			InputStream stream = getClass().getResourceAsStream("/res/textures/" + name + ".png");
-			Texture texture = TextureIO.newTexture(stream, false, "png");
-			texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
-			texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
-
-			return texture;
+			return context.loadTexture(stream);
 		}
 	}
 

@@ -1,10 +1,7 @@
-package de.yogularm;
+package de.yogularm.drawing;
 
-import javax.media.opengl.GL2;
-
-import com.jogamp.opengl.util.texture.Texture;
-
-import de.yogularm.drawing.Drawable;
+import de.yogularm.Rect;
+import de.yogularm.Vector;
 
 public class Image implements Cloneable, Drawable {
 	private Texture texture;
@@ -32,25 +29,9 @@ public class Image implements Cloneable, Drawable {
 		this(texture, new Rect(0, 0, 1, 1));
 	}
 	
-	public void draw(GL2 gl) {
+	public void draw(RenderContext context) {
 		texture.bind();
-		drawQuad(gl);
-	}
-	
-	protected void drawQuad(GL2 gl) {
-		float max = range.getMaxVector().getX();
-		float min = range.getMinVector().getX();
-		
-		gl.glBegin(GL2.GL_QUADS);
-		gl.glTexCoord2f(min, range.getMaxVector().getY());
-		gl.glVertex3f(0, 0, 0);
-		gl.glTexCoord2f(max, range.getMaxVector().getY());
-		gl.glVertex3f(size.getX(), 0, 0);
-		gl.glTexCoord2f(max, range.getMinVector().getY());
-		gl.glVertex3f(size.getX(), size.getY(), 0);
-		gl.glTexCoord2f(min, range.getMinVector().getY());
-		gl.glVertex3f(0, size.getY(), 0);
-		gl.glEnd();
+		context.drawRect(new Rect(Vector.getZero(), size), range);
 	}
 	
 	public void update(float elapsedTime) {

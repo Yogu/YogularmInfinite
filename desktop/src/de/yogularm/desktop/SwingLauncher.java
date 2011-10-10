@@ -1,4 +1,4 @@
-package de.yogularm.launcher;
+package de.yogularm.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.SystemColor;
@@ -33,17 +33,25 @@ public class SwingLauncher {
 
 	public void run() {
 		GLProfile.initSingleton(true);
-		Game game = new Game();
-		game.setExceptionHandler(new ExceptionHandler() {
+		canvas = createWindow();
+		RenderContextImpl context = new RenderContextImpl(canvas.getGL().getGL2());
+		InputImpl input = new InputImpl();
+		Game game = new Game(context, input);
+		GLEventListenerImpl eventListener = new GLEventListenerImpl(game, context);
+		canvas.addGLEventListener(eventListener);
+
+		canvas.addKeyListener(input.getKeyListener());
+		window.addKeyListener(input.getKeyListener());
+		
+		eventListener.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(Throwable e) {
 				SwingLauncher.this.handleException(e);
 			}
 		});
-		canvas = createWindow(game);
-		game.start(canvas);
+		eventListener.start(canvas);
 	}
 
-	public GLCanvas createWindow(final Game game) {
+	public GLCanvas createWindow() {
 		window = new JFrame("Yogularm Infinite");
 		window.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowevent) {
@@ -58,10 +66,7 @@ public class SwingLauncher {
 		GLProfile glprofile = GLProfile.getDefault();
 		GLCapabilities glcapabilities = new GLCapabilities(glprofile);
 		GLCanvas canvas = new GLCanvas(glcapabilities);
-		canvas.addGLEventListener(game);
 		window.getContentPane().add(canvas, BorderLayout.CENTER);
-		canvas.addKeyListener(game.getKeyListener());
-		window.addKeyListener(game.getKeyListener());
 
 		return canvas;
 	}

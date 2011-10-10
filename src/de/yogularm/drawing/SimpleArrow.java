@@ -1,8 +1,5 @@
 package de.yogularm.drawing;
 
-import javax.media.opengl.GL2;
-
-import de.yogularm.OpenGLHelper;
 import de.yogularm.Vector;
 
 public class SimpleArrow implements Drawable {
@@ -11,31 +8,25 @@ public class SimpleArrow implements Drawable {
 	public float getLength(float length) {
 		return length;
 	}
-	
-	public void draw(GL2 gl) {
-		draw(gl, 1);
-	}
 
-	public void draw(GL2 gl, float opacity) {
-		gl.glLineWidth(2);
-		gl.glBegin(GL2.GL_LINE_STRIP);
-		gl.glVertex2f(0, 0);
-		gl.glVertex2f(1, 0);
-		gl.glVertex2f(1 - HEAD_SIZE, -HEAD_SIZE);
-		gl.glVertex2f(1, 0);
-		gl.glVertex2f(1 - HEAD_SIZE, HEAD_SIZE);
-		gl.glEnd();
-		OpenGLHelper.checkErrors(gl);
+	public void draw(RenderContext context) {
+		context.drawLines(new Vector[] {
+			new Vector(0, 0),
+			new Vector(1, 0),
+			new Vector(1 - HEAD_SIZE, -HEAD_SIZE),
+			new Vector(1, 0),
+			new Vector(1 - HEAD_SIZE, HEAD_SIZE)
+		}, 2, true);
 	}
 
 	public void update(float elapsedTime) { }
 	
-	public static void render(GL2 gl, Vector offset, float length, float angle) {
+	public static void render(RenderContext context, Vector offset, float length, float angle) {
 		SimpleArrow arrow = new SimpleArrow();
 		RenderTransformation transformation = new RenderTransformation(arrow);
 		transformation.setOffset(offset);
 		transformation.setAngle(angle);
 		transformation.setScale(new Vector(length, 1));
-		transformation.draw(gl);
+		transformation.draw(context);
 	}
 }

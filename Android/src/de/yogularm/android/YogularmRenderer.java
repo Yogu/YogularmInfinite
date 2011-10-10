@@ -27,21 +27,17 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		
 		quadVertices = createBuffer(new float[] { 
+			0, 1, 0,
 			0, 0, 0,
-			0, 1, 0, 
-			1, 1, 0, 
-			0, 0, 0, 
-			1, 1, 0, 
+			1, 1, 0,
 			1, 0, 0 
 		});
 		
 		quadTexCoords = createBuffer(new float[] { 
 			0, 0,
-			0, 1, 
-			1, 1, 
-			0, 0, 
-			1, 1, 
+			0, 1,
 			1, 0, 
+			1, 1
 		});
 	}
 
@@ -61,7 +57,7 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 		Res.coin.bind();
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, quadVertices);
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, quadTexCoords);
-		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 2 * 3);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {

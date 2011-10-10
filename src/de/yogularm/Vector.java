@@ -44,6 +44,10 @@ public class Vector {
 	public Vector divide(float value) {
 		return new Vector(x / value, y / value);
 	}
+	
+	public Vector negate() {
+		return new Vector(-x, -y);
+	}
 
 	public float getLength() {
 		return (float) Math.sqrt(x * x + y * y);

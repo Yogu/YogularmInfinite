@@ -1,8 +1,5 @@
 package de.yogularm.drawing;
 
-import javax.media.opengl.GL2;
-
-import de.yogularm.OpenGLHelper;
 import de.yogularm.Vector;
 
 public class RenderTransformation implements Drawable {
@@ -89,25 +86,22 @@ public class RenderTransformation implements Drawable {
 		return isVerticallyMirrored;
 	}
 
-	public void draw(GL2 gl) {
-		gl.glPushMatrix();
-		gl.glTranslatef(offset.getX() + (isVerticallyMirrored ? 1 : 0), offset.getY(), 0);
-		gl.glTranslatef(rotationCenter.getX(), rotationCenter.getY(), 0);
-		gl.glRotatef(angle, 0, 0, 1);
-		gl.glScalef(scale.getX() * (isVerticallyMirrored ? -1 : 1), scale.getY(), 1);
-		gl.glTranslatef(-rotationCenter.getX(), -rotationCenter.getY(), 0);
-		
-		drawable.draw(gl);
-
-		gl.glPopMatrix();
-		OpenGLHelper.checkErrors(gl);
+	public void draw(RenderContext context) {
+		context.beginTransformation();
+			context.translate(offset.add(new Vector(isVerticallyMirrored ? 1 : 0, 0)));
+			context.translate(rotationCenter);
+			context.rotate(angle);
+			context.scale(scale.add(new Vector(isVerticallyMirrored ? -1 : 1, 0)));
+			context.translate(rotationCenter.negate());
+			drawable.draw(context);
+		context.endTransformation();
 	}
 	
-	public static void draw(GL2 gl, Drawable drawable, float x, float y, float width, float height) {
+	public static void draw(RenderContext context, Drawable drawable, float x, float y, float width, float height) {
 		RenderTransformation transformation = new RenderTransformation(drawable);
 		transformation.setOffset(new Vector(x, y));
 		transformation.setScale(new Vector(width, height));
-		transformation.draw(gl);
+		transformation.draw(context);
 	}
 	
 	public void update(float elapsedTime) {

@@ -1,6 +1,6 @@
 package de.yogularm;
 
-import javax.media.opengl.GL2;
+import de.yogularm.drawing.RenderContext;
 
 
 public class Camera {
@@ -21,9 +21,9 @@ public class Camera {
 		this.bounds = bounds;
 	}
 	
-	public void applyMatrix(GL2 gl) {
-		gl.glLoadIdentity();
-	  gl.glTranslatef(-bounds.getMinVector().getX(), -bounds.getMinVector().getY(), 0);
+	public void applyMatrix(RenderContext context) {
+		context.resetTranformation();
+		context.translate(bounds.getMinVector().negate());
 	}
 	
 	public void scroll(Vector target, float elapsedTime) {

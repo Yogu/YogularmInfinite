@@ -1,9 +1,5 @@
 package de.yogularm.drawing;
 
-import javax.media.opengl.GL2;
-
-
-
 public class ColoredDrawable implements Drawable {
 	private Drawable drawable;
 	private Color color = Color.white;
@@ -35,9 +31,9 @@ public class ColoredDrawable implements Drawable {
 		return drawable;
 	}
 	
-	public void draw(GL2 gl) {
-		gl.glColor4f(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-		drawable.draw(gl);
+	public void draw(RenderContext context) {
+		context.setColor(color);
+		drawable.draw(context);
 	}
 
 	public void update(float elapsedTime) {

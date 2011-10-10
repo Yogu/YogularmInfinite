@@ -1,6 +1,5 @@
 package de.yogularm.drawing;
 
-import de.yogularm.Image;
 
 
 public class Animation {

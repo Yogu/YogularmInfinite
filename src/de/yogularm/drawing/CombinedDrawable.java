@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.media.opengl.GL2;
-
 public class CombinedDrawable implements Drawable {
 	private List<Drawable> drawables = new ArrayList<Drawable>();
 	
@@ -28,9 +26,9 @@ public class CombinedDrawable implements Drawable {
 		drawables.addAll(collection);
 	}
 	
-	public void draw(GL2 gl) {
+	public void draw(RenderContext context) {
 		for (Drawable drawable : drawables)
-			drawable.draw(gl);
+			drawable.draw(context);
 	}
 
 	public void update(float elapsedTime) {
