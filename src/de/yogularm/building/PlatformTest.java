@@ -2,7 +2,6 @@ package de.yogularm.building;
 
 import de.yogularm.BuilderBase;
 import de.yogularm.Vector;
-import de.yogularm.components.Ladder;
 import de.yogularm.components.Platform;
 
 public class PlatformTest extends BuilderBase {	

@@ -3,6 +3,7 @@ package de.yogularm.drawing;
 import javax.media.opengl.GL2;
 
 
+
 public class ColoredDrawable implements Drawable {
 	private Drawable drawable;
 	private Color color = Color.white;

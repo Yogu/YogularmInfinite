@@ -1,10 +1,8 @@
 package de.yogularm.components;
 
 import de.yogularm.Block;
-import de.yogularm.Config;
 import de.yogularm.Rect;
 import de.yogularm.Res;
-import de.yogularm.Vector;
 import de.yogularm.World;
 
 public class Ladder extends Block {	

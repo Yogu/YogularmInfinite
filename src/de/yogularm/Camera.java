@@ -2,6 +2,7 @@ package de.yogularm;
 
 import javax.media.opengl.GL2;
 
+
 public class Camera {
 	private Rect bounds;
 	

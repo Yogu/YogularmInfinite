@@ -3,6 +3,7 @@ package de.yogularm.drawing;
 import javax.media.opengl.GL2;
 
 
+
 public class AnimatedImage implements Drawable {
 	private Animation animation;
 	private float currentTime;

@@ -1,7 +1,5 @@
 package de.yogularm.components;
 
-import javax.media.opengl.GL2;
-
 import de.yogularm.Body;
 import de.yogularm.Direction;
 import de.yogularm.Entity;
@@ -10,7 +8,6 @@ import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
 import de.yogularm.World;
-import de.yogularm.drawing.Drawable;
 import de.yogularm.drawing.RenderTransformation;
 
 public class Arrow extends Entity {

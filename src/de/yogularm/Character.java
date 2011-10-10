@@ -1,7 +1,5 @@
 package de.yogularm;
 
-import javax.media.opengl.GL2;
-
 import de.yogularm.components.Arrow;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.ColoredDrawable;

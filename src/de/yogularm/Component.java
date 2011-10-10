@@ -1,7 +1,5 @@
 package de.yogularm;
 
-import javax.media.opengl.GL2;
-
 import de.yogularm.drawing.AnimatedImage;
 import de.yogularm.drawing.Animation;
 import de.yogularm.drawing.Drawable;

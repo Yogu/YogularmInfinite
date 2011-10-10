@@ -3,6 +3,7 @@ package de.yogularm;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+
 public class Input {
 	private boolean isLeft;
 	private boolean isRight;

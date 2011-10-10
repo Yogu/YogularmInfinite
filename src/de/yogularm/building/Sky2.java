@@ -8,7 +8,6 @@ import de.yogularm.Vector;
 import de.yogularm.components.Checkpoint;
 import de.yogularm.components.Chicken;
 import de.yogularm.components.Coin;
-import de.yogularm.components.Heart;
 import de.yogularm.components.Ladder;
 import de.yogularm.components.Platform;
 import de.yogularm.components.Shooter;

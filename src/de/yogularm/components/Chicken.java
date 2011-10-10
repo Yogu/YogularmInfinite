@@ -1,7 +1,5 @@
 package de.yogularm.components;
 
-import javax.media.opengl.GL2;
-
 import de.yogularm.Body;
 import de.yogularm.Bot;
 import de.yogularm.Direction;

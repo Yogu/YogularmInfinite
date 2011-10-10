@@ -2,8 +2,6 @@ package de.yogularm;
 
 import java.util.Random;
 
-import de.yogularm.components.Coin;
-
 public abstract class BuilderBase implements Builder {
 	private World world;
 	private int index;
