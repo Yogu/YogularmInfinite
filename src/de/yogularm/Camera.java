@@ -28,9 +28,9 @@ public class Camera {
 	
 	public void scroll(Vector target, float elapsedTime) {
 		Vector distance = target.subtract(bounds.getCenter());
-		// let player move the center quarter of the screen witho ut scrolling
-		distance = distance.changeX(Math.signum(distance.getX()) * Math.max(0, Math.abs(distance.getX()) - bounds.getWidth()  / 8 ));
-		distance = distance.changeY(Math.signum(distance.getY()) * Math.max(0, Math.abs(distance.getY()) - bounds.getHeight() / 8 ));
+		// let player move the center quarter of the screen without scrolling
+		distance = distance.changeX(Math.signum(distance.getX()) * Math.max(0, Math.abs(distance.getX()) - bounds.getWidth() * Config.SCROLL_BUFFER / 2 ));
+		distance = distance.changeY(Math.signum(distance.getY()) * Math.max(0, Math.abs(distance.getY()) - bounds.getHeight() * Config.SCROLL_BUFFER / 2 ));
 		bounds = bounds.add(distance.multiply(Config.SCROLL_SPEED * elapsedTime));
 	}
 }

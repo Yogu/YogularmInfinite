@@ -29,7 +29,6 @@ public class GLEventListenerImpl implements GLEventListener {
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glDisable(GL.GL_CULL_FACE);
 			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glClearColor(0.8f, 0.8f, 1, 1);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			context.checkErrors();

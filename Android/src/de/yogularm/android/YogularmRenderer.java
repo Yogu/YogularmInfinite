@@ -1,86 +1,99 @@
 package de.yogularm.android;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
 import android.opengl.GLSurfaceView;
+import de.yogularm.ExceptionHandler;
+import de.yogularm.Game;
+import de.yogularm.Rect;
+import de.yogularm.Vector;
+import de.yogularm.drawing.Color;
 
 public class YogularmRenderer implements GLSurfaceView.Renderer {
-	private FloatBuffer quadVertices;
-	private FloatBuffer quadTexCoords;
-	private Context context;
-	
-	public YogularmRenderer(Context context) {
-		this.context = context;
+	private RenderContextImpl context;
+	private Game game;
+	private ExceptionHandler exceptionHandler;
+
+	public YogularmRenderer(Game game) {
+		this.game = game;
 	}
-	
+
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		Res.laod(gl, context);
-		
-		// Set the background frame color
-		gl.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		
-		quadVertices = createBuffer(new float[] { 
-			0, 1, 0,
-			0, 0, 0,
-			1, 1, 0,
-			1, 0, 0 
-		});
-		
-		quadTexCoords = createBuffer(new float[] { 
-			0, 0,
-			0, 1,
-			1, 0, 
-			1, 1
-		});
+		try {
+			context = new RenderContextImpl(gl);
+
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_CULL_FACE);
+			gl.glEnable(GL10.GL_TEXTURE_2D);
+			gl.glEnable(GL10.GL_BLEND);
+			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			context.checkErrors();
+
+			game.setRenderContext(context);
+			game.init();
+		} catch (Exception e) {
+			if (exceptionHandler != null)
+				exceptionHandler.handleException(e);
+		}
 	}
 
 	public void onDrawFrame(GL10 gl) {
-		// Redraw background color
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		
-    // Enable use of vertex arrays06	        
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-
-    // Set GL_MODELVIEW transformation mode
-    gl.glMatrixMode(GL10.GL_MODELVIEW);
-    gl.glLoadIdentity();   // reset the matrix to its default state
-    
-		gl.glColor4f(1, 1, 0, 1);
-		Res.coin.bind();
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, quadVertices);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, quadTexCoords);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		try {
+			game.update();
+			game.render();
+			
+			drawControlArea();
+		} catch (Exception e) {
+			if (exceptionHandler != null)
+				exceptionHandler.handleException(e);
+		}
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
-		gl.glViewport(0, 0, width, height);
+		try {
+			gl.glViewport(0, 0, width, height);
+			context.checkErrors();
 
-    // Set GL_MODELVIEW transformation mode
-    gl.glMatrixMode(GL10.GL_PROJECTION);
-    gl.glOrthof(0, 10, 0, 5, 0, 1);
+			game.setResolution(width, height);
+		} catch (Exception e) {
+			if (exceptionHandler != null)
+				exceptionHandler.handleException(e);
+		}
+	}
+
+	public void setExceptionHandler(ExceptionHandler handler) {
+		this.exceptionHandler = handler;
 	}
 	
-	private FloatBuffer createBuffer(float[] vertices) {
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
-
-		// use the device hardware's native byte order
-		byteBuffer.order(ByteOrder.nativeOrder());
-
-		// create a floating point buffer from the ByteBuffer
-		FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+	private void drawControlArea() {
+		float size = YogularmActivity.CONTROL_SIZE;
+		context.beginProjection(1, 1);
+		context.beginTransformation();
+		context.translate(new Vector(1 - size, 0));
+		context.scale(new Vector(size / 3, size / 3));
+		context.unbindTexture();
+		context.setColor(new Color(0, 0, 0, 0.1f));
 		
-		floatBuffer.put(vertices);
-
-		// set the buffer to read the first coordinate
-		floatBuffer.position(0);
-		return floatBuffer;
+		// rect
+		context.drawRect(new Rect(0, 0, 3, 3));
+		
+		// oxo
+		// oxo
+		// oxo
+		context.drawRect(new Rect(1, 0, 2, 3));
+		// ooo
+		// xoo
+		// ooo
+		context.drawRect(new Rect(0, 1, 1, 2));
+		// ooo
+		// oox
+		// ooo
+		context.drawRect(new Rect(2, 1, 3, 2));
+		
+		context.endTransformation();
+		context.endProjection();
 	}
 }
