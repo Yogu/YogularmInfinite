@@ -37,6 +37,10 @@ public class Vector {
 		return new Vector(x - other.x, y - other.y);
 	}
 
+	public Vector multiply(Vector other) {
+		return new Vector(x * other.x, y * other.y);
+	}
+
 	public Vector multiply(float value) {
 		return new Vector(x * value, y * value);
 	}

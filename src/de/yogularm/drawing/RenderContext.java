@@ -1,6 +1,7 @@
 package de.yogularm.drawing;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import de.yogularm.Rect;
 import de.yogularm.Vector;
@@ -25,5 +26,5 @@ public interface RenderContext {
 	void setProjection(float width, float height);
 	
 	Texture loadTexture(InputStream stream);
-	Font loadFont();
+	Font loadFont(int size, Set<FontStyle> style);
 }

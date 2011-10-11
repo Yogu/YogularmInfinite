@@ -9,26 +9,22 @@ public class InputImpl implements Input {
 
 	@Override
 	public boolean isLeft() {
-		// TODO Auto-generated method stub
-		return false;
+		return isLeft;
 	}
 
 	@Override
 	public boolean isRight() {
-		// TODO Auto-generated method stub
-		return false;
+		return isRight;
 	}
 
 	@Override
 	public boolean isUp() {
-		// TODO Auto-generated method stub
-		return false;
+		return isUp;
 	}
 
 	@Override
 	public boolean isDown() {
-		// TODO Auto-generated method stub
-		return false;
+		return isDown;
 	}
 
 	private boolean isLeft;

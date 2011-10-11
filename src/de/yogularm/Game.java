@@ -1,9 +1,11 @@
 package de.yogularm;
 
+import java.util.EnumSet;
 import java.util.Random;
 
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
+import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.RenderTransformation;
 import de.yogularm.input.Input;
@@ -24,15 +26,29 @@ public class Game {
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
 	public static final String VERSION = "0.2";
 	
-	public Game(RenderContext renderContext, Input input) {
+	public Game() {
+
+	}
+	
+	public void setRenderContext(RenderContext renderContext) {
 		if (renderContext == null)
 			throw new NullPointerException("renderContext is null");
+		if (this.renderContext != null)
+			throw new IllegalStateException("renderContext is already set");
+		this.renderContext = renderContext;
+	}
+	
+	public void setInput(Input input) {
 		if (input == null)
 			throw new NullPointerException("input is null");
-		
-		this.renderContext = renderContext;
+		if (this.input != null)
+			throw new IllegalStateException("input is already set");
 		this.input = input;
-		
+	}
+	
+	public void init() {
+		if (renderContext == null || input == null)
+			throw new NullPointerException("Both renderContext and input must be set before init() can be called");
 		Res.init(renderContext);
 		restart();
 	}
@@ -84,7 +100,7 @@ public class Game {
 		renderContext.setProjection(width, height);
 		renderContext.setColor(Color.white);
 		renderContext.resetTranformation();
-		Font font = renderContext.loadFont();
+		Font font = renderContext.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
 		
 		// Coins + Life (text)
 		renderContext.setColor(new Color(0, 0, 0, 0.8f));
@@ -93,6 +109,7 @@ public class Game {
 		renderContext.drawText(new Vector(80, height - 130), font,  "" + life);
 
 		// Coins + life (icons)
+		renderContext.setColor(Color.white);
 		RenderTransformation.draw(renderContext, Res.images.coin, 20, height - 70, 50, 50);
 		RenderTransformation.draw(renderContext, Res.images.heart, 20, height - 140, 50, 50);
 
@@ -108,10 +125,11 @@ public class Game {
 		
 		// Title
 		renderContext.setColor(Color.black);
-		Font font2 = renderContext.loadFont();
-		renderContext.drawText(new Vector(width - 165, height - 200), font2, "Yogularm Infinite " + VERSION);
 
-		renderContext.endTransformation();
+		Font font2 = renderContext.loadFont(12, EnumSet.of(FontStyle.BOLD));
+		renderContext.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
+
+		renderContext.setProjection(viewSize.getX(), viewSize.getY());
 	}
 
 	private void captureFrameTime() {

@@ -2,30 +2,41 @@ package de.yogularm.desktop;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
+import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.TextureIO;
 
 import de.yogularm.Rect;
 import de.yogularm.Vector;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
+import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
 
 public class RenderContextImpl implements RenderContext {
 	private GL2 gl;
+	private GLU glu;
+	private float width = 1;
+	private float height = 1;
+	private Color color = Color.black;
 	
 	public RenderContextImpl(GL2 gl) {
 		this.gl = gl;
+		glu = new GLU();
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 	}
 	
 	public void setColor(Color color) {
 		gl.glColor4f(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 		checkErrors();
+		
+		this.color = color;
 	}
 	
 	public void unbindTexture() {
@@ -71,7 +82,12 @@ public class RenderContextImpl implements RenderContext {
 	}
 	
 	public void drawText(Vector position, Font font, String text) {
-		// TODO: implement.
+		FontImpl impl = (FontImpl)font;
+		TextRenderer renderer = impl.getRenderer();
+		renderer.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+		renderer.beginRendering((int)width, (int)height);
+		renderer.draw(text, (int)position.getX(), (int)position.getY());
+		renderer.endRendering();
 	}
 	
 	public void resetTranformation() {
@@ -111,8 +127,14 @@ public class RenderContextImpl implements RenderContext {
 	
 	public void setProjection(float width, float height) {
 		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glOrtho(0, width, 0, height, -1, 1);
+		gl.glLoadIdentity();
+		glu.gluOrtho2D(0, width, 0, height);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		checkErrors();
+
+		// Remember for text rendering 
+		this.width = width;
+		this.height = height;
 	}
 	
 	public Texture loadTexture(InputStream stream) {
@@ -129,9 +151,8 @@ public class RenderContextImpl implements RenderContext {
 		return new TextureImpl(texture);
 	}
 	
-	public Font loadFont() {
-		// TODO: load fonts
-		return new FontImpl();
+	public Font loadFont(int size, Set<FontStyle> style) {
+		return new FontImpl(size, style);
 	}
 	
 	public void checkErrors() {

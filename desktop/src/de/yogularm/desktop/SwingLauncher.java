@@ -33,16 +33,20 @@ public class SwingLauncher {
 
 	public void run() {
 		GLProfile.initSingleton(true);
+		
+		Game game = new Game();
 		canvas = createWindow();
-		RenderContextImpl context = new RenderContextImpl(canvas.getGL().getGL2());
+		
+		// Input
 		InputImpl input = new InputImpl();
-		Game game = new Game(context, input);
-		GLEventListenerImpl eventListener = new GLEventListenerImpl(game, context);
-		canvas.addGLEventListener(eventListener);
-
+		game.setInput(input);
 		canvas.addKeyListener(input.getKeyListener());
 		window.addKeyListener(input.getKeyListener());
 		
+		// OpenGL
+		GLEventListenerImpl eventListener = new GLEventListenerImpl(game);
+		canvas.addGLEventListener(eventListener);
+
 		eventListener.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(Throwable e) {
 				SwingLauncher.this.handleException(e);

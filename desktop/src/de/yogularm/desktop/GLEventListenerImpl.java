@@ -15,16 +15,17 @@ public class GLEventListenerImpl implements GLEventListener {
 	private Game game;
 	private RenderContextImpl context;
 	private ExceptionHandler exceptionHandler;
-
-	public GLEventListenerImpl(Game game, RenderContextImpl context) {
+	
+	public GLEventListenerImpl(Game game) {
 		this.game = game;
-		this.context = context;
 	}
 
 	public void init(GLAutoDrawable drawable) {
 		try {
 			GL2 gl = drawable.getGL().getGL2();
 
+			context = new RenderContextImpl(gl);
+			
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glDisable(GL.GL_CULL_FACE);
 			gl.glEnable(GL.GL_TEXTURE_2D);
@@ -32,6 +33,9 @@ public class GLEventListenerImpl implements GLEventListener {
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			context.checkErrors();
+
+			game.setRenderContext(context);
+			game.init();
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);
