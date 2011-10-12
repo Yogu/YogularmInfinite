@@ -2,6 +2,8 @@ package de.yogularm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.yogularm.drawing.Animation;
 import de.yogularm.drawing.Image;
@@ -29,12 +31,14 @@ public class Res {
 		public Texture yogu;
 		public Texture chicken;
 		public Texture ui;
+		public Texture numbers;
 
 		public void load(RenderContext context) throws IOException {
 			blocks = loadTexture(context, "blocks");
 			yogu = loadTexture(context, "yogu");
 			chicken = loadTexture(context, "chicken");
 			ui = loadTexture(context, "ui");
+			numbers = loadTexture(context, "numbers");
 		}
 
 		private Texture loadTexture(RenderContext context, String name) throws IOException {
@@ -75,6 +79,8 @@ public class Res {
 		public Image chickenExploding4;
 		
 		public Image arrowKey;
+		
+		public Map<java.lang.Character, Image> numbers;
 
 		public void load() {
 			TiledImage tiles = new TiledImage(Res.textures.blocks, 4, 4);
@@ -113,6 +119,25 @@ public class Res {
 
 			tiles = new TiledImage(Res.textures.ui, 3, 3);
 			arrowKey = tiles.get(0, 2);
+			
+			tiles = new TiledImage(Res.textures.numbers, 4, 4);
+			numbers = new HashMap<java.lang.Character, Image>();
+			numbers.put('1', tiles.get(0, 0));
+			numbers.put('2', tiles.get(1, 0));
+			numbers.put('3', tiles.get(2, 0));
+			numbers.put('4', tiles.get(0, 1));
+			numbers.put('5', tiles.get(1, 1));
+			numbers.put('6', tiles.get(2, 1));
+			numbers.put('7', tiles.get(0, 2));
+			numbers.put('8', tiles.get(1, 2));
+			numbers.put('9', tiles.get(2, 2));
+			numbers.put('.', tiles.get(0, 3));
+			numbers.put('0', tiles.get(1, 3));
+			numbers.put(',', tiles.get(2, 3));
+			numbers.put('_', tiles.get(3, 0));
+			numbers.put('-', tiles.get(3, 1));
+			numbers.put('+', tiles.get(3, 2));
+			numbers.put('*', tiles.get(3, 3));
 		}
 	}
 

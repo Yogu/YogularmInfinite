@@ -8,6 +8,7 @@ import de.yogularm.drawing.Font;
 import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.RenderTransformation;
+import de.yogularm.drawing.TextDrawable;
 import de.yogularm.input.Input;
 
 public class Game {
@@ -102,16 +103,17 @@ public class Game {
 		renderContext.resetTranformation();
 		Font font = renderContext.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
 		
-		// Coins + Life (text)
-		renderContext.setColor(new Color(0, 0, 0, 0.8f));
-		renderContext.drawText(new Vector(80, height - 60), font, "" + world.getPlayer().getCollectedCoins());
+		// Coins
+		RenderTransformation.draw(renderContext, Res.images.coin, 20, height - 70, 50, 50);
+		TextDrawable.draw(renderContext, "" + world.getPlayer().getCollectedCoins(), 70, height - 70, 50);
+		
+		// Life
+		RenderTransformation.draw(renderContext, Res.images.heart, 20, height - 140, 50, 50);
 		int life = Math.max(0, Math.round(world.getPlayer().getLife() - 1));
-		renderContext.drawText(new Vector(80, height - 130), font,  "" + life);
+		TextDrawable.draw(renderContext, "" + life, 70, height - 140, 50);
 
 		// Coins + life (icons)
-		renderContext.setColor(Color.white);
-		RenderTransformation.draw(renderContext, Res.images.coin, 20, height - 70, 50, 50);
-		RenderTransformation.draw(renderContext, Res.images.heart, 20, height - 140, 50, 50);
+		
 
 		// Game Over screen
 		if (isGameover) {
