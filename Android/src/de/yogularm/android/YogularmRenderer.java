@@ -7,13 +7,20 @@ import android.opengl.GLSurfaceView;
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
 import de.yogularm.Rect;
+import de.yogularm.Res;
 import de.yogularm.Vector;
 import de.yogularm.drawing.Color;
+import de.yogularm.drawing.Drawable;
+import de.yogularm.drawing.RenderTransformation;
 
 public class YogularmRenderer implements GLSurfaceView.Renderer {
 	private RenderContextImpl context;
 	private Game game;
 	private ExceptionHandler exceptionHandler;
+	private int width = 1;
+	private int height = 1;
+	
+	private static final float CONTROL_DISPLAY_VERTICAL_FRACTION = 2 / 3f;
 
 	public YogularmRenderer(Game game) {
 		this.game = game;
@@ -54,6 +61,9 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		try {
+			this.width = width;
+			this.height = height;
+			
 			gl.glViewport(0, 0, width, height);
 			context.checkErrors();
 
@@ -69,29 +79,29 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	private void drawControlArea() {
-		float size = YogularmActivity.CONTROL_SIZE;
+		float size = YogularmActivity.CONTROL_SIZE * CONTROL_DISPLAY_VERTICAL_FRACTION;
+		float div = YogularmActivity.CONTROL_DISPLAY_HORIZONTAL_DIVISION;
 		context.beginProjection(1, 1);
 		context.beginTransformation();
-		context.translate(new Vector(1 - size, 0));
-		context.scale(new Vector(size / 3, size / 3));
+		context.scale(new Vector(1 / div, size));
 		context.unbindTexture();
-		context.setColor(new Color(0, 0, 0, 0.1f));
-		
-		// rect
-		context.drawRect(new Rect(0, 0, 3, 3));
-		
-		// oxo
-		// oxo
-		// oxo
-		context.drawRect(new Rect(1, 0, 2, 3));
-		// ooo
-		// xoo
-		// ooo
-		context.drawRect(new Rect(0, 1, 1, 2));
-		// ooo
-		// oox
-		// ooo
-		context.drawRect(new Rect(2, 1, 3, 2));
+		context.setColor(Color.white);
+
+		// the size of an control bar quarter
+		float xSize = width / div;
+		float ySize = height * size;
+		Vector scale;
+		if (xSize > ySize)
+			scale = new Vector(ySize / xSize, 1);
+		else
+			scale = new Vector(1, xSize / ySize);
+
+		float last = div - 1;
+		Vector center = new Vector(0.5f, 0.5f);
+		new RenderTransformation(Res.images.arrowKey, new Vector(0,        0), scale, 0,   center).draw(context);
+		new RenderTransformation(Res.images.arrowKey, new Vector(1,        0), scale, 180, center).draw(context);
+		new RenderTransformation(Res.images.arrowKey, new Vector(last - 1, 0), scale, 90,  center).draw(context);
+		new RenderTransformation(Res.images.arrowKey, new Vector(last,     0), scale, 270, center).draw(context);
 		
 		context.endTransformation();
 		context.endProjection();

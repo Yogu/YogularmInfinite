@@ -28,11 +28,13 @@ public class Res {
 		public Texture blocks;
 		public Texture yogu;
 		public Texture chicken;
+		public Texture ui;
 
 		public void load(RenderContext context) throws IOException {
 			blocks = loadTexture(context, "blocks");
 			yogu = loadTexture(context, "yogu");
 			chicken = loadTexture(context, "chicken");
+			ui = loadTexture(context, "ui");
 		}
 
 		private Texture loadTexture(RenderContext context, String name) throws IOException {
@@ -52,12 +54,14 @@ public class Res {
 		public Image ladder;
 		public Image platform;
 		public Image platformPropeller;
+		
 		public Image yogu;
 		public Image yoguWalkingLeft1;
 		public Image yoguWalkingLeft2;
 		public Image yoguWalkingRight1;
 		public Image yoguWalkingRight2;
 		public Image yoguFalling;
+		
 		public Image chicken;
 		public Image chickenWalkingLeft1;
 		public Image chickenWalkingLeft2;
@@ -69,6 +73,8 @@ public class Res {
 		public Image chickenExploding2;
 		public Image chickenExploding3;
 		public Image chickenExploding4;
+		
+		public Image arrowKey;
 
 		public void load() {
 			TiledImage tiles = new TiledImage(Res.textures.blocks, 4, 4);
@@ -104,6 +110,9 @@ public class Res {
 			chickenExploding2 = tiles.get(1, 0);
 			chickenExploding3 = tiles.get(2, 0);
 			chickenExploding4 = tiles.get(3, 0);
+
+			tiles = new TiledImage(Res.textures.ui, 3, 3);
+			arrowKey = tiles.get(0, 2);
 		}
 	}
 

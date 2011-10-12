@@ -14,7 +14,8 @@ import de.yogularm.Game;
 public class YogularmActivity extends Activity {
 	private GLSurfaceView surfaceView;
 	
-	public static final float CONTROL_SIZE = 0.5f;
+	public static final float CONTROL_SIZE = 0.3f;
+	public static final float CONTROL_DISPLAY_HORIZONTAL_DIVISION = 6f;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

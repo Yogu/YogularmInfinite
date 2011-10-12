@@ -29,6 +29,22 @@ public class RenderTransformation implements Drawable {
 		
 		this.angle = angle;
 	}
+
+	public RenderTransformation(Drawable drawable, Vector offset, Vector scale, float angle, Vector rotationCenter) {
+		this(drawable, offset, scale, angle);
+
+		if (rotationCenter == null)
+			throw new NullPointerException("rotationCenter is null");
+		this.rotationCenter = rotationCenter;
+	}
+
+	public RenderTransformation(Drawable drawable, Vector offset, float angle, Vector rotationCenter) {
+		this(drawable, offset, new Vector(1, 1), angle, rotationCenter);
+	}
+
+	public RenderTransformation(Drawable drawable, Vector offset, float angle) {
+		this(drawable, offset, new Vector(1, 1), angle);
+	}
 	
 	public Drawable getDrawable() {
 		return drawable;
@@ -90,8 +106,8 @@ public class RenderTransformation implements Drawable {
 		context.beginTransformation();
 			context.translate(offset.add(new Vector(isVerticallyMirrored ? 1 : 0, 0)));
 			context.translate(rotationCenter);
-			context.rotate(angle);
 			context.scale(scale.multiply(new Vector(isVerticallyMirrored ? -1 : 1, 1)));
+			context.rotate(angle);
 			context.translate(rotationCenter.negate());
 			drawable.draw(context);
 		context.endTransformation();
