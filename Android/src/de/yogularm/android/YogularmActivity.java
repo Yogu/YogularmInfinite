@@ -1,11 +1,13 @@
 package de.yogularm.android;
 
+import android.R;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 import de.yogularm.Config;
 import de.yogularm.ExceptionHandler;
@@ -13,27 +15,30 @@ import de.yogularm.Game;
 
 public class YogularmActivity extends Activity {
 	private GLSurfaceView surfaceView;
-	
+
 	public static final float CONTROL_SIZE = 0.3f;
 	public static final float CONTROL_DISPLAY_HORIZONTAL_DIVISION = 6f;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		setTheme(android.R.style.Theme_NoTitleBar_Fullscreen);
+
 
 		Config.MAX_VIEW_WIDTH = 18;
 		Config.MAX_VIEW_HEIGHT = 10;
-		Config.SCROLL_BUFFER = 1/16f;
-		
+		Config.SCROLL_BUFFER = 1 / 16f;
+		Config.PLAYER_JUMP_SPEED = 6;
+		Config.AIR_ADHESION = 5;
+
 		Game game = new Game();
 		InputImpl input = new InputImpl();
 		game.setInput(input);
-		
+
 		YogularmRenderer renderer = new YogularmRenderer(game);
 
 		// Create a GLSurfaceView instance and set it

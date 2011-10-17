@@ -151,14 +151,14 @@ public class Game {
 	}
 
 	private void applyInput() {
-		int direction = (input.isLeft() && !input.isRight()) ? -1 : (input.isRight() && !input.isLeft()) ? 1 : 0;
+		float direction = input.getXControl();
 		world.getPlayer().setDirection(direction);
 
-		if (input.isUp() && !world.getPlayer().isClimbing())
+		if (input.getYControl() > 0 && !world.getPlayer().isClimbing())
 			world.getPlayer().jump();
 
 		if (world.getPlayer().isClimbing()) {
-			direction = (input.isDown() && !input.isUp()) ? -1 : (input.isUp() && !input.isDown()) ? 1 : 0;
+			direction = input.getYControl();
 			world.getPlayer().setClimbSpeed(direction * Config.PLAYER_CLIMB_SPEED);
 		}
 	}

@@ -44,7 +44,7 @@ public class Player extends Character {
 		return collectedCoins;
 	}
 	
-	public void setDirection(int direction) {
+	public void setDirection(float direction) {
 		setWalkSpeed(direction * Config.PLAYER_SPEED);
 	}
 	

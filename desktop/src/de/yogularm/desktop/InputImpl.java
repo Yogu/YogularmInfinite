@@ -3,9 +3,10 @@ package de.yogularm.desktop;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import de.yogularm.input.DigitalInput;
 import de.yogularm.input.Input;
 
-public class InputImpl implements Input {
+public class InputImpl extends DigitalInput {
 
 	@Override
 	public boolean isLeft() {
