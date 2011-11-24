@@ -6,11 +6,9 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLSurfaceView;
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
-import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
 import de.yogularm.drawing.Color;
-import de.yogularm.drawing.Drawable;
 import de.yogularm.drawing.RenderTransformation;
 
 public class YogularmRenderer implements GLSurfaceView.Renderer {
@@ -19,6 +17,7 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 	private ExceptionHandler exceptionHandler;
 	private int width = 1;
 	private int height = 1;
+	private boolean isInitialized;
 	
 	private static final float CONTROL_DISPLAY_VERTICAL_FRACTION = 2 / 3f;
 
@@ -41,36 +40,44 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 
 			game.setRenderContext(context);
 			game.init();
+			
+			// Avoid having the resolution 0x0 when onDrawFrame() is called before onSurfaceChanged()
+			game.setResolution(1, 1);
+			
+			isInitialized = true;
 		} catch (Exception e) {
-			if (exceptionHandler != null)
-				exceptionHandler.handleException(e);
+			handleException(e);
 		}
 	}
 
 	public void onDrawFrame(GL10 gl) {
 		try {
-			game.update();
-			game.render();
-			
-			drawControlArea();
+			// Some devices seem to call onDrawFrame() before onSurfaceCreated()
+			if (isInitialized) {
+				game.update();
+				game.render();
+				
+				drawControlArea();
+			}
 		} catch (Exception e) {
-			if (exceptionHandler != null)
-				exceptionHandler.handleException(e);
+			handleException(e);
 		}
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		try {
-			this.width = width;
-			this.height = height;
-			
-			gl.glViewport(0, 0, width, height);
-			context.checkErrors();
+			// Better allow any sequence of these events.
+			if (isInitialized) {
+				this.width = width;
+				this.height = height;
+				
+				gl.glViewport(0, 0, width, height);
+				context.checkErrors();
 
-			game.setResolution(width, height);
+				game.setResolution(width, height);
+			}
 		} catch (Exception e) {
-			if (exceptionHandler != null)
-				exceptionHandler.handleException(e);
+			handleException(e);
 		}
 	}
 
@@ -105,5 +112,10 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 		
 		context.endTransformation();
 		context.endProjection();
+	}
+	
+	private void handleException(Exception e) {
+		if (exceptionHandler != null)
+			exceptionHandler.handleException(e);
 	}
 }

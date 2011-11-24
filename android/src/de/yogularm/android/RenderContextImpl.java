@@ -154,16 +154,23 @@ public class RenderContextImpl implements RenderContext {
 
 	@Override
 	public void setProjection(float width, float height) {
+		if (width == 0 || height == 0)
+			throw new RuntimeException("Either width or height is zero");
+
+		checkErrors();
 		gl.glMatrixMode(GL10.GL_PROJECTION);
+		checkErrors();
 		gl.glLoadIdentity();
-		gl.glOrthof(0,	width, 0, height, -1, 1);
+		checkErrors();
+		gl.glOrthof(0, width, 0, height, -1, 1);
+		checkErrors();
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		checkErrors();
 	}
 
 	@Override
 	public Texture loadTexture(InputStream stream) {
-		return new TextureImpl(gl, stream);
+		return new TextureImpl(this, gl, stream);
 	}
 
 	@Override

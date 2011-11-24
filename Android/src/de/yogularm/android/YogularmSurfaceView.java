@@ -8,8 +8,9 @@ import de.yogularm.Vector;
 public class YogularmSurfaceView extends GLSurfaceView {
 	private InputImpl input;
 	
-	private static float MIN_ACCELERATION = 0.8f;
-	private static float MAX_ACCELERATION = 1.2f;
+	private static boolean ENABLE_ACCELERATION_CONTROL = false;
+	private static float MIN_ACCELERATION = 0.3f;//0.8f;
+	private static float MAX_ACCELERATION = 1f;
 	private static float JUMP_ANGLE_SPEED = 180; // [°/s]
 
 	public YogularmSurfaceView(Context context, Renderer renderer, InputImpl input) {
@@ -20,7 +21,12 @@ public class YogularmSurfaceView extends GLSurfaceView {
 		this.input = input;
 
 
-		AccelerometerManager acceleration = new AccelerometerManager(context);
+		if (ENABLE_ACCELERATION_CONTROL)
+			initAccelerationControl();
+	}
+	
+	private void initAccelerationControl() {
+		AccelerometerManager acceleration = new AccelerometerManager(getContext());
 		if (acceleration.isSupported()) {
 			acceleration.startListening(new AccelerometerListener() {
 				private float lastAngle;

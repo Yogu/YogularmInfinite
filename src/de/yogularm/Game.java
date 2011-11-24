@@ -55,6 +55,9 @@ public class Game {
 	}
 	
 	public void setResolution(int width, int height) {
+		if (world == null)
+			throw new IllegalStateException("setResolution() is called before init()");
+		
 		// limit to maximum block counts in each direction
 		float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH, (float) height / Config.MAX_VIEW_HEIGHT);
 		// resolution = Math.max(resolution, Config.MIN_RESOLUTION);
@@ -69,6 +72,9 @@ public class Game {
 	}
 	
 	public void update() {
+		if (world == null)
+			throw new IllegalStateException("update() is called before init()");
+		
 		captureFrameTime();
 
 		if (!isGameover)
@@ -83,6 +89,9 @@ public class Game {
 	}
 	
 	public void render() {
+		if (world == null)
+			throw new IllegalStateException("render() is called before init()");
+		
 		renderContext.clear(CLEAR_COLOR);
 		world.render(renderContext);
 		renderGUI();

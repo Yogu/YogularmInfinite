@@ -1,12 +1,20 @@
 package de.yogularm.android;
 
-import android.R;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.pm.ActivityInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.text.ClipboardManager;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yogularm.Config;
@@ -22,35 +30,40 @@ public class YogularmActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		try {
+			getWindow()
+				.addFlags(
+					WindowManager.LayoutParams.FLAG_FULLSCREEN
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			setTheme(android.R.style.Theme_NoTitleBar_Fullscreen);
 
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		setTheme(android.R.style.Theme_NoTitleBar_Fullscreen);
+			Config.MAX_VIEW_WIDTH = 18;
+			Config.MAX_VIEW_HEIGHT = 10;
+			Config.SCROLL_BUFFER = 1 / 16f;
+			Config.PLAYER_JUMP_SPEED = 6;
+			Config.AIR_ADHESION = 5;
 
+			Game game = new Game();
+			InputImpl input = new InputImpl();
+			game.setInput(input);
 
-		Config.MAX_VIEW_WIDTH = 18;
-		Config.MAX_VIEW_HEIGHT = 10;
-		Config.SCROLL_BUFFER = 1 / 16f;
-		Config.PLAYER_JUMP_SPEED = 6;
-		Config.AIR_ADHESION = 5;
+			YogularmRenderer renderer = new YogularmRenderer(game);
 
-		Game game = new Game();
-		InputImpl input = new InputImpl();
-		game.setInput(input);
+			// Create a GLSurfaceView instance and set it
+			// as the ContentView for this Activity.
+			surfaceView = new YogularmSurfaceView(this, renderer, input);
+			setContentView(surfaceView);
 
-		YogularmRenderer renderer = new YogularmRenderer(game);
-
-		// Create a GLSurfaceView instance and set it
-		// as the ContentView for this Activity.
-		surfaceView = new YogularmSurfaceView(this, renderer, input);
-		setContentView(surfaceView);
-
-		renderer.setExceptionHandler(new ExceptionHandler() {
-			public void handleException(Throwable e) {
-				YogularmActivity.this.handleException(e);
-			}
-		});
+			renderer.setExceptionHandler(new ExceptionHandler() {
+				public void handleException(Throwable e) {
+					YogularmActivity.this.handleException(e);
+				}
+			});
+		} catch (Exception e) {
+			handleException(e);
+		}
 	}
 
 	@Override
@@ -60,7 +73,11 @@ public class YogularmActivity extends Activity {
 		// If your OpenGL application is memory intensive,
 		// you should consider de-allocating objects that
 		// consume significant memory here.
-		surfaceView.onPause();
+		try {
+			surfaceView.onPause();
+		} catch (Exception e) {
+			handleException(e);
+		}
 	}
 
 	@Override
@@ -69,11 +86,69 @@ public class YogularmActivity extends Activity {
 		// The following call resumes a paused rendering thread.
 		// If you de-allocated graphic objects for onPause()
 		// this is a good place to re-allocate them.
-		surfaceView.onResume();
+		try {
+			surfaceView.onResume();
+		} catch (Exception e) {
+			handleException(e);
+		}
 	}
 
-	private void handleException(Throwable exception) {
-		Toast.makeText(this, "Error: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-		finish();
+	private void handleException(final Throwable exception) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				// Without this call the phone may crash (!)
+				surfaceView.onPause();
+				
+				String ex = printStackToString(exception);
+				AlertDialog dialog =
+					createSelectableDialog("Runtime Error", "Oh! Yogu tripped over a bug.\n\nTouch long to copy this message.\n\n" + ex);
+				dialog.setOnDismissListener(new OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						YogularmActivity.this.finish();
+					}
+				});
+				dialog.show();
+			}
+		});
+	}
+
+	private AlertDialog createSelectableDialog(String title, String message) {
+		AlertDialog dialog;
+		AlertDialog.Builder builder;
+		// The TextView to show your Text
+		TextView showText = new TextView(this);
+		showText.setText(message);
+		// Add the Listener
+		showText.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				// Copy the Text to the clipboard
+				ClipboardManager manager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+				TextView showTextParam = (TextView) v;
+				manager.setText(showTextParam.getText());
+				// Show a message:
+				Toast.makeText(v.getContext(), "Text in clipboard", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+		});
+		// Build the Dialog
+		builder = new AlertDialog.Builder(this);
+		
+		ScrollView scrollView = new ScrollView(this);
+		scrollView.addView(showText);
+		builder.setView(scrollView);
+		dialog = builder.create();
+		// Some eye-candy
+		dialog.setTitle(title);
+		dialog.setCancelable(true);
+		return dialog;
+	}
+
+	private static String printStackToString(Throwable e) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		return sw.toString();
 	}
 }
