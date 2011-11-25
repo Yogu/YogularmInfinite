@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
 import de.yogularm.drawing.Texture;
+import de.yogularm.utils.Numbers;
 
 public class TextureImpl implements Texture {
 	private RenderContextImpl renderContext;
@@ -21,8 +22,14 @@ public class TextureImpl implements Texture {
 		this.renderContext = renderContext;
 
 		Bitmap bmp = BitmapFactory.decodeStream(stream);
+		if (bmp == null)
+			throw new RuntimeException("Unable to decode the given texture stream");
 		width = bmp.getWidth();
 		height = bmp.getHeight();
+		if (!Numbers.isPowerOfTwo(width) || !Numbers.isPowerOfTwo(height))
+			throw new RuntimeException("Either width (" + width + ") or height (" + height + 
+				") of the given texture picture is not a power of two");
+			
 		int[] ids = new int[1];
 		gl.glGenTextures(1, ids, 0);
 		renderContext.checkErrors();

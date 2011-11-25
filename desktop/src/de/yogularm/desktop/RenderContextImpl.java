@@ -18,6 +18,7 @@ import de.yogularm.drawing.Font;
 import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
+import de.yogularm.utils.Numbers;
 
 public class RenderContextImpl implements RenderContext {
 	private GL2 gl;
@@ -144,6 +145,11 @@ public class RenderContextImpl implements RenderContext {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		if (!Numbers.isPowerOfTwo(texture.getWidth()) || !Numbers.isPowerOfTwo(texture.getHeight()))
+			throw new RuntimeException("Either width (" + texture.getWidth() + ") or height (" + 
+				texture.getHeight() +	") of the given texture picture is not a power of two");
+		
 		texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
 		texture.setTexParameteri(GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
 		checkErrors();

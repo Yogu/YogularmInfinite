@@ -96,26 +96,26 @@ public class Res {
 			arrow = tiles.get(3, 2);
 			shooter = tiles.get(0, 3);
 
-			tiles = new TiledImage(Res.textures.yogu, 3, 3);
+			tiles = new TiledImage(Res.textures.yogu, 4, 2);
 			yogu = tiles.get(0, 0);
+			yoguFalling = tiles.get(0, 1);
 			yoguWalkingLeft1 = tiles.get(1, 0);
-			yoguWalkingLeft2 = tiles.get(2, 0);
-			yoguWalkingRight1 = tiles.get(0, 1);
-			yoguWalkingRight2 = tiles.get(1, 1);
-			yoguFalling = tiles.get(2, 1);
+			yoguWalkingLeft2 = tiles.get(1, 1);
+			yoguWalkingRight1 = tiles.get(2, 0);
+			yoguWalkingRight2 = tiles.get(2, 1);
 
 			tiles = new TiledImage(Res.textures.chicken, 4, 4);
-			chicken = tiles.get(1, 1);
-			chickenWalkingLeft1 = tiles.get(1, 1);
-			chickenWalkingLeft2 = tiles.get(2, 1);
-			chickenWalkingRight1 = tiles.get(0, 2);
+			chicken = tiles.get(0, 0);
+			chickenWalkingLeft1 = tiles.get(0, 1);
+			chickenWalkingLeft2 = tiles.get(0, 2);
+			chickenWalkingRight1 = tiles.get(1, 1);
 			chickenWalkingRight2 = tiles.get(1, 2);
-			chickenFluttering1 = tiles.get(2, 2);
-			chickenFluttering2 = tiles.get(0, 3);
-			chickenExploding1 = tiles.get(0, 0);
-			chickenExploding2 = tiles.get(1, 0);
-			chickenExploding3 = tiles.get(2, 0);
-			chickenExploding4 = tiles.get(3, 0);
+			chickenFluttering1 = tiles.get(2, 1);
+			chickenFluttering2 = tiles.get(2, 2);
+			chickenExploding1 = tiles.get(0, 3);
+			chickenExploding2 = tiles.get(1, 3);
+			chickenExploding3 = tiles.get(2, 3);
+			chickenExploding4 = tiles.get(3, 3);
 
 			tiles = new TiledImage(Res.textures.ui, 3, 3);
 			arrowKey = tiles.get(0, 2);
