@@ -37,12 +37,6 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 			context.checkErrors();
-
-			game.setRenderContext(context);
-			game.init();
-			
-			// Avoid having the resolution 0x0 when onDrawFrame() is called before onSurfaceChanged()
-			game.setResolution(1, 1);
 			
 			isInitialized = true;
 		} catch (Exception e) {
@@ -55,7 +49,7 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 			// Some devices seem to call onDrawFrame() before onSurfaceCreated()
 			if (isInitialized) {
 				game.update();
-				game.render();
+				game.render(context);
 				
 				drawControlArea();
 			}
@@ -74,7 +68,7 @@ public class YogularmRenderer implements GLSurfaceView.Renderer {
 				gl.glViewport(0, 0, width, height);
 				context.checkErrors();
 
-				game.setResolution(width, height);
+				game.setResolution(context, width, height);
 			}
 		} catch (Exception e) {
 			handleException(e);

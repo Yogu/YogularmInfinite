@@ -7,7 +7,7 @@ public class Camera {
 	private Rect bounds;
 	
 	public Camera() {
-		bounds = new Rect(0, 0, 0 ,0);
+		bounds = new Rect(0, 0, 1 ,1);
 	}
 	
 	public Rect getBounds() {

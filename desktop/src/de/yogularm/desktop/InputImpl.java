@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import de.yogularm.input.DigitalInput;
-import de.yogularm.input.Input;
 
 public class InputImpl extends DigitalInput {
 

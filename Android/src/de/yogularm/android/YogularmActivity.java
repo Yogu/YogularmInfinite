@@ -45,15 +45,11 @@ public class YogularmActivity extends Activity {
 			Config.PLAYER_JUMP_SPEED = 6;
 			Config.AIR_ADHESION = 5;
 
-			Game game = new Game();
-			InputImpl input = new InputImpl();
-			game.setInput(input);
-
-			YogularmRenderer renderer = new YogularmRenderer(game);
+			YogularmRenderer renderer = new YogularmRenderer(Controller.getGame());
 
 			// Create a GLSurfaceView instance and set it
 			// as the ContentView for this Activity.
-			surfaceView = new YogularmSurfaceView(this, renderer, input);
+			surfaceView = new YogularmSurfaceView(this, renderer, Controller.getInput());
 			setContentView(surfaceView);
 
 			renderer.setExceptionHandler(new ExceptionHandler() {

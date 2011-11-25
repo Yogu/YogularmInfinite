@@ -13,12 +13,11 @@ import de.yogularm.input.Input;
 
 public class Game {
 	private World world;
-	private RenderContext renderContext;
 	private Input input;
 	private long lastFrameTime;
 	private long frameCount = 0;
 	private float frameTime = 0;
-	private Vector viewSize = Vector.getZero();
+	private Vector viewSize = new Vector(1, 1);
 	private int width;
 	private int height;
 	private boolean isGameover = false;
@@ -28,43 +27,22 @@ public class Game {
 	public static final String VERSION = "0.2";
 	
 	public Game() {
-
-	}
-	
-	public void setRenderContext(RenderContext renderContext) {
-		if (renderContext == null)
-			throw new NullPointerException("renderContext is null");
-		if (this.renderContext != null)
-			throw new IllegalStateException("renderContext is already set");
-		this.renderContext = renderContext;
-	}
-	
-	public void setInput(Input input) {
-		if (input == null)
-			throw new NullPointerException("input is null");
-		if (this.input != null)
-			throw new IllegalStateException("input is already set");
-		this.input = input;
-	}
-	
-	public void init() {
-		if (renderContext == null || input == null)
-			throw new NullPointerException("Both renderContext and input must be set before init() can be called");
-		Res.init(renderContext);
+		// Init world
 		restart();
 	}
 	
-	public void setResolution(int width, int height) {
-		if (world == null)
-			throw new IllegalStateException("setResolution() is called before init()");
-		
+	public void setInput(Input input) {
+		this.input = input;
+	}
+	
+	public void setResolution(RenderContext context, int width, int height) {		
 		// limit to maximum block counts in each direction
 		float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH, (float) height / Config.MAX_VIEW_HEIGHT);
 		// resolution = Math.max(resolution, Config.MIN_RESOLUTION);
 		float w = width / resolution;
 		float h = height / resolution;
 		
-		renderContext.setProjection(w, h);
+		context.setProjection(w, h);
 		viewSize = new Vector(w, h);
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		this.width = width;
@@ -72,9 +50,6 @@ public class Game {
 	}
 	
 	public void update() {
-		if (world == null)
-			throw new IllegalStateException("update() is called before init()");
-		
 		captureFrameTime();
 
 		if (!isGameover)
@@ -88,59 +63,54 @@ public class Game {
 		frameCount++;
 	}
 	
-	public void render() {
-		if (world == null)
-			throw new IllegalStateException("render() is called before init()");
-		
-		renderContext.clear(CLEAR_COLOR);
-		world.render(renderContext);
-		renderGUI();
+	public void render(RenderContext context) {
+		context.clear(CLEAR_COLOR);
+		world.render(context);
+		renderGUI(context);
 	}
 
 	private void doTick() {
 		world.update(frameTime);
-		applyInput();
+		if (input != null)
+			applyInput();
 		if (world.getPlayer().isDead()) {
 			gameoverTime = Config.GAMEOVER_LENGTH;
 			isGameover = true;
 		}
 	}
 
-	private void renderGUI() {
-		renderContext.setProjection(width, height);
-		renderContext.setColor(Color.white);
-		renderContext.resetTranformation();
-		Font font = renderContext.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
+	private void renderGUI(RenderContext context) {
+		context.setProjection(width, height);
+		context.setColor(Color.white);
+		context.resetTranformation();
+		Font font = context.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
 		
 		// Coins
-		RenderTransformation.draw(renderContext, Res.images.coin, 20, height - 70, 50, 50);
-		TextDrawable.draw(renderContext, "" + world.getPlayer().getCollectedCoins(), 70, height - 70, 50);
+		RenderTransformation.draw(context, Res.images.coin, 20, height - 70, 50, 50);
+		TextDrawable.draw(context, "" + world.getPlayer().getCollectedCoins(), 70, height - 70, 50);
 		
 		// Life
-		RenderTransformation.draw(renderContext, Res.images.heart, 20, height - 140, 50, 50);
+		RenderTransformation.draw(context, Res.images.heart, 20, height - 140, 50, 50);
 		int life = Math.max(0, Math.round(world.getPlayer().getLife() - 1));
-		TextDrawable.draw(renderContext, "" + life, 70, height - 140, 50);
-
-		// Coins + life (icons)
-		
+		TextDrawable.draw(context, "" + life, 70, height - 140, 50);
 
 		// Game Over screen
 		if (isGameover) {
-			renderContext.setColor(new Color(0, 0, 0, 0.5f));
-			renderContext.unbindTexture();
-			renderContext.drawRect(new Rect(0, 0, width, height));
-			renderContext.setColor(Color.white);
+			context.setColor(new Color(0, 0, 0, 0.5f));
+			context.unbindTexture();
+			context.drawRect(new Rect(0, 0, width, height));
+			context.setColor(Color.white);
 
-			renderContext.drawText(new Vector(width / 2 - 130, height / 2 - 20), font, "GAME OVER");
+			context.drawText(new Vector(width / 2 - 130, height / 2 - 20), font, "GAME OVER");
 		}
 		
 		// Title
-		renderContext.setColor(Color.black);
+		context.setColor(Color.black);
 
-		Font font2 = renderContext.loadFont(12, EnumSet.of(FontStyle.BOLD));
-		renderContext.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
+		Font font2 = context.loadFont(12, EnumSet.of(FontStyle.BOLD));
+		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
 
-		renderContext.setProjection(viewSize.getX(), viewSize.getY());
+		context.setProjection(viewSize.getX(), viewSize.getY());
 	}
 
 	private void captureFrameTime() {

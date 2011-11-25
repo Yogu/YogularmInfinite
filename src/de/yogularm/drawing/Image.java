@@ -30,7 +30,7 @@ public class Image implements Cloneable, Drawable {
 	}
 	
 	public void draw(RenderContext context) {
-		texture.bind();
+		context.bindTexture(texture);
 		context.drawRect(new Rect(Vector.getZero(), size), range);
 	}
 	

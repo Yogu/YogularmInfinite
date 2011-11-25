@@ -32,9 +32,6 @@ public class GLEventListenerImpl implements GLEventListener {
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			context.checkErrors();
-
-			game.setRenderContext(context);
-			game.init();
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);
@@ -43,7 +40,7 @@ public class GLEventListenerImpl implements GLEventListener {
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 		try {
-			game.setResolution(width, height);
+			game.setResolution(context, width, height);
 			
 			GL2 gl = drawable.getGL().getGL2();
 			gl.glViewport(0, 0, width, height);
@@ -61,7 +58,7 @@ public class GLEventListenerImpl implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		try {
 			game.update();
-			game.render();
+			game.render(context);
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);

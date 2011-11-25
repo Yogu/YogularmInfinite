@@ -1,13 +1,10 @@
 package de.yogularm;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.yogularm.drawing.Animation;
 import de.yogularm.drawing.Image;
-import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
 import de.yogularm.drawing.TiledImage;
 
@@ -16,35 +13,17 @@ public class Res {
 	public static final Images images = new Images();
 	public static final Animations animations = new Animations();
 
-	public static void init(RenderContext context) {
-		try {
-			textures.load(context);
-			images.load();
-			animations.load();
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to load resources", e);
-		}
+	static {
+		images.load();
+		animations.load();
 	}
 
 	public static class Textures {
-		public Texture blocks;
-		public Texture yogu;
-		public Texture chicken;
-		public Texture ui;
-		public Texture numbers;
-
-		public void load(RenderContext context) throws IOException {
-			blocks = loadTexture(context, "blocks");
-			yogu = loadTexture(context, "yogu");
-			chicken = loadTexture(context, "chicken");
-			ui = loadTexture(context, "ui");
-			numbers = loadTexture(context, "numbers");
-		}
-
-		private Texture loadTexture(RenderContext context, String name) throws IOException {
-			InputStream stream = getClass().getResourceAsStream("/res/textures/" + name + ".png");
-			return context.loadTexture(stream);
-		}
+		public Texture blocks = Texture.getTexture("blocks");
+		public Texture yogu = Texture.getTexture("yogu");
+		public Texture chicken = Texture.getTexture("chicken");
+		public Texture ui = Texture.getTexture("ui");
+		public Texture numbers = Texture.getTexture("numbers");
 	}
 
 	public static class Images {
@@ -117,8 +96,8 @@ public class Res {
 			chickenExploding3 = tiles.get(2, 3);
 			chickenExploding4 = tiles.get(3, 3);
 
-			tiles = new TiledImage(Res.textures.ui, 3, 3);
-			arrowKey = tiles.get(0, 2);
+			tiles = new TiledImage(Res.textures.ui, 1, 1);
+			arrowKey = tiles.get(0, 0);
 			
 			tiles = new TiledImage(Res.textures.numbers, 4, 4);
 			numbers = new HashMap<java.lang.Character, Image>();

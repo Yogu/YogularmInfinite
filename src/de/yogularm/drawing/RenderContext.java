@@ -1,6 +1,5 @@
 package de.yogularm.drawing;
 
-import java.io.InputStream;
 import java.util.Set;
 
 import de.yogularm.Rect;
@@ -8,6 +7,7 @@ import de.yogularm.Vector;
 
 public interface RenderContext {
 	void setColor(Color color);
+	void bindTexture(Texture texture);
 	void unbindTexture();
 	
 	void drawRect(Rect bounds);
@@ -25,6 +25,12 @@ public interface RenderContext {
 	void clear(Color clearColor);
 	void setProjection(float width, float height);
 	
-	Texture loadTexture(InputStream stream);
 	Font loadFont(int size, Set<FontStyle> style);
+	
+	/**
+	 * Deletes all native resources
+	 * 
+	 * This object should be re-usable after dispose() is called
+	 */
+	void dispose();
 }
