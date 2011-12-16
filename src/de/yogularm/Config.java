@@ -27,6 +27,7 @@ public class Config {
 	public static float DEATH_FALL_SPEED = 20;
 	public static float MAX_LIFE = 3;
 	public static float IMMUNE_TIME = 2;
+	public static int CHECKPOINT_RANGE = 21; // every x structures a checkpoint
 	
 	// Debug
 	public static boolean DISPLAY_FORCES = false;

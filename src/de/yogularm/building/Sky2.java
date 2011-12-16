@@ -4,6 +4,7 @@ import java.util.Random;
 
 import de.yogularm.Builder;
 import de.yogularm.BuilderBase;
+import de.yogularm.Config;
 import de.yogularm.Vector;
 import de.yogularm.components.Checkpoint;
 import de.yogularm.components.Chicken;
@@ -22,8 +23,6 @@ public class Sky2 extends BuilderBase {
 		1 /* up */, 2 /* flat */,
 		3 /* down 1 */, 3 /* down 2 */
 	};
-	
-	private static final int CHECKPOINT_RANGE = 21; // every x structures a checkpoint
 	
 	private static BuilderSelector subBuilders = new BuilderSelector();
 	
@@ -72,11 +71,11 @@ public class Sky2 extends BuilderBase {
 		int index = getCurrentIndex() + indexOffset;
 		return
 			// only be checkpoint if this is not a platform
-			(index % CHECKPOINT_RANGE == CHECKPOINT_RANGE - 1
+			(index % Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1
 				&& !(getSubBuilder(indexOffset) instanceof PlatformBuilder))
 				
 			// be a checkpoint if last would be one but was a platform
-			|| ((index - 1) % CHECKPOINT_RANGE == CHECKPOINT_RANGE - 1
+			|| ((index - 1) % Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1
 				&& (getSubBuilder(indexOffset - 1) instanceof PlatformBuilder)); 
 	}
 	

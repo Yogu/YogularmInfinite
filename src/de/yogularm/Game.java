@@ -24,7 +24,7 @@ public class Game {
 	private float gameoverTime = 0;
 	
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.2";
+	public static final String VERSION = "0.3.1";
 	
 	public Game() {
 		// Init world

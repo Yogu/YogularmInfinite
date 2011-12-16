@@ -12,7 +12,7 @@
 			
 			.page {
 				margin: 0 auto;
-				max-width: 800px;
+				max-width: 990px;
 				padding: 20px 20px 100px;
 				
 				background: #FFFFFF;
@@ -65,6 +65,12 @@
 			img.right {
 				float: right;
 				margin-left: 20px;
+			}
+			
+			img.full-width {
+				display: block;
+				margin: 0 auto;
+				max-width: 100%;
 			}
 			
 			.download {
@@ -133,8 +139,8 @@
 			.important {
 				background: #800000;
 				color: #FFFFFF;
-			}
-			
+			}		
+				
 			.new {
 				background: #E08000 !important;
 				color: #000000 !important;
@@ -170,17 +176,23 @@
 					<div>
 						<a href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
 							<span>Start Yogularm Infinite</span>
-							<span class="version">Version 0.2 Alpha</span>
+							<span class="version">Version 0.3.1 Alpha</span>
 						</a>
-						
-						<a href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" class="new">
+												
+						<a class="new" href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" class="new">
 							<span>Download for Android</span>
-							<span class="version">Version 0.3 Alpha</span>
+
+							<span class="version">Version 0.3.1 Alpha</span>
 						</a>
 					</div>
-				</section>
+				</section>		
+						
+				<p>
+					Yogularm is open-source. You can view and download the source at
+					<a href="https://github.com/Yogu/YogularmInfinite">github.com</a>. Feel free to make your changes!
+				</p>
 				
-				<p class="important">
+				<p>
 					<strong>Important</strong>: If you chose to always trust the author of Yogularm in version up to
 					0.1.4.0, please undo this. Unfortunately, the keys have become public and are no longer trustful.
 					You can edit the certificates by executing <i>javaws -viewer</i> in the command line and going to
@@ -190,15 +202,6 @@
 				<p>
 					Note: You will be asked whether you really want to start the appliction, because it requires full access
 					over your computer. Unfortunately, there is currently no alternative.
-				</p>
-				
-				<p>
-					Yogularm is open-source. You can view and download the source at
-					<a href="https://github.com/Yogu/YogularmInfinite">github.com</a>. Feel free to make your changes!
-				</p>
-				
-				<p>
-					Also try the first version of <a href="http://www.yogularm.de/infinite/code/de.yogularm.android-acc.apk">accelerometer-controlled android app</a>.
 				</p>
 			</section>
 			
@@ -223,10 +226,36 @@
 			
 			<section>
 				<header>
-					<h2>Recent changes</h2>
+					<h2>Screenshot</h2>
 				</header>
 				
+				<img src="screenshot.png" alt="Playing Yogularm: Yogu is standing on a block, an arrow flies above it.
+				A chicken flutters over a gap, and to the left, a platform moves. Yogu has yet collected ten coins, and
+				two other coins are in the world." class="full-width" />
+			</section>
+			
+			<section>
+				<header>
+					<h2>Recent changes</h2>
+				</header>			
+						
+				<h3>Version 0.3.1 Alpha</h3>
+
+				<ul>
+					<li>
+						<b>Crash fixed:</b> Yogularm crashed on some devices, especially on several Android phones. This is now fixed.
+						(Technical Information: The textures' dimensions were no powers of two, so some video cards could not load
+						them).
+					</li>
+					
+					<li>
+						<b>Bug reporting:</b> If the Android App crashes, it displays a detailed error message. If this happens to
+						you, please copy the message by  
+					</li>
+				</ul>
+							
 				<h3>Version 0.3 Alpha</h3>
+
 				<ul>
 					<li>
 						<b>Yogularm for Android:</b> Yogularm is available as Android app. You have to
@@ -324,12 +353,8 @@
 				</p>
 				
 				<p>
-					Maybe I'll add more, especially mobile, enemies, which try to push you off the platforms. Also I thought
-					of moving platforms you have to jump on for moving over a large gap.
-				</p>
-				
-				<p>
-					The current world builder is called Sky, because it creates platforms in the air. Other
+					Maybe I'll add more, especially mobile, enemies, which try to push you off the platforms. The
+					current world builder is called Sky, because it creates platforms in the air. Other
 					world builders would be possible, for example an underground lava cave or an underwater world.
 				</p>
 			</section>

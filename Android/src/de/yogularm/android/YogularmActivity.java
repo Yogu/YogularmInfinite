@@ -43,7 +43,8 @@ public class YogularmActivity extends Activity {
 			Config.MAX_VIEW_HEIGHT = 10;
 			Config.SCROLL_BUFFER = 1 / 16f;
 			Config.PLAYER_JUMP_SPEED = 6;
-			Config.AIR_ADHESION = 5;
+			//Config.AIR_ADHESION = 5; // temporarily disabled for testing
+			Config.CHECKPOINT_RANGE = 11; // temporarily changed for testing
 
 			YogularmRenderer renderer = new YogularmRenderer(Controller.getGame());
 
