@@ -1,5 +1,6 @@
 package de.yogularm;
 
+
 public class Vector {
 	private final float x;
 	private final float y;
@@ -67,6 +68,13 @@ public class Vector {
 
 	public boolean equals(Vector other) {
 		return x == other.x && y == other.y;
+	}
+	
+	public int hashCode() {
+		// copyied from Point2D.hashCode();
+    long bits = Double.doubleToLongBits(x);
+    bits ^= Double.doubleToLongBits(y) * 31;
+    return (((int) bits) ^ ((int) (bits >> 32)));
 	}
 
 	public Vector normalize() {

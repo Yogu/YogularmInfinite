@@ -6,7 +6,7 @@ import de.yogularm.components.Ladder;
 public class ClimbTest extends BuilderBase {	
 	public void doBuild() {
 		int length = 40;
-		int height = 10;
+		//int height = 10;
 		
 		for (int i = 0; i < length; i++) {
 			if (i % 5 == 0) {

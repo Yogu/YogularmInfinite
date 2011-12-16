@@ -1,10 +1,10 @@
 package de.yogularm.components;
 
 import de.yogularm.Block;
+import de.yogularm.ComponentCollection;
 import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
-import de.yogularm.World;
 import de.yogularm.drawing.CombinedDrawable;
 import de.yogularm.drawing.RenderTransformation;
 
@@ -25,8 +25,8 @@ public class Platform extends Block {
 	private RenderTransformation propellerTransformation;
 	private float animationTime;
 	
-	public Platform(World world) {
-		super(world);
+	public Platform(ComponentCollection collection) {
+		super(collection);
 		propellerTransformation = new RenderTransformation(Res.images.platformPropeller);
 		propellerTransformation.setRotationCenter(new Vector(0.5f, 0.5f));
 		CombinedDrawable drawable = new CombinedDrawable();

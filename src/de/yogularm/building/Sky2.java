@@ -14,7 +14,7 @@ import de.yogularm.components.Platform;
 import de.yogularm.components.Shooter;
 import de.yogularm.components.Stone;
 
-public class Sky2 extends BuilderBase {
+public class Sky2 extends CompositeBuilder {
 	private static final int[] MAX_X_OFFSET_BY_Y_OFFSET = {
 		3 /* up */, 4 /* flat */,
 		5 /* down 1 */, 5 /* down 2 */, 5 /* down 3*/
@@ -24,19 +24,18 @@ public class Sky2 extends BuilderBase {
 		3 /* down 1 */, 3 /* down 2 */
 	};
 	
-	private static BuilderSelector subBuilders = new BuilderSelector();
-	
-	static {
-		subBuilders.add(new BridgeBuilder(), 1.0f);
-		subBuilders.add(new PlatformBuilder(), 0.4f);
-		subBuilders.add(new LadderBuilder(), 0.3f);
+	public Sky2() {
+		addBuilder(new BridgeBuilder(), 1.0f);
+		addBuilder(new PlatformBuilder(), 0.4f);
+		addBuilder(new LadderBuilder(), 0.3f);
 	}
 	
 	public void doBuild() {
 		buildGap();
 
 		Builder subBuilder = getSubBuilder(0);
-		subBuilder.build(getWorld(), getCurrentIndex());
+		subBuilder.build();
+		setBuildingPosition(subBuilder.getBuildingPosition());
 
 		if (isCheckpoint(0))
 			place(Checkpoint.class, 0, 1);
@@ -61,7 +60,7 @@ public class Sky2 extends BuilderBase {
 		Random random = getRandom(0x390401E0, indexOffset);
 		Builder builder;
 		do {
-			builder = subBuilders.get(random.nextFloat());
+			builder = getBuilder(random.nextFloat());
 			// no two platforms behind each other, that is too difficult
 		} while (builder instanceof PlatformBuilder && getSubBuilder(indexOffset - 1 ) instanceof PlatformBuilder);
 		return builder;
@@ -115,7 +114,7 @@ public class Sky2 extends BuilderBase {
 			// due to physics problems, upwards moving platforms are hard to ride on
 			int yOffset = random.nextInt(2 * MAX_Y_OFFSET + 1) - MAX_Y_OFFSET;
 			
-			Platform platform = new Platform(getWorld());
+			Platform platform = new Platform(getComponents());
 			platform.setPlatformSpeed(speed);
 			platform.setTargets(new Vector[] { Vector.getZero(), new Vector(length - 1, yOffset) } );
 			place(platform, 1, 0);

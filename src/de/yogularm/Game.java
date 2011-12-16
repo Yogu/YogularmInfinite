@@ -1,7 +1,6 @@
 package de.yogularm;
 
 import java.util.EnumSet;
-import java.util.Random;
 
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
@@ -14,14 +13,17 @@ import de.yogularm.input.Input;
 public class Game {
 	private World world;
 	private Input input;
-	private long lastFrameTime;
-	private long frameCount = 0;
-	private float frameTime = 0;
 	private Vector viewSize = new Vector(1, 1);
 	private int width;
 	private int height;
 	private boolean isGameover = false;
 	private float gameoverTime = 0;
+
+	private long lastFrameTime;
+	private long frameCount = 0;
+	private float frameTime = 0;
+	private long updateTime;
+	private long renderTime;
 	
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
 	public static final String VERSION = "0.3.1";
@@ -64,12 +66,16 @@ public class Game {
 	}
 	
 	public void render(RenderContext context) {
+		long time = System.nanoTime();
 		context.clear(CLEAR_COLOR);
 		world.render(context);
 		renderGUI(context);
+		renderTime = System.nanoTime() - time;
 	}
 
 	private void doTick() {
+		long time = System.nanoTime();
+		
 		world.update(frameTime);
 		if (input != null)
 			applyInput();
@@ -77,6 +83,8 @@ public class Game {
 			gameoverTime = Config.GAMEOVER_LENGTH;
 			isGameover = true;
 		}
+		
+		updateTime = System.nanoTime() - time;
 	}
 
 	private void renderGUI(RenderContext context) {
@@ -110,6 +118,16 @@ public class Game {
 		Font font2 = context.loadFont(12, EnumSet.of(FontStyle.BOLD));
 		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
 
+
+		// Debug
+		context.drawText(new Vector(10, 40), font2, String.format(
+			"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms",
+			1 / frameTime, frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
+		context.drawText(new Vector(10, 25), font2, String.format(
+			"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d",
+			world.getComponents().getCount(), world.renderCount, world.updateCount, world.inRangeCount));
+		context.drawText(new Vector(10, 10), font2, "Player: " + world.getPlayer().getPosition());
+
 		context.setProjection(viewSize.getX(), viewSize.getY());
 	}
 
@@ -123,7 +141,7 @@ public class Game {
 	}
 
 	private void restart() {
-		world = new World(new Random().nextInt());
+		world = new World();
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		gameoverTime = 0;
 		isGameover = false;

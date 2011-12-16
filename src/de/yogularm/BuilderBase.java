@@ -3,32 +3,54 @@ package de.yogularm;
 import java.util.Random;
 
 public abstract class BuilderBase implements Builder {
-	private World world;
+	private ComponentCollection components;
 	private int index;
+	private int seed;
+	private Vector buildingPosition;
 	
 	public abstract void doBuild();
 	
-	public void build(World world, int index) {
-		this.world = world;
-		this.index = index;
+	public void init(ComponentCollection components, Vector buildingPosition) {
+		this.components = components;
+		this.buildingPosition = buildingPosition;
+		index = 0;
+		seed = new Random().nextInt();
+	}
+	
+	public void build() {
+		index++;
 		doBuild();
 	}
 	
-	public World getWorld() {
-		return world;
+	public ComponentCollection getComponents() {
+		return components;
 	}
 	
+	/**
+	 * Places the given component relatively to the place below the player
+	 * @param component The component to place
+	 * @param x The translation along x axis
+	 * @param y The translation along y axis
+	 */
 	protected void place(Component component, float x, float y) {
 		// coordinates relatively to the place below the player
-		Vector position = new Vector(x, y - 1).add(world.getBuildingPosition());
+		Vector position = new Vector(x, y - 1).add(buildingPosition);
 		
 		component.setPosition(position);
-		world.addComponent(component);
+		components.add(component);
 	}
-	
+
+	/**
+	 * Creates an instance of the component class and places it relatively to the place below the
+	 * player
+	 * 
+	 * @param componentClass The class of the component to place
+	 * @param x The translation along x axis
+	 * @param y The translation along y axis
+	 */
 	protected void place(Class<? extends Component> componentClass, float x, float y) {
 		try {
-			Component component = componentClass.getConstructor(World.class).newInstance(world);
+			Component component = componentClass.getConstructor(ComponentCollection.class).newInstance(components);
 
 			place(component, x, y);
 		} catch (Exception e) {
@@ -45,15 +67,23 @@ public abstract class BuilderBase implements Builder {
 	}
 	
 	protected int getSeed(int indexOffset) {
-		return world.getSeed() + (index + indexOffset) * 0x24613672;
+		return seed + (index + indexOffset) * 0x24613672;
 	}
 	
 	protected int getSeed() {
 		return getSeed(0);
 	}
 	
+	public Vector getBuildingPosition() {
+		return buildingPosition;
+	}
+	
+	protected void setBuildingPosition(Vector value) {
+		buildingPosition = value;
+	}
+	
 	protected void moveBuildingPosition(Vector offset) {
-		world.setBuildingPosition(world.getBuildingPosition().add(offset));
+		buildingPosition = buildingPosition.add(offset);
 	}
 	
 	protected void moveBuildingPosition(float x, float y) {

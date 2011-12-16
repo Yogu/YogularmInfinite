@@ -5,12 +5,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.yogularm.Builder;
+import de.yogularm.BuilderBase;
 
-public class BuilderSelector {
+public abstract class CompositeBuilder extends BuilderBase {
 	private Map<Builder, Float> builders = new HashMap<Builder, Float>();
 	private float frequencySum;
 	
-	public void add(Builder builder, float frequency) {
+	public void addBuilder(Builder builder, float frequency) {
 		builders.put(builder, frequency);
 		frequencySum += frequency;
 	}
@@ -21,12 +22,15 @@ public class BuilderSelector {
 	 * @param random a random seed, between 0 and 1 (inclusive)
 	 * @return a random builder
 	 */
-	public Builder get(float random) {
+	public Builder getBuilder(float random) {
 		random *= frequencySum;
 		for (Entry<Builder, Float> entry : builders.entrySet()) {
 			random -= entry.getValue();
-			if (random <= 0)
-				return entry.getKey();
+			if (random <= 0) {
+				Builder builder = entry.getKey();
+				builder.init(getComponents(), getBuildingPosition());
+				return builder;
+			}
 		}
 		return null;
 	}

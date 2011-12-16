@@ -1,21 +1,21 @@
 package de.yogularm.components;
 
 import de.yogularm.Body;
+import de.yogularm.ComponentCollection;
 import de.yogularm.Direction;
 import de.yogularm.Entity;
 import de.yogularm.Item;
 import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
-import de.yogularm.World;
 import de.yogularm.drawing.RenderTransformation;
 
 public class Arrow extends Entity {
 	private Body sender;
 	private RenderTransformation transformation;
 	
-	public Arrow(World world) {
-		super(world);
+	public Arrow(ComponentCollection collection) {
+		super(collection);
 		transformation = new RenderTransformation(Res.images.arrow);
 		transformation.setRotationCenter(new Vector(0.5f, 0.5f));
 		setDrawable(transformation);
@@ -24,8 +24,8 @@ public class Arrow extends Entity {
 		setIsSolid(false);
 	}
 	
-	public Arrow(World world, Body sender) {
-		this(world);
+	public Arrow(ComponentCollection collection, Body sender) {
+		this(collection);
 		this.sender = sender;
 	}
 	

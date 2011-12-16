@@ -12,8 +12,8 @@ public abstract class Character extends Entity {
 	private float walkSpeed = 0;
 	private float climbSpeed;
 
-	public Character(World world) {
-		super(world);
+	public Character(ComponentCollection collection) {
+		super(collection);
 		setIsGravityAffected(true);
 		setIsShiftable(true);
 	}
@@ -113,8 +113,10 @@ public abstract class Character extends Entity {
 	}
 
 	protected float getHeightOverGround() {
-		Body blockBelowLeft = getWorld().getBlockBelow(getPosition().changeX((float) Math.floor(getPosition().getX())));
-		Body blockBelowRight = getWorld().getBlockBelow(getPosition().changeX((float) Math.ceil(getPosition().getX())));
+		Vector v = getPosition().changeX((float) Math.floor(getPosition().getX()));
+		Body blockBelowLeft = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
+		v = getPosition().changeX((float) Math.ceil(getPosition().getX()));
+		Body blockBelowRight = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
 		float height = Float.POSITIVE_INFINITY;
 		if (blockBelowLeft != null)
 			height = Math.min(height, getOuterBounds().getBottom() - blockBelowLeft.getOuterBounds().getTop());

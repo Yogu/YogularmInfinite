@@ -9,8 +9,8 @@ public class Player extends Character {
 	private float fallTime;
 	private Vector checkpoint;
 	
-	public Player(World world) {
-		super(world);
+	public Player(ComponentCollection collection) {
+		super(collection);
 		setDrawable(Res.images.yogu);
 		setBounds(new Rect(0.18721875f, 0.080890625f, 0.801515625f, 0.9359375f));
 		setLife(Config.MAX_LIFE);

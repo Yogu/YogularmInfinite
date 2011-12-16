@@ -2,11 +2,11 @@ package de.yogularm.components;
 
 import de.yogularm.Body;
 import de.yogularm.Bot;
+import de.yogularm.ComponentCollection;
 import de.yogularm.Direction;
 import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
-import de.yogularm.World;
 import de.yogularm.drawing.AnimatedImage;
 import de.yogularm.drawing.RenderTransformation;
 
@@ -16,8 +16,8 @@ public class Chicken extends Bot {
 	private RenderTransformation transformation;
 	private float explodeRemainingTime;
 	
-	public Chicken(World world) {
-		super(world);
+	public Chicken(ComponentCollection collection) {
+		super(collection);
 		walkingAnimation = Res.animations.chickenWalking.getInstance();
 		flutteringAnimation = Res.animations.chickenFluttering.getInstance();
 		transformation = new RenderTransformation(walkingAnimation);
@@ -65,8 +65,8 @@ public class Chicken extends Bot {
 	}
 	
 	private void dropHeart() {
-		Heart heart = new Heart(getWorld());
+		Heart heart = new Heart(getCollection());
 		heart.setPosition(getPosition());
-		getWorld().addComponent(heart);
+		getCollection().add(heart);
 	}
 }

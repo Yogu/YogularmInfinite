@@ -3,22 +3,30 @@ package de.yogularm;
 import de.yogularm.drawing.AnimatedImage;
 import de.yogularm.drawing.Animation;
 import de.yogularm.drawing.Drawable;
+import de.yogularm.event.Event;
 
 public class Component implements Locatable {
 	private Vector position;
-	private World world;
+	private ComponentCollection collection;
 	private boolean isRemoved = false;
 	private Drawable drawable;
 	
-	public Component(World world) {
-		if (world == null)
-			throw new NullPointerException("world is null");
-		this.world = world;
+	/**
+	 * An event that is called when this component is moved
+	 * 
+	 * The event parameter specifies the former position.
+	 */
+	public final Event<Vector> onMoved = new Event<Vector>(this);
+	
+	public Component(ComponentCollection collection) {
+		if (collection == null)
+			throw new NullPointerException("collection is null");
+		this.collection = collection;
 		position = Vector.getZero();
 	}
 	
-	public World getWorld() {
-		return world;
+	public ComponentCollection getCollection() {
+		return collection;
 	}
 	
 	public Vector getPosition() {
@@ -29,7 +37,10 @@ public class Component implements Locatable {
 		if (position == null)
 			throw new IllegalArgumentException("position is null");
 		
+		Vector oldPosition = this.position;
 		this.position = position;
+		if (!position.equals(oldPosition))
+			onMoved.call(oldPosition);
 	}
 	
 	public void update(float elapsedTime) {

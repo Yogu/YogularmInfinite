@@ -51,20 +51,20 @@ public class Body extends Component {
 		 * Gets the force that should be applied, depending on the body's current
 		 * speed
 		 */
-		public Vector getForce() {
+		public Vector getForce(float elapsedTime) {
 			// Direction dir = axis ? Direction.DOWN : Direction.LEFT;
 			float speedDiff = speed - getSpeed().getComponent(axis);
 			if (speedDiff != 0) {
 				float direction = speedDiff / Math.abs(speedDiff);
-				float theForce = Math.min(Math.abs(force), Math.abs(speedDiff * mass) / getWorld().getFrameTime());
+				float theForce = Math.min(Math.abs(force), Math.abs(speedDiff * mass) / elapsedTime);
 				return Vector.getZero().changeComponent(axis, direction * theForce);
 			}
 			return Vector.getZero();
 		}
 	}
 
-	public Body(World world) {
-		super(world);
+	public Body(ComponentCollection collection) {
+		super(collection);
 		bounds = new Rect(0, 0, 1, 1);
 		collectedForce = Vector.getZero();
 		totalForce = Vector.getZero();
@@ -272,9 +272,9 @@ public class Body extends Component {
 
 		momentum = momentum.add(collectedForce.multiply(elapsedTime));
 		for (ForceToSpeed info : forceToSpeed) {
-			Vector force = info.getForce();
+			Vector force = info.getForce(elapsedTime);
 			applyForce(force);
-			momentum = momentum.add(force.multiply(getWorld().getFrameTime()));
+			momentum = momentum.add(force.multiply(elapsedTime));
 		}
 		forceToSpeed.clear();
 		totalForce = collectedForce;
@@ -306,7 +306,9 @@ public class Body extends Component {
 
 	private void checkClimbing() {
 		if (canClimb) {
-			Iterable<Body> overlaps = getWorld().getOverlappingBodies(getOuterBounds());
+			Iterable<Body> overlaps = 
+				ComponentCollectionUtils.getOverlappingBodies(getCollection(), getOuterBounds());
+			
 			for (Body body : overlaps) {
 				if (body.isClimbable) {
 					isClimbing = true;
@@ -323,7 +325,7 @@ public class Body extends Component {
 		Rect path = new Rect(Math.min(source.getLeft(), target.getLeft()),
 			Math.min(source.getBottom(), target.getBottom()), Math.max(source.getRight(), target.getRight()), Math.max(
 				source.getTop(), target.getTop()));
-		for (Component component : getWorld().getComponents()) {
+		for (Component component : getCollection().getComponentsAround(path)) {
 			if ((component != this) && !component.isToRemove() && (component instanceof Body) && ((Body) component).isSolid()) {
 				Body body = (Body) component;
 				Rect obstacle = body.getOuterBounds();
@@ -358,7 +360,7 @@ public class Body extends Component {
 
 		//List<Body> collidedBodies = null;
 
-		for (Component component : getWorld().getComponents()) {
+		for (Component component : getCollection().getComponentsAround(path)) {
 			if ((component instanceof Body) && !component.isToRemove() && (component != this)) {
 				Body body = (Body) component;
 				Rect obstacle = body.getOuterBounds();

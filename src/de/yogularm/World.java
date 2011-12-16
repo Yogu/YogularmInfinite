@@ -1,9 +1,5 @@
 package de.yogularm;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
 import de.yogularm.drawing.RenderContext;
@@ -14,7 +10,10 @@ public class World {
 	// private static List<Builder> builders = new ArrayList<Builder>();
 
 	public static final int MIN_BUFFER_LENGTH = 50;
-	public static final int MAX_BUFFER_LENGTH = 200;
+	public static final int MAX_BUFFER_LENGTH = Integer.MAX_VALUE;//200;
+	
+	private static final int SECTOR_WIDTH = (int)(Config.MAX_VIEW_WIDTH * 1.2);
+	private static final int SECTOR_HEIGHT = (int)(Config.MAX_VIEW_HEIGHT * 1.2);
 
 	static {
 		/*
@@ -23,74 +22,77 @@ public class World {
 		 */
 	}
 
-	private List<Component> components = new ArrayList<Component>();
-	private List<Component> componentsToAdd = new ArrayList<Component>();
+	private ComponentCollection components = new ComponentTree(SECTOR_WIDTH, SECTOR_HEIGHT);
 	private Camera camera = new Camera();
 	private Player player;
-	private int seed;
-	private int structureCounter = 0;
-	private Vector buildingPosition = Vector.getZero();
 	private Builder currentBuilder;
 	private float frameTime;
 	
-	public World(int seed) {
-		this.seed = seed;
+	// Debug
+	public int updateCount;
+	public int deleteCount;
+	public int renderCount;
+	public int inRangeCount;
+	
+	public World() {
+		player = new Player(components);
+		components.add(player);
 		
 		currentBuilder = new Sky2();
-
-		player = new Player(this);
-		components.add(player);
+		//currentBuilder = new GroundBuilder();
+		currentBuilder.init(components, new Vector(0, 0));
 
 		// First place
-		Stone stone = new Stone(this);
+		Stone stone = new Stone(components);
 		stone.setPosition(new Vector(0, -1));
-		components.add(0, stone);
+		components.add(stone);
 	}
 
 	public void render(RenderContext context) {
 		camera.applyMatrix(context);
 
-		for (Component component : components) {
-			if (component instanceof Renderable) {
+		renderCount = 0;
+		for (Component component : components.getComponentsAround(camera.getBounds())) {
+			if (component instanceof Renderable && component != player) {
 				Renderer.render(context, (Renderable) component);
+				renderCount++;
 			}
 		}
+		// To show it above all other components
+		Renderer.render(context, player);
 	}
 
 	public void update(float elapsedTime) {
 		frameTime = elapsedTime;
 
 		build();
+		
+		// inaccurate, for performance reasons: actionRange = 2 * camera.bounds
+		Rect actionRange = camera.getBounds().changeSize(camera.getBounds().getSize().multiply(2));
 
-		components.addAll(0, componentsToAdd);
-		componentsToAdd.clear();
-
+		// accurate, for gameplay
 		float actionDistance = Math.max(camera.getBounds().getWidth(), camera
 				.getBounds().getHeight());
 
-		Iterator<Component> iterator = components.iterator();
-		while (iterator.hasNext()) {
-			Component component = iterator.next();
+		updateCount = 0;
+		deleteCount = 0;
+		inRangeCount = 0;
+		
+		for (Component component : components.getComponentsAround(actionRange)) {
+			inRangeCount++;
+			
 			float distance = Vector.getDistance(component.getPosition(), player
 					.getPosition());
-			if (!component.isToRemove() && distance <= actionDistance)
+			if (!component.isToRemove() && distance <= actionDistance) {
 				component.update(elapsedTime);
-			if (distance > MAX_BUFFER_LENGTH || component.isToRemove())
-				iterator.remove();
+				updateCount++;
+			}
+			if (distance > MAX_BUFFER_LENGTH || component.isToRemove()) {
+				components.remove(component);
+				deleteCount++;
+			}
 		}
 		camera.scroll(player.getOuterBounds().getCenter(), elapsedTime);
-	}
-
-	public int getSeed() {
-		return seed;
-	}
-
-	public int getStructureCounter() {
-		return structureCounter;
-	}
-
-	public Vector getBuildingPosition() {
-		return buildingPosition;
 	}
 
 	public Player getPlayer() {
@@ -105,81 +107,13 @@ public class World {
 		return frameTime;
 	}
 
-	public List<Component> getComponents() {
+	public ComponentCollection getComponents() {
 		return components;
 	}
 
-	public void setBuildingPosition(Vector position) {
-		if (position == null)
-			throw new NullPointerException("position is null");
-		buildingPosition = position;
-	}
-
-	public void addComponent(Component component) {
-		componentsToAdd.add(component);
-	}
-
 	public void build() {
-		while (Vector.getDistance(player.getPosition(), buildingPosition) < MIN_BUFFER_LENGTH)
-			buildStructure();
-	}
-
-	public void buildStructure() {
-		currentBuilder.build(this, structureCounter);
-		structureCounter++;
-	}
-
-	public Iterable<Component> getComponentsAt(Vector position) {
-		List<Component> list = new ArrayList<Component>();
-		Vector rounded = position.round();
-		for (Component component : components) {
-			if (component.getPosition().round().equals(rounded))
-				list.add(component);
+		while (Vector.getDistance(player.getPosition(), currentBuilder.getBuildingPosition()) < MIN_BUFFER_LENGTH) {
+			currentBuilder.build();
 		}
-		return list;
-	}
-
-	public Iterable<Body> getOverlappingBodies(Rect range) {
-		List<Body> list = new ArrayList<Body>();
-		for (Component component : components) {
-			if (component instanceof Body) {
-				Body body = (Body)component;
-				if (body.getOuterBounds().overlaps(range))
-						list.add(body);
-			}
-		}
-		return list;
-	}
-
-	public Block getBlockAt(Vector position) {
-		for (Component component : getComponentsAt(position))
-			if (component instanceof Block)
-				return (Block) component;
-		return null;
-	}
-
-	public boolean hasSolidAt(Vector position) {
-		for (Component component : getComponentsAt(position))
-			if (component instanceof Body && ((Body) component).isSolid())
-				return true;
-		return false;
-	}
-
-	public Body getBlockBelow(Vector position) {
-		Vector rounded = position.round();
-		for (Component component : components) {
-			if (component instanceof Block) {
-				Block block = (Block) component;
-				if ((Math.round(component.getPosition().getX()) == rounded
-						.getX())
-						&& (block.getPosition().getY() <= position.getY()))
-					return block;
-			}
-		}
-		return null;
-	}
-	
-	public boolean hasBlockBelow(Vector position) {
-		return getBlockBelow(position) != null;
 	}
 }

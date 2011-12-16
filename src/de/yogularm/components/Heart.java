@@ -1,12 +1,12 @@
 package de.yogularm.components;
 
+import de.yogularm.ComponentCollection;
 import de.yogularm.Item;
 import de.yogularm.Res;
-import de.yogularm.World;
 
 public class Heart extends Item {
-	public Heart(World world) {
-		super(world);
+	public Heart(ComponentCollection collection) {
+		super(collection);
 		setDrawable(Res.images.heart);
 	}
 }

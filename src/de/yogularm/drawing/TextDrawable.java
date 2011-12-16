@@ -4,11 +4,11 @@ import de.yogularm.Res;
 import de.yogularm.Vector;
 
 public class TextDrawable implements Drawable {
-	private String text;
+	//private String text;
 	private Image[] images;
 	
 	public TextDrawable(String text) {
-		this.text = text;
+		//this.text = text;
 
 		images = new Image[text.length()];
 		for (int i = 0; i < text.length(); i++) {
