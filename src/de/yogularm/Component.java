@@ -1,22 +1,32 @@
 package de.yogularm;
 
-import javax.media.opengl.GL2;
+import de.yogularm.drawing.AnimatedImage;
+import de.yogularm.drawing.Animation;
+import de.yogularm.drawing.Drawable;
+import de.yogularm.event.Event;
 
 public class Component implements Locatable {
 	private Vector position;
-	private World world;
+	private ComponentCollection collection;
 	private boolean isRemoved = false;
-	private Image image;
+	private Drawable drawable;
 	
-	public Component(World world) {
-		if (world == null)
-			throw new NullPointerException("world is null");
-		this.world = world;
+	/**
+	 * An event that is called when this component is moved
+	 * 
+	 * The event parameter specifies the former position.
+	 */
+	public final Event<Vector> onMoved = new Event<Vector>(this);
+	
+	public Component(ComponentCollection collection) {
+		if (collection == null)
+			throw new NullPointerException("collection is null");
+		this.collection = collection;
 		position = Vector.getZero();
 	}
 	
-	public World getWorld() {
-		return world;
+	public ComponentCollection getCollection() {
+		return collection;
 	}
 	
 	public Vector getPosition() {
@@ -27,11 +37,15 @@ public class Component implements Locatable {
 		if (position == null)
 			throw new IllegalArgumentException("position is null");
 		
+		Vector oldPosition = this.position;
 		this.position = position;
+		if (!position.equals(oldPosition))
+			onMoved.call(oldPosition);
 	}
 	
 	public void update(float elapsedTime) {
-		
+		if (drawable != null)
+			drawable.update(elapsedTime);
 	}
 	
 	public void remove() {
@@ -42,16 +56,20 @@ public class Component implements Locatable {
 		return isRemoved;
 	}
 	
-	protected void setImage(Image image) {
-		this.image = image;
+	protected void setDrawable(Drawable drawable) {
+		this.drawable = drawable;
 	}
 	
-	protected Image getImage() {
-		return image;
+	protected void setAnimation(Animation animation) {
+		if ((this.drawable instanceof AnimatedImage)) {
+			AnimatedImage animatedImage = (AnimatedImage)drawable;
+			if (animatedImage.getAnimation() == animation)
+				return;
+		}
+		drawable = animation.getInstance();
 	}
 	
-	public void draw(GL2 gl) {
-		if (image != null)
-			image.draw(gl);
+	public Drawable getDrawable() {
+		return drawable;
 	}
 }

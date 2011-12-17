@@ -1,12 +1,11 @@
 package de.yogularm.components;
 
 import de.yogularm.Block;
+import de.yogularm.ComponentCollection;
 import de.yogularm.Config;
-import de.yogularm.Image;
 import de.yogularm.Rect;
 import de.yogularm.Res;
 import de.yogularm.Vector;
-import de.yogularm.World;
 
 public class Shooter extends Block {
 	private float rechargeTime = 0;
@@ -16,10 +15,11 @@ public class Shooter extends Block {
 	public static final float MIN_ANGLE = 15;
 	public static final float MAX_ANGLE = 45;
 	
-	public Shooter(World world) {
-		super(world);
-		setImage(new Image(Res.textures.blocks, new Rect(0, 0.75f, 0.25f, 1)));
+	public Shooter(ComponentCollection collection) {
+		super(collection);
+		setDrawable(Res.images.shooter);
 		setBounds(new Rect(0, 0, 1, 0.6015625f));
+		rechargeTime = getRechargeTime();
 	}
 	
 	public void update(float elapsedTime) {
@@ -32,11 +32,11 @@ public class Shooter extends Block {
 	}
 	
 	private void shoot() {
-		Arrow arrow = new Arrow(getWorld(), this);
-		arrow.setPosition(getPosition());
+		Arrow arrow = new Arrow(getCollection(), this);
+		arrow.setPosition(getPosition().add(new Vector(0, -0.2f))); // arrow shoots out of pipe
 		float angle = (float)Math.toRadians(180 - getAngle());
 		arrow.setSpeed(new Vector((float)Math.cos(angle), (float)Math.sin(angle)).multiply(Config.ARROW_SPEED));
-		getWorld().addComponent(arrow);
+		getCollection().add(arrow);
 		rechargeTime = getRechargeTime();
 	}
 	

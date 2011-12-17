@@ -7,8 +7,8 @@ public abstract class Bot extends Character {
 	private int direction;
 	private boolean stopping;
 	
-	public Bot(World world) {
-		super(world);
+	public Bot(ComponentCollection collection) {
+		super(collection);
 		direction = Math.random() > 0.5 ? 1 : -1;
 	}
 	
@@ -16,6 +16,10 @@ public abstract class Bot extends Character {
 		super.update(elapsedTime);
 
 		walk(elapsedTime);
+	}
+	
+	public int getDirection() {
+		return direction;
 	}
 	
 	private void walk(float elapsedTime) {
@@ -34,23 +38,19 @@ public abstract class Bot extends Character {
 	}
 	
 	private boolean shouldStop() {
-		return !standsOnGround() && getWorld().hasBlockBelow(getPosition())
-			&& !getWorld().hasBlockBelow(getPosition().add(new Vector(direction, 0)));
+		return !standsOnGround() && hasBlockBelow(getPosition())
+			&& !hasBlockBelow(getPosition().add(new Vector(direction, 0)));
 	}
 	
 	private boolean shouldJump() {
-		return getWorld().hasSolidAt(getPosition().add(new Vector(direction, 0))) // obstacle
+		return hasSolidAt(getPosition().add(new Vector(direction, 0))) // obstacle
 			|| standsBeforeGap();
 	}
 	
 	private boolean standsBeforeGap() {
-		return !getWorld().hasBlockBelow(getPosition())
-			&& !getWorld().hasBlockBelow(getPosition().add(new Vector(direction, -1)))
-			&& !getWorld().hasBlockBelow(getPosition().add(new Vector(direction * 2, -1)));
-	}
-	
-	public int getDirection() {
-		return direction;
+		return !hasBlockBelow(getPosition())
+			&& !hasBlockBelow(getPosition().add(new Vector(direction, -1)))
+			&& !hasBlockBelow(getPosition().add(new Vector(direction * 2, -1)));
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
@@ -61,5 +61,14 @@ public abstract class Bot extends Character {
 			else if (direction == Direction.RIGHT)
 				this.direction = -1;
 		}
+	}
+	
+	// helper functions
+	private boolean hasBlockBelow(Vector position) {
+		return ComponentCollectionUtils.hasBlockBelow(getCollection(), position);
+	}
+
+	private boolean hasSolidAt(Vector position) {
+		return ComponentCollectionUtils.hasSolidAt(getCollection(), position);
 	}
 }

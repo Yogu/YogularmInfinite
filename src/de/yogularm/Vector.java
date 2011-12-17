@@ -1,5 +1,6 @@
 package de.yogularm;
 
+
 public class Vector {
 	private final float x;
 	private final float y;
@@ -37,12 +38,20 @@ public class Vector {
 		return new Vector(x - other.x, y - other.y);
 	}
 
+	public Vector multiply(Vector other) {
+		return new Vector(x * other.x, y * other.y);
+	}
+
 	public Vector multiply(float value) {
 		return new Vector(x * value, y * value);
 	}
 
 	public Vector divide(float value) {
 		return new Vector(x / value, y / value);
+	}
+	
+	public Vector negate() {
+		return new Vector(-x, -y);
 	}
 
 	public float getLength() {
@@ -60,49 +69,118 @@ public class Vector {
 	public boolean equals(Vector other) {
 		return x == other.x && y == other.y;
 	}
+	
+	public int hashCode() {
+		// copyied from Point2D.hashCode();
+    long bits = Double.doubleToLongBits(x);
+    bits ^= Double.doubleToLongBits(y) * 31;
+    return (((int) bits) ^ ((int) (bits >> 32)));
+	}
 
 	public Vector normalize() {
 		float length = getLength();
-		return new Vector(x / length, y / length);
+		if (length == 1)
+			return this;
+		else
+			return new Vector(x / length, y / length);
 	}
 
 	public float getAngleToXAxis() {
 		Vector norm = normalize();
-		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x)
-				- Math.atan2(0, -1));
+		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x));
+				//- Math.atan2(0, -1));
+	}
+	
+	public static float getAngle(Vector v1, Vector v2) {
+    return (float)Math.toDegrees(Math.acos(getDotProduct(v1.normalize(), v2.normalize())));
+	}
+	
+	public static float getDotProduct(Vector v1, Vector v2) {
+		return v1.x * v2.x + v1.y * v2.y;
 	}
 
 	public Vector round() {
 		return new Vector(Math.round(x), Math.round(y));
 	}
 
+	/**
+	 * Rounds both components down and returns the new vector
+	 * 
+	 * @return the vector with both components rounded down
+	 */
+	public Vector floor() {
+		return new Vector((float)Math.floor(x), (float)Math.floor(y));
+	}
+
+	/**
+	 * Rounds both components up and returns the new vector
+	 * 
+	 * @return the vector with both components rounded up
+	 */
+	public Vector ceil() {
+		return new Vector((float)Math.ceil(x), (float)Math.ceil(y));
+	}
+
+	/**
+	 * Formats this vector to a string, including x and y component
+	 * 
+	 * @return a string that represents this vector
+	 */
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
 	}
 
-	public float getComponent(Direction direction) {
-		switch (direction) {
-		case LEFT:
-		case RIGHT:
+	/**
+	 * Gets the value of the given component
+	 * 
+	 * @param axis the axis that specifies the component (x or y)
+	 * @return the value of the component
+	 */
+	public float getComponent(Axis axis) {
+		switch (axis) {
+		case HORIZONTAL:
 			return getX();
-		case UP:
-		case DOWN:
+		case VERTICAL:
 			return getY();
 		default:
 			return 0;
 		}
 	}
 
-	public Vector changeComponent(Direction direction, float value) {
-		switch (direction) {
-		case LEFT:
-		case RIGHT:
+	/**
+	 * Changes the value of the given axis and returns the new vector
+	 * 
+	 * @param axis the axis whose component to change
+	 * @param value the component's new value
+	 * @return the new vector with the changed component
+	 */
+	public Vector changeComponent(Axis axis, float value) {
+		switch (axis) {
+		case HORIZONTAL:
 			return changeX(value);
-		case UP:
-		case DOWN:
+		case VERTICAL:
 			return changeY(value);
 		default:
 			return this;
 		}
+	}
+	
+	/**
+	 * Gets the direction this vector points to, if it is parallel to one of the axes
+	 * 
+	 * @return the direction of this vector, or Direction.NONE, if this vector is
+	 *   neither parallel to x axis, nor to y axis.
+	 */
+	public Direction getDirection() {
+		if (x == 0 && y < 0)
+			return Direction.DOWN;
+		else if (x == 0 && y > 0)
+			return Direction.UP;
+		else if (y == 0 && x > 0)
+			return Direction.RIGHT;
+		else if (y == 0 & x < 0)
+			return Direction.LEFT;
+		else
+			return Direction.NONE;
 	}
 }

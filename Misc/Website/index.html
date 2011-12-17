@@ -12,7 +12,7 @@
 			
 			.page {
 				margin: 0 auto;
-				max-width: 800px;
+				max-width: 990px;
 				padding: 20px 20px 100px;
 				
 				background: #FFFFFF;
@@ -67,9 +67,21 @@
 				margin-left: 20px;
 			}
 			
+			img.full-width {
+				display: block;
+				margin: 0 auto;
+				max-width: 100%;
+			}
+			
 			.download {
 				text-align: center;
 				margin: 2em 0;
+			}
+			
+			.download div {
+				margin: 0 auto;
+				overflow: hidden;
+				max-width: 600px;
 			}
 			
 			.download a,
@@ -77,7 +89,8 @@
 				padding: 10px;
 				display: block;
 				width: 200px;
-				margin: 0 auto;
+				margin: 20px;
+				float: left;
 				
 				background: #008000;
 				border: 3px solid #FFFFFF;
@@ -96,8 +109,10 @@
 			}
 			
 			.download a .version {
-				color: #808080;
-				color: rgba(255, 255, 255, 0.5);
+				display: block;
+				padding-top: 5px;
+			
+				opacity: 0.7;
 				font-weight: normal;
 				font-size: 10px;
 			}
@@ -124,6 +139,11 @@
 			.important {
 				background: #800000;
 				color: #FFFFFF;
+			}		
+				
+			.new {
+				background: #E08000 !important;
+				color: #000000 !important;
 			}
 		</style>
 	</head>
@@ -138,7 +158,7 @@
 				Yogularm Infinite is a Java game in which <b>Yogu</b> - the player - jumps and runs through an
 				<b>auto-generated</b> 2-dimensional world. As the name says, it is impossible to finish the
 				game. However, the goal is to collect as many <b>coins</b> as possibly. <b>Chicken</b> make
-				their own way through the dizzy air, and you have to take care of <b>arrow shooters</b>...
+				their own way through the dizzy air, and you have to watch out for <b>arrows</b>...
 			</p>
 			
 			<section>
@@ -152,22 +172,31 @@
 					green button and open it with the <b>Java(TM) Web Start Launcher</b>.
 				</p>
 				
-				<p class="download"><a href="http://www.yogularm.de/infinite/code/YogularmWebStart.jnlp">
-					<span>Start Yogularm Infinite</span>
-					<span class="version">Version 0.1.4.1 Alpha</span>
-				</a></p>
-				
-				<p class="note">
-					<strong>Note:</strong> If you have started Yogularm in a previous version, make sure the old one is
-					deleted. You can delete YogularmInfinte by executing <i>javaws -viewer</i> and chosing
-					the application then.
+				<section class="download">
+					<div>
+						<a href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
+							<span>Start Yogularm Infinite</span>
+							<span class="version">Version 0.3.1 Alpha</span>
+						</a>
+												
+						<a class="new" href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" class="new">
+							<span>Download for Android</span>
+
+							<span class="version">Version 0.3.1 Alpha</span>
+						</a>
+					</div>
+				</section>		
+						
+				<p>
+					Yogularm is open-source. You can view and download the source at
+					<a href="https://github.com/Yogu/YogularmInfinite">github.com</a>. Feel free to make your changes!
 				</p>
 				
-				<p class="important">
+				<p>
 					<strong>Important</strong>: If you chose to always trust the author of Yogularm in version up to
-					0.1.4.0, please undo this. Unfortunately, they have become public and are no longer trustful. You can
-					edit the certificates by executing <i>javaws -viewer</i> in the command line and going to the
-					<i>Security</i> section. Please apologize my beginner's mistake.
+					0.1.4.0, please undo this. Unfortunately, the keys have become public and are no longer trustful.
+					You can edit the certificates by executing <i>javaws -viewer</i> in the command line and going to
+					the <i>Security</i> section. I'm sorry for that mistake.
 				</p>
 				
 				<p>
@@ -197,8 +226,77 @@
 			
 			<section>
 				<header>
-					<h2>Recent changes</h2>
+					<h2>Screenshot</h2>
 				</header>
+				
+				<img src="screenshot.png" alt="Playing Yogularm: Yogu is standing on a block, an arrow flies above it.
+				A chicken flutters over a gap, and to the left, a platform moves. Yogu has yet collected ten coins, and
+				two other coins are in the world." class="full-width" />
+			</section>
+			
+			<section>
+				<header>
+					<h2>Recent changes</h2>
+				</header>			
+						
+				<h3>Version 0.3.1 Alpha</h3>
+
+				<ul>
+					<li>
+						<b>Crash fixed:</b> Yogularm crashed on some devices, especially on several Android phones. This is now fixed.
+						(Technical Information: The textures' dimensions were no powers of two, so some video cards could not load
+						them).
+					</li>
+					
+					<li>
+						<b>Bug reporting:</b> If the Android App crashes, it displays a detailed error message. If this happens to
+						you, please copy the message by  
+					</li>
+				</ul>
+							
+				<h3>Version 0.3 Alpha</h3>
+
+				<ul>
+					<li>
+						<b>Yogularm for Android:</b> Yogularm is available as Android app. You have to
+						download, copy to your sd card and open it from there because I don't want to
+						pay USD 25,00 to place it in the Market.
+					</li>
+				</ul>
+				
+				<h3>Version 0.2 Alpha</h3>
+				<ul>
+					<li>
+						<b>Platforms:</b> Propeller-powered wooden platforms carry you over large gaps.
+					</li>
+					
+					<li>
+						<b>Ladders:</b> Sometimes, it is neccessary to climb a little upwards. 
+					</li>
+					
+					<li>
+						<b>Physics:</b> For ladders and especially platforms to work properly, the physics engine
+						has been changed significantly.
+					</li>
+				</ul>
+				
+				<h3>Version 0.1.5 Alpha</h3>
+				<ul>
+					<li>
+						<b>Animations:</b> Yogu and the chicken are now animated! Whether walking, flying or being hurt - the characters
+						now are more lively.
+					</li>
+					
+					<li>
+						<b>Yogu gets thinner:</b> In previous versions, you could stand half on air when the hand was over a stone. Note
+						that although you'll have to get used to the new behavior, it is now more realistic. 
+					</li>
+					
+					<li>
+						<b>Yogularm on small screens:</b> If your desktop resolution is smaller than 1024x768 (or if you like
+						to run the game in a smaller window), the game is now better to play.
+					</li>
+				</ul>
 				
 				<h3>Version 0.1.4.1 Alpha</h3>
 				<ul>
@@ -255,12 +353,8 @@
 				</p>
 				
 				<p>
-					Maybe I'll add more, especially mobile, enemies, which try to push you off the platforms. Also I thought
-					of moving platforms you have to jump on for moving over a large gap.
-				</p>
-				
-				<p>
-					The current world builder is called Sky, because it creates platforms in the air. Other
+					Maybe I'll add more, especially mobile, enemies, which try to push you off the platforms. The
+					current world builder is called Sky, because it creates platforms in the air. Other
 					world builders would be possible, for example an underground lava cave or an underwater world.
 				</p>
 			</section>
