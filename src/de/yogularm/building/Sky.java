@@ -11,8 +11,8 @@ public class Sky extends CompositeBuilder {
 		addBuilder(new Gaps(), 2);
 	}
 	
-	public void doBuild() {
-		Random random = getRandom(0x573C75B5);
+	public void build() {
+		Random random = new Random();
 		Builder builder = getBuilder(random.nextFloat());
 		builder.build();
 	}

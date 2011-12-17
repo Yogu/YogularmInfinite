@@ -5,7 +5,7 @@ import de.yogularm.Vector;
 import de.yogularm.components.Platform;
 
 public class PlatformTest extends BuilderBase {	
-	public void doBuild() {
+	public void build() {
 		moveBuildingPosition(7, 0);
 		Platform platform = new Platform(getComponents());
 		platform.setTargets(new Vector[] { 

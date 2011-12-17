@@ -145,6 +145,7 @@ public class Game {
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		gameoverTime = 0;
 		isGameover = false;
+		System.gc();
 	}
 
 	private void applyInput() {

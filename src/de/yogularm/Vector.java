@@ -34,6 +34,10 @@ public class Vector {
 		return new Vector(x + other.x, y + other.y);
 	}
 
+	public Vector add(float x, float y) {
+		return new Vector(this.x + x,this. y + y);
+	}
+
 	public Vector subtract(Vector other) {
 		return new Vector(x - other.x, y - other.y);
 	}
