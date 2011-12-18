@@ -1,15 +1,19 @@
 package de.yogularm.desktop;
 
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -72,6 +76,10 @@ public class SwingLauncher {
 		GLCanvas canvas = new GLCanvas(glcapabilities);
 		window.getContentPane().add(canvas, BorderLayout.CENTER);
 
+		// Load icon
+		window
+			.setIconImages(getIconImages(new String[] { "res/icon-16.png", "res/icon-32.png", "res/icon-48.png" }));
+
 		return canvas;
 	}
 
@@ -97,5 +105,13 @@ public class SwingLauncher {
 		if (window != null)
 			window.dispose();
 		System.exit(1);
+	}
+
+	private List<Image> getIconImages(String[] fileNames) {
+		List<Image> images = new ArrayList<Image>();
+		for (String fileName : fileNames) {
+			images.add(new ImageIcon(getClass().getResource(fileName)).getImage());
+		}
+		return images;
 	}
 }
