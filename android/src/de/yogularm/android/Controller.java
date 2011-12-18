@@ -1,7 +1,6 @@
 package de.yogularm.android;
 
 import de.yogularm.Game;
-import de.yogularm.input.Input;
 
 public class Controller {
 	private static Game game;

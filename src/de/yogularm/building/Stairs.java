@@ -9,8 +9,8 @@ public class Stairs extends BuilderBase {
 	private static final int MIN_LENGTH = 1;
 	private static final int MAX_LENGTH = 4;
 	
-	public void doBuild() {
-		Random random = getRandom(0x154021FE);
+	public void build() {
+		Random random = new Random();
 		int length = MIN_LENGTH + random.nextInt(MAX_LENGTH - MIN_LENGTH);
 		int direction = 1 - 2 * random.nextInt(2);
 		for (int i = 1; i <= length; i++)

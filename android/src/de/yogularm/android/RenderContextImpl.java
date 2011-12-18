@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -17,7 +16,6 @@ import de.yogularm.Vector;
 import de.yogularm.drawing.AbstractRenderContext;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
-import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
 import de.yogularm.utils.Numbers;
@@ -128,10 +126,17 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		checkErrors();
 	}
 
+	protected Object loadFont(Font font) {
+		return null;
+	}
+
+	protected void destroyFont(Object fontObject) {
+		
+	}
+
 	@Override
 	public void drawText(Vector position, Font font, String text) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -208,11 +213,6 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		checkErrors();
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		checkErrors();
-	}
-
-	@Override
-	public Font loadFont(int size, Set<FontStyle> style) {
-		return new FontImpl();
 	}
 
 	private FloatBuffer createBuffer(float[] vertices) {

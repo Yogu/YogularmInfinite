@@ -37,16 +37,16 @@ public class SwingLauncher {
 
 	public void run() {
 		GLProfile.initSingleton(true);
-		
+
 		Game game = new Game();
 		canvas = createWindow();
-		
+
 		// Input
 		InputImpl input = new InputImpl();
 		game.setInput(input);
 		canvas.addKeyListener(input.getKeyListener());
 		window.addKeyListener(input.getKeyListener());
-		
+
 		// OpenGL
 		GLEventListenerImpl eventListener = new GLEventListenerImpl(game);
 		canvas.addGLEventListener(eventListener);
@@ -92,14 +92,13 @@ public class SwingLauncher {
 			String stackTrace = sw.toString();
 			String message = String.format(
 					"Sorry, an error occured: %s\n\nPlease send this error report to "
-							+ "info@yogularm.de. Thanks!\n\n%s\n\nVersion: %s", e.getMessage(),
-					stackTrace, Game.VERSION);
-	
+							+ "info@yogularm.de. Thanks!\n\n%s\n\nVersion: %s", e.getMessage(), stackTrace,
+					Game.VERSION);
+
 			JTextArea text = new JTextArea(message);
 			text.setEditable(false);
 			text.setBackground(SystemColor.control);
-			JOptionPane.showMessageDialog(window, text, "Runtime Error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(window, text, "Runtime Error", JOptionPane.ERROR_MESSAGE);
 			exceptionShown = true;
 		}
 

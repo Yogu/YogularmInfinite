@@ -24,33 +24,34 @@ public class Game {
 	private float frameTime = 0;
 	private long updateTime;
 	private long renderTime;
-	
+
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.3.1*";
-	
+	public static final String VERSION = "0.4.0*";
+
 	public Game() {
 		// Init world
 		restart();
 	}
-	
+
 	public void setInput(Input input) {
 		this.input = input;
 	}
-	
-	public void setResolution(RenderContext context, int width, int height) {		
+
+	public void setResolution(RenderContext context, int width, int height) {
 		// limit to maximum block counts in each direction
-		float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH, (float) height / Config.MAX_VIEW_HEIGHT);
+		float resolution = Math.max((float) width / Config.MAX_VIEW_WIDTH, (float) height
+				/ Config.MAX_VIEW_HEIGHT);
 		// resolution = Math.max(resolution, Config.MIN_RESOLUTION);
 		float w = width / resolution;
 		float h = height / resolution;
-		
+
 		context.setProjection(w, h);
 		viewSize = new Vector(w, h);
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		this.width = width;
 		this.height = height;
 	}
-	
+
 	public void update() {
 		captureFrameTime();
 
@@ -61,10 +62,10 @@ public class Game {
 			if (gameoverTime < 0)
 				restart();
 		}
-		
+
 		frameCount++;
 	}
-	
+
 	public void render(RenderContext context) {
 		long time = System.nanoTime();
 		context.clear(CLEAR_COLOR);
@@ -75,7 +76,7 @@ public class Game {
 
 	private void doTick() {
 		long time = System.nanoTime();
-		
+
 		world.update(frameTime);
 		if (input != null)
 			applyInput();
@@ -83,7 +84,7 @@ public class Game {
 			gameoverTime = Config.GAMEOVER_LENGTH;
 			isGameover = true;
 		}
-		
+
 		updateTime = System.nanoTime() - time;
 	}
 
@@ -91,12 +92,12 @@ public class Game {
 		context.setProjection(width, height);
 		context.setColor(Color.white);
 		context.resetTranformation();
-		Font font = context.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
-		
+		Font font =  new Font(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
+
 		// Coins
 		RenderTransformation.draw(context, Res.images.coin, 20, height - 70, 50, 50);
 		TextDrawable.draw(context, "" + world.getPlayer().getCollectedCoins(), 70, height - 70, 50);
-		
+
 		// Life
 		RenderTransformation.draw(context, Res.images.heart, 20, height - 140, 50, 50);
 		int life = Math.max(0, Math.round(world.getPlayer().getLife() - 1));
@@ -111,21 +112,20 @@ public class Game {
 
 			context.drawText(new Vector(width / 2 - 130, height / 2 - 20), font, "GAME OVER");
 		}
-		
+
 		// Title
 		context.setColor(Color.black);
 
-		Font font2 = context.loadFont(12, EnumSet.of(FontStyle.BOLD));
+		Font font2 =  new Font(12, EnumSet.of(FontStyle.BOLD));
 		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
-
 
 		// Debug
 		context.drawText(new Vector(10, 40), font2, String.format(
-			"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms",
-			1 / frameTime, frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
+				"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms", 1 / frameTime,
+				frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
 		context.drawText(new Vector(10, 25), font2, String.format(
-			"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d",
-			world.getComponents().getCount(), world.renderCount, world.updateCount, world.inRangeCount));
+				"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d", world.getComponents()
+						.getCount(), world.renderCount, world.updateCount, world.inRangeCount));
 		context.drawText(new Vector(10, 10), font2, "Player: " + world.getPlayer().getPosition());
 
 		context.setProjection(viewSize.getX(), viewSize.getY());
@@ -145,6 +145,7 @@ public class Game {
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		gameoverTime = 0;
 		isGameover = false;
+		System.gc();
 	}
 
 	private void applyInput() {

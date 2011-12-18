@@ -1,25 +1,12 @@
 package de.yogularm;
 
-import java.util.Random;
-
 public abstract class BuilderBase implements Builder {
 	private ComponentCollection components;
-	private int index;
-	private int seed;
 	private Vector buildingPosition;
-	
-	public abstract void doBuild();
 	
 	public void init(ComponentCollection components, Vector buildingPosition) {
 		this.components = components;
 		this.buildingPosition = buildingPosition;
-		index = 0;
-		seed = new Random().nextInt();
-	}
-	
-	public void build() {
-		index++;
-		doBuild();
 	}
 	
 	public ComponentCollection getComponents() {
@@ -66,14 +53,6 @@ public abstract class BuilderBase implements Builder {
 		place(component, 0, 0);
 	}
 	
-	protected int getSeed(int indexOffset) {
-		return seed + (index + indexOffset) * 0x24613672;
-	}
-	
-	protected int getSeed() {
-		return getSeed(0);
-	}
-	
 	public Vector getBuildingPosition() {
 		return buildingPosition;
 	}
@@ -88,21 +67,5 @@ public abstract class BuilderBase implements Builder {
 	
 	protected void moveBuildingPosition(float x, float y) {
 		moveBuildingPosition(new Vector(x, y));
-	}
-	
-	protected Random getRandom(int additionalSeed, int indexOffset) {
-		return new Random(getSeed(indexOffset) + additionalSeed * 0x5685CAE7);
-	}
-	
-	protected Random getRandom(int additionalSeed) {
-		return getRandom(additionalSeed, 0);
-	}
-	
-	protected Random getRandom() {
-		return getRandom(0);
-	}
-	
-	protected int getCurrentIndex() {
-		return index;
 	}
 }

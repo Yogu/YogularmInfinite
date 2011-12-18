@@ -10,8 +10,8 @@ public class Gaps extends BuilderBase {
 	private static final int MAX_LENGTH = 3;
 	private static final int MAX_HEIGHT = 1;
 	
-	public void doBuild() {
-		Random random = getRandom(0x157BF96E);
+	public void build() {
+		Random random = new Random();
 		int length = MIN_LENGTH + random.nextInt(MAX_LENGTH - MIN_LENGTH);
 		int height = random.nextInt(MAX_HEIGHT + 1);
 		place(Stone.class, length + 1, height);

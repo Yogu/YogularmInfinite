@@ -5,7 +5,7 @@ import de.yogularm.components.Chicken;
 import de.yogularm.components.Stone;
 
 public class JumpTest extends BuilderBase {	
-	public void doBuild() {
+	public void build() {
 		int length = 40;
 		int height = 10;
 		

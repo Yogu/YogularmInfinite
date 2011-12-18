@@ -4,7 +4,7 @@ import de.yogularm.BuilderBase;
 import de.yogularm.components.Bricks;
 
 public class Castle extends BuilderBase {
-	public void doBuild() {
+	public void build() {
 		int width = 16;
 		int height = 64;
 		int corridorHeight = 3;
