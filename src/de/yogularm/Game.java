@@ -120,13 +120,15 @@ public class Game {
 		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
 
 		// Debug
-		context.drawText(new Vector(10, 40), font2, String.format(
-				"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms", 1 / frameTime,
-				frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
-		context.drawText(new Vector(10, 25), font2, String.format(
-				"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d", world.getComponents()
-						.getCount(), world.renderCount, world.updateCount, world.inRangeCount));
-		context.drawText(new Vector(10, 10), font2, "Player: " + world.getPlayer().getPosition());
+		if (Config.DISPLAY_DEGBUG_INFO) {
+			context.drawText(new Vector(10, 40), font2, String.format(
+					"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms", 1 / frameTime,
+					frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
+			context.drawText(new Vector(10, 25), font2, String.format(
+					"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d", world.getComponents()
+							.getCount(), world.renderCount, world.updateCount, world.inRangeCount));
+			context.drawText(new Vector(10, 10), font2, "Player: " + world.getPlayer().getPosition());
+		}
 
 		context.setProjection(viewSize.getX(), viewSize.getY());
 	}

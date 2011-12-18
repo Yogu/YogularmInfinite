@@ -32,4 +32,5 @@ public class Config {
 	
 	// Debug
 	public static boolean DISPLAY_FORCES = false;
+	public static boolean DISPLAY_DEGBUG_INFO = false;
 }
