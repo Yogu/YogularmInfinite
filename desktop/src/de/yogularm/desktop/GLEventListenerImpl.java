@@ -9,13 +9,11 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
-import de.yogularm.drawing.RenderContext;
 
 public class GLEventListenerImpl implements GLEventListener {
 	private FPSAnimator animator;
 	private Game game;
-	//private RenderContextImpl context;
-	private RenderContext context;
+	private RenderContextImpl context;
 	private ExceptionHandler exceptionHandler;
 	
 	public GLEventListenerImpl(Game game) {
@@ -27,14 +25,13 @@ public class GLEventListenerImpl implements GLEventListener {
 			GL2 gl = drawable.getGL().getGL2();
 
 			context = new RenderContextImpl(gl);
-			//context = new DummyRenderContext();
 			
 			gl.glDisable(GL.GL_DEPTH_TEST);
 			gl.glDisable(GL.GL_CULL_FACE);
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-			//context.checkErrors();
+			context.checkErrors();
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);
@@ -47,7 +44,7 @@ public class GLEventListenerImpl implements GLEventListener {
 			
 			GL2 gl = drawable.getGL().getGL2();
 			gl.glViewport(0, 0, width, height);
-			//context.checkErrors();
+			context.checkErrors();
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);

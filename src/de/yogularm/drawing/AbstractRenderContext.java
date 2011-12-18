@@ -7,7 +7,6 @@ import java.util.Map;
 
 public abstract class AbstractRenderContext implements RenderContext {
 	private Map<Texture, Integer> textures = new HashMap<Texture, Integer>();
-	private Map<Font, Object> fonts = new HashMap<Font, Object>();
 
 	protected int getTextureID(Texture texture) {
 		if (textures.containsKey(texture))
@@ -35,7 +34,6 @@ public abstract class AbstractRenderContext implements RenderContext {
 	
 	public void dispose() {
 		destroyTextures();
-		destroyFonts();
 	}
 	
 	private void destroyTextures() {
@@ -47,24 +45,4 @@ public abstract class AbstractRenderContext implements RenderContext {
 	
 	protected abstract void destroyTexture(int id);
 	protected abstract int loadTextureFromStream(InputStream stream, Texture texture);
-
-	protected Object getFontObject(Font font) {
-		if (fonts.containsKey(font))
-			return fonts.get(font);
-		else {
-			Object obj = loadFont(font);
-			fonts.put(font, obj);
-			return obj;
-		}
-	}
-	
-	private void destroyFonts() {
-		for (Object obj : fonts.values()) {
-			destroyFont(obj);
-		}
-		textures.clear();
-	}
-	
-	protected abstract void destroyFont(Object fontObject);
-	protected abstract Object loadFont(Font font);
 }

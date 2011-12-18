@@ -1,6 +1,6 @@
 package de.yogularm;
 
-import de.yogularm.building.GroundBuilder;
+import de.yogularm.building.Sky2;
 import de.yogularm.components.Stone;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Renderable;
@@ -38,8 +38,8 @@ public class World {
 		player = new Player(components);
 		components.add(player);
 		
-		//currentBuilder = new Sky2();
-		currentBuilder = new GroundBuilder();
+		currentBuilder = new Sky2();
+		//currentBuilder = new GroundBuilder();
 		currentBuilder.init(components, new Vector(0, 0));
 
 		// First place

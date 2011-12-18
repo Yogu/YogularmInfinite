@@ -26,7 +26,7 @@ public class Game {
 	private long renderTime;
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.3.1";
+	public static final String VERSION = "0.3.2";
 
 	public Game() {
 		// Init world
@@ -92,7 +92,7 @@ public class Game {
 		context.setProjection(width, height);
 		context.setColor(Color.white);
 		context.resetTranformation();
-		Font font =  new Font(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
+		Font font = context.loadFont(40, EnumSet.of(FontStyle.BOLD, FontStyle.ITALIC));
 
 		// Coins
 		RenderTransformation.draw(context, Res.images.coin, 20, height - 70, 50, 50);
@@ -116,7 +116,7 @@ public class Game {
 		// Title
 		context.setColor(Color.black);
 
-		Font font2 =  new Font(12, EnumSet.of(FontStyle.BOLD));
+		Font font2 = context.loadFont(12, EnumSet.of(FontStyle.BOLD));
 		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
 
 		// Debug

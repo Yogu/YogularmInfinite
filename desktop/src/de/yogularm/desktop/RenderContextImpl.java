@@ -113,25 +113,9 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		checkErrors();
 	}
 
-	protected Object loadFont(Font font) {
-		int s = 0;
-		if (font.getStyle().contains(FontStyle.BOLD))
-			s |= java.awt.Font.BOLD;
-		if (font.getStyle().contains(FontStyle.ITALIC))
-			s |= java.awt.Font.ITALIC;
-		
-		return new TextRenderer(new java.awt.Font("Verdana", s, font.getSize()));
-	}
-
-	protected void destroyFont(Object fontObject) {
-		if (fontObject instanceof TextRenderer) {
-			TextRenderer renderer = (TextRenderer)fontObject;
-			renderer.dispose();
-		}
-	}
-
 	public void drawText(Vector position, Font font, String text) {
-		TextRenderer renderer = (TextRenderer) getFontObject(font);
+		FontImpl impl = (FontImpl) font;
+		TextRenderer renderer = impl.getRenderer();
 		renderer.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 		renderer.beginRendering((int) width, (int) height);
 		renderer.draw(text, (int) position.getX(), (int) position.getY());
@@ -185,6 +169,10 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		// Remember for text rendering
 		this.width = width;
 		this.height = height;
+	}
+
+	public Font loadFont(int size, Set<FontStyle> style) {
+		return new FontImpl(size, style);
 	}
 
 	public void checkErrors() {

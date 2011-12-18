@@ -25,6 +25,8 @@ public interface RenderContext {
 	void clear(Color clearColor);
 	void setProjection(float width, float height);
 	
+	Font loadFont(int size, Set<FontStyle> style);
+	
 	/**
 	 * Deletes all native resources
 	 * 
