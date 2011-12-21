@@ -114,15 +114,14 @@ public class Sky2 extends CompositeBuilder {
 	
 	private boolean isCheckpoint(int indexOffset) {
 		int i = index + indexOffset;
-		/*return
+		return
 			// only be checkpoint if this is not a platform
 			(i % Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1
-				&& !(getSubBuilder(indexOffset) instanceof PlatformBuilder))
+				&& !(currentBuilder instanceof PlatformBuilder))
 				
 			// be a checkpoint if last would be one but was a platform
 			|| ((i - 1) % Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1
-				&& (getSubBuilder(indexOffset - 1) instanceof PlatformBuilder));*/
-		return i % Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1;
+				&& (lastBuilder instanceof PlatformBuilder));
 	}
 	
 	private class BridgeBuilder extends BuilderBase {

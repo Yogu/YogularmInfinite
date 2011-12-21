@@ -295,7 +295,6 @@ public class Body extends Component {
 			// Must handle x and y move separate, otherwise there are strange effects
 			tryMoveTo(getPosition().add(delta.changeY(0)), Axis.HORIZONTAL);
 			tryMoveTo(getPosition().add(delta.changeX(0)), Axis.VERTICAL);
-
 		}
 		actualSpeed = getPosition().subtract(lastPosition).divide(elapsedTime);
 
@@ -336,6 +335,7 @@ public class Body extends Component {
 					if (path.overlaps(obstacle))
 						return false;
 				} else
+					// TODO: occurs on chickens
 					System.out.println("stuck!");
 			}
 		}
@@ -431,12 +431,12 @@ public class Body extends Component {
 							body.shiftSpeed = body.shiftSpeed.changeComponent(axis, getActualSpeed().getComponent(axis));
 
 							// Orthogonal force (when pressed to ground, apply x force
-							/* if (axis == Axis.VERTICAL) { */
-							Vector force = totalForce.subtract(body.totalForce).multiply(Config.ADHESION);
-							float speed = (body.momentum.getX() + momentum.getX()) / (mass + body.mass);
-							applyGroundSpeed(force.getY(), speed);
-							body.applyGroundSpeed(force.getY(), speed);
-							// }
+							if (axis == Axis.VERTICAL) {
+								Vector force = totalForce.subtract(body.totalForce).multiply(Config.ADHESION);
+								float speed = (body.momentum.getX() + momentum.getX()) / (mass + body.mass);
+								applyGroundSpeed(force.getY(), speed);
+								body.applyGroundSpeed(force.getY(), speed);
+							}
 						}
 
 						onCollision(body, direction, true);
@@ -503,8 +503,8 @@ public class Body extends Component {
 	}
 
 	public boolean standsOnGround() {
-		// if (standsOnGround == null)
-		standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -Config.ON_GROUND_EPSILON)));
+		if (standsOnGround == null)
+			standsOnGround = !canMoveTo(getPosition().add(new Vector(0, -Config.ON_GROUND_EPSILON)));
 		return standsOnGround;
 	}
 
