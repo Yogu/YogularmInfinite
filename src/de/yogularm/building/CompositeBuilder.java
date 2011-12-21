@@ -34,4 +34,10 @@ public abstract class CompositeBuilder extends BuilderBase {
 		}
 		return null;
 	}
+	
+	public void subBuild(Builder subBuilder) {
+		subBuilder.init(getComponents(), getBuildingPosition());
+		subBuilder.build();
+		setBuildingPosition(subBuilder.getBuildingPosition());
+	}
 }

@@ -19,7 +19,8 @@ public class Sky2 extends CompositeBuilder {
 	private int index;
 	private int maxLength;
 	private int forceYDirection;
-	private boolean lastWasPlatform;
+	private Builder currentBuilder;
+	private Builder lastBuilder;
 	
 	private static final int[] MAX_X_OFFSET_BY_Y_OFFSET = {
 		3 /* up */, 4 /* flat */,
@@ -33,7 +34,8 @@ public class Sky2 extends CompositeBuilder {
 	public void init(ComponentCollection components, Vector buildingPosition) {
 		super.init(components, buildingPosition);
 		index = 0;
-		lastWasPlatform = false;
+		lastBuilder = null;
+		currentBuilder = null;
 	}
 	
 	public Sky2() {
@@ -60,15 +62,16 @@ public class Sky2 extends CompositeBuilder {
 		if (maxLength >= 0 && maxLength < 6)
 			return;
 		
+		lastBuilder = currentBuilder;
+		currentBuilder = getSubBuilder();
+		
 		Vector gap = buildGap(forceYDirection);
 		
 		// Store length into field so that it can be used by the sub-builders
 		this.maxLength = maxLength - (int)gap.getX();
 		this.forceYDirection = forceYDirection;
 
-		Builder subBuilder = getSubBuilder();
-		subBuilder.build();
-		setBuildingPosition(subBuilder.getBuildingPosition());
+		subBuild(currentBuilder);
 
 		if (isCheckpoint(0))
 			place(Checkpoint.class, 0, 1);
@@ -80,10 +83,10 @@ public class Sky2 extends CompositeBuilder {
 	
 	private Vector buildGap(int forceYDirection) {
 		Random random = new Random();
-		/*boolean isPlatform =
-			(getSubBuilder(0) instanceof PlatformBuilder)
-			|| !(getSubBuilder(-1) instanceof BridgeBuilder); // include ladders*/
-		int[] xByY = /*isPlatform ? MAX_X_OFFSET_BY_Y_OFFSET_PLATFORM : */MAX_X_OFFSET_BY_Y_OFFSET;
+		boolean isPlatform =
+			(currentBuilder instanceof PlatformBuilder)
+			|| !(lastBuilder instanceof BridgeBuilder); // include ladders*/
+		int[] xByY = isPlatform ? MAX_X_OFFSET_BY_Y_OFFSET_PLATFORM : MAX_X_OFFSET_BY_Y_OFFSET;
 
 		int maxYOffset = xByY.length - 2;
 		int yOffset = random.nextInt(maxYOffset * 2 + 1) - maxYOffset;
@@ -104,9 +107,8 @@ public class Sky2 extends CompositeBuilder {
 		do {
 			builder = getBuilder(random.nextFloat());
 			// no two platforms behind each other, that is too difficult
-		} while ((lastWasPlatform && builder instanceof PlatformBuilder)
+		} while ((lastBuilder instanceof PlatformBuilder && builder instanceof PlatformBuilder)
 			|| (Math.abs(forceYDirection) == 2 && builder instanceof BridgeBuilder));
-		lastWasPlatform = builder instanceof PlatformBuilder;
 		return builder;
 	}
 	
