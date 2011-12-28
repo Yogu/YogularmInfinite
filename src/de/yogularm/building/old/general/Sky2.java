@@ -1,8 +1,11 @@
-package de.yogularm.building;
+package de.yogularm.building.old.general;
 
 import java.util.Random;
 
 import de.yogularm.Config;
+import de.yogularm.building.old.Builder;
+import de.yogularm.building.old.BuilderBase;
+import de.yogularm.building.old.CompositeBuilder;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.general.Checkpoint;
 import de.yogularm.components.general.Chicken;

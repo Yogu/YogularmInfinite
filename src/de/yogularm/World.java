@@ -1,7 +1,10 @@
 package de.yogularm;
 
-import de.yogularm.building.Builder;
-import de.yogularm.building.Sky2;
+import de.yogularm.building.Builder2;
+import de.yogularm.building.BuildingSite;
+import de.yogularm.building.old.BuilderConverter;
+import de.yogularm.building.old.general.Sky2;
+import de.yogularm.building.test.TestBuilder;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.ComponentTree;
@@ -29,11 +32,11 @@ public class World {
 		 */
 	}
 
-	private ComponentCollection components = new ComponentTree(SECTOR_WIDTH, SECTOR_HEIGHT);
-	private Camera camera = new Camera();
+	private ComponentCollection components;
+	private Camera camera;
 	private Player player;
-	private Builder currentBuilder;
-	private float frameTime;
+	private BuildingSite buildingSite;
+	private Builder2 currentBuilder;
 	
 	// Debug
 	public int updateCount;
@@ -42,12 +45,17 @@ public class World {
 	public int inRangeCount;
 	
 	public World() {
+		components = new ComponentTree(SECTOR_WIDTH, SECTOR_HEIGHT);
+		buildingSite = new BuildingSite(components);
+		camera = new Camera();
 		player = new Player(components);
 		components.add(player);
 		
-		currentBuilder = new Sky2();
+		//currentBuilder = new BuilderConverter(new Sky2());
+		currentBuilder = new TestBuilder();
 		//currentBuilder = new GroundBuilder();
-		currentBuilder.init(components, new Vector(0, 0));
+		
+		currentBuilder.init(buildingSite);
 
 		// First place
 		Stone stone = new Stone(components);
@@ -70,8 +78,6 @@ public class World {
 	}
 
 	public void update(float elapsedTime) {
-		frameTime = elapsedTime;
-
 		build();
 		
 		// inaccurate, for performance reasons: actionRange = 2 * camera.bounds
@@ -110,17 +116,13 @@ public class World {
 		return camera;
 	}
 
-	public float getFrameTime() {
-		return frameTime;
-	}
-
 	public ComponentCollection getComponents() {
 		return components;
 	}
 
 	public void build() {
-		while (Vector.getDistance(player.getPosition(), currentBuilder.getBuildingPosition()) < MIN_BUFFER_LENGTH) {
-			currentBuilder.build();
-		}
+		Rect rect =
+			Rect.fromCenterAndSize(player.getPosition(), new Vector(MIN_BUFFER_LENGTH, MIN_BUFFER_LENGTH));
+		currentBuilder.build(rect);
 	}
 }

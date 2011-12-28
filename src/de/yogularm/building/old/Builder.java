@@ -1,4 +1,4 @@
-package de.yogularm.building;
+package de.yogularm.building.old;
 
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.geometry.Vector;

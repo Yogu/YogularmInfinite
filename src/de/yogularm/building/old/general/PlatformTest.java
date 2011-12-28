@@ -1,5 +1,6 @@
-package de.yogularm.building;
+package de.yogularm.building.old.general;
 
+import de.yogularm.building.old.BuilderBase;
 import de.yogularm.components.general.Platform;
 import de.yogularm.geometry.Vector;
 

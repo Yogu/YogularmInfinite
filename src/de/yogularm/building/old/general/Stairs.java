@@ -1,7 +1,8 @@
-package de.yogularm.building;
+package de.yogularm.building.old.general;
 
 import java.util.Random;
 
+import de.yogularm.building.old.BuilderBase;
 import de.yogularm.components.general.Stone;
 
 public class Stairs extends BuilderBase {

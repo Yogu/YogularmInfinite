@@ -1,5 +1,6 @@
-package de.yogularm.building;
+package de.yogularm.building.old.general;
 
+import de.yogularm.building.old.BuilderBase;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.general.Ladder;
 import de.yogularm.components.general.Platform;

@@ -1,4 +1,4 @@
-package de.yogularm.building;
+package de.yogularm.building.old;
 
 import java.util.HashMap;
 import java.util.Map;

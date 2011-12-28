@@ -9,6 +9,10 @@ public class Point {
 		this.y = y;
 	}
 	
+	public static Point getZero() {
+		return new Point(0, 0);
+	}
+	
 	public int getX() {
 		return x;
 	}
@@ -19,6 +23,18 @@ public class Point {
 	
 	public String toString() {
 		return x + ", " + y;
+	}
+	
+	public Vector toVector() {
+		return new Vector(x, y);
+	}
+	
+	public Point add(Point other) {
+		return new Point(x + other.x, y + other.y);	
+	}
+	
+	public Point add(int x, int y) {
+		return new Point(this.x + x, this.y + y);
 	}
 	
 	public boolean equals(Point other) {

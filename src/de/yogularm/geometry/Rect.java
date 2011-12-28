@@ -22,6 +22,11 @@ public class Rect {
 		normalize();
 	}
 	
+	public static Rect fromCenterAndSize(Vector center, Vector size) {
+		Vector halfSize = size.divide(2);
+		return new Rect(center.subtract(halfSize), center.add(halfSize));
+	}
+	
 	private void normalize() {
 		float minX, maxX, minY, maxY;
 		minX = Math.min(minVector.getX(), maxVector.getX());
@@ -120,5 +125,10 @@ public class Rect {
 	
 	public Rect add(Vector offset) {
 		return new Rect(minVector.add(offset), maxVector.add(offset));
+	}
+	
+	public boolean contains(Vector point) {
+		return point.getX() >= getLeft() && point.getX() <= getRight()
+			&& point.getY() >= getBottom() && point.getY() <= getTop();
 	}
 }
