@@ -6,9 +6,13 @@ import de.yogularm.geometry.Vector;
 public abstract class Bot extends Character {
 	private static final float WALK_SPEED = 4;
 	private static final float JUMP_SPEED = 8;
+	private static final float STUCK_BIG_CHANGE = 0.5f; // If bot can move such a step, it is not stuck
+	private static final float STUCK_TURN_TIME = 1.5f; // Bot should turn after being stuck n seconds
 	
 	private int direction;
 	private boolean stopping;
+	private float xOfLastBigChange;
+	private float lastXBigChangeTime;
 	
 	public Bot(ComponentCollection collection) {
 		super(collection);
@@ -38,6 +42,17 @@ public abstract class Bot extends Character {
 			
 		if (shouldJump() && standsOnGround())
 			setSpeed(getSpeed().changeY(JUMP_SPEED));
+		
+		if (Math.abs(xOfLastBigChange - getPosition().getX()) > STUCK_BIG_CHANGE) {
+			xOfLastBigChange = getPosition().getX();
+			lastXBigChangeTime = 0;
+		} else {
+			lastXBigChangeTime += elapsedTime;
+			if (!stopping && standsOnGround() && lastXBigChangeTime > STUCK_TURN_TIME) {
+				direction = -direction;
+				lastXBigChangeTime = 0;
+			}
+		}
 	}
 	
 	private boolean shouldStop() {
@@ -58,12 +73,14 @@ public abstract class Bot extends Character {
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
-		if (standsOnGround()) {
-			if (direction == Direction.LEFT)
-				this.direction = 1;
-			else if (direction == Direction.RIGHT)
-				this.direction = -1;
-		}
+		/*if (other.isSolid()) {
+			if (standsOnGround()) {
+				if (direction == Direction.LEFT)
+					this.direction = 1;
+				else if (direction == Direction.RIGHT)
+					this.direction = -1;
+			}
+		}*/
 	}
 	
 	// helper functions

@@ -36,8 +36,8 @@ public abstract class Character extends Entity {
 		if (life <= 0)
 			die();
 
-		//if (-getSpeed().getY() > Config.DEATH_FALL_SPEED)
-		if (getPosition().getY() < Config.DEATH_Y_POS)
+		if (-getSpeed().getY() > Config.DEATH_FALL_SPEED)
+		//if (getPosition().getY() < Config.DEATH_Y_POS)
 			onDeathFall();
 	}
 

@@ -14,7 +14,7 @@ public class JumpTest extends BuilderBase {
 		for (int i = 0; i < length; i++) {
 			place(Stone.class, i - 1, 0);
 			if (i % 5 == 0) {
-				place(Stone.class, i - 1, 1);
+				place(Stone.class, i - 1, 1); // obstacle
 				place(Chicken.class, i, 1);
 			}
 		}

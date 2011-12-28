@@ -57,12 +57,12 @@
 				border: none;
 			}
 			
-			img.left {
+			.left {
 				float: left;
 				margin-right: 20px;
 			}
 			
-			img.right {
+			.right {
 				float: right;
 				margin-left: 20px;
 			}
@@ -74,12 +74,7 @@
 			}
 			
 			.download {
-				text-align: center;
-				margin: 2em 0;
-			}
-			
-			.download div {
-				margin: 0 auto;
+				margin: 2em auto;
 				overflow: hidden;
 				max-width: 600px;
 			}
@@ -106,6 +101,7 @@
 				font-weight: bold;
 				color: #FFFFFF;
 				text-decoration: none;
+				text-align: center;
 			}
 			
 			.download a .version {
@@ -149,7 +145,7 @@
 	</head>
 	
 	<body>
-		<div class="page">
+		<div class="page" id="top">
 			<h1>Yogularm Infinite</h1>
 			
 			<p>
@@ -161,7 +157,11 @@
 				their own way through the dizzy air, and you have to watch out for <b>arrows</b>...
 			</p>
 			
-			<section>
+			<section id="download">
+				<a href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" title="Download Android App" class="right">
+					<img src="android-qr.png" alt="QR Code for Android App" />
+				</a>
+				
 				<header>
 					<h2>Want to try it out?</h2> 
 				</header>
@@ -172,31 +172,22 @@
 					green button and open it with the <b>Java(TM) Web Start Launcher</b>.
 				</p>
 				
-				<section class="download">
-					<div>
-						<a href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
-							<span>Start Yogularm Infinite</span>
-							<span class="version">Version 0.3.1 Alpha</span>
-						</a>
-												
-						<a class="new" href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" class="new">
-							<span>Download for Android</span>
+				<div class="download">
+					<a href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
+						<span>Start Yogularm Infinite</span>
+						<span class="version">Version 0.3.3 Alpha</span>
+					</a>
+											
+					<a class="new" href="http://www.yogularm.de/infinite/code/de.yogularm.android.apk" class="new">
+						<span>Download for Android</span>
 
-							<span class="version">Version 0.3.1 Alpha</span>
-						</a>
-					</div>
-				</section>		
+						<span class="version">Version 0.3.3 Alpha</span>
+					</a>
+				</div>		
 						
 				<p>
 					Yogularm is open-source. You can view and download the source at
 					<a href="https://github.com/Yogu/YogularmInfinite">github.com</a>. Feel free to make your changes!
-				</p>
-				
-				<p>
-					<strong>Important</strong>: If you chose to always trust the author of Yogularm in version up to
-					0.1.4.0, please undo this. Unfortunately, the keys have become public and are no longer trustful.
-					You can edit the certificates by executing <i>javaws -viewer</i> in the command line and going to
-					the <i>Security</i> section. I'm sorry for that mistake.
 				</p>
 				
 				<p>
@@ -205,7 +196,17 @@
 				</p>
 			</section>
 			
-			<section>
+			<section id="screenshot">
+				<header>
+					<h2>Screenshot</h2>
+				</header>
+				
+				<img src="screenshot.png" alt="Playing Yogularm: Yogu is standing on a block, an arrow flies above it.
+				A chicken flutters over a gap, and to the left, a platform moves. Yogu has yet collected ten coins, and
+				two other coins are in the world." class="full-width" />
+			</section>
+			
+			<sectio id="contact">
 				<header>
 					<h2>Contact the author</h2>
 				</header>
@@ -224,20 +225,30 @@
 				</p>
 			</section>
 			
-			<section>
-				<header>
-					<h2>Screenshot</h2>
-				</header>
-				
-				<img src="screenshot.png" alt="Playing Yogularm: Yogu is standing on a block, an arrow flies above it.
-				A chicken flutters over a gap, and to the left, a platform moves. Yogu has yet collected ten coins, and
-				two other coins are in the world." class="full-width" />
-			</section>
-			
-			<section>
+			<section id="changes">
 				<header>
 					<h2>Recent changes</h2>
-				</header>			
+				</header>	
+						
+				<h3>Version 0.3.3 Alpha</h3>
+
+				<ul>
+					<li>
+						<b>Several bug fixes:</b> Physics, chicken's AI, display issues, world generation.
+					</li>
+				</ul>		
+						
+				<h3>Version 0.3.2 Alpha</h3>
+
+				<ul>
+					<li>
+						<b>Performance Update:</b> Fixed a memory leak (Previously, the RAM usage grew very quickly and significantly).
+					</li>
+					
+					<li>
+						<b>Icon:</b> Added an icon for the game window in the desktop version.
+					</li>
+				</ul>		
 						
 				<h3>Version 0.3.1 Alpha</h3>
 
@@ -339,7 +350,7 @@
 				</ul>
 			</section>
 			
-			<section>
+			<section id="future">
 				<header>
 					<h2>Future</h2>
 				</header>
@@ -359,7 +370,7 @@
 				</p>
 			</section>
 			
-			<section>
+			<section id="history">
 				<header>
 					<h2>History</h2>
 				</header>
@@ -394,7 +405,7 @@
 				</p>
 			</section>
 			
-			<footer>
+			<footer id="bottom">
 				<p><a href="http://www.yogularm.de/imprint.htm">Impressum</a></p>
 			</footer>
 		</div>
