@@ -1,8 +1,7 @@
 package de.yogularm.building;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.Vector;
-import de.yogularm.components.Platform;
+import de.yogularm.components.general.Platform;
+import de.yogularm.geometry.Vector;
 
 public class PlatformTest extends BuilderBase {	
 	public void build() {

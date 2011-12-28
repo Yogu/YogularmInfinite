@@ -1,6 +1,6 @@
 package de.yogularm.drawing;
 
-import de.yogularm.Vector;
+import de.yogularm.geometry.Vector;
 
 public class RenderTransformation implements Drawable {
 	private Drawable drawable;

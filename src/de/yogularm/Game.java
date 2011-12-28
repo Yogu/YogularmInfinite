@@ -8,6 +8,8 @@ import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.RenderTransformation;
 import de.yogularm.drawing.TextDrawable;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 import de.yogularm.input.Input;
 
 public class Game {

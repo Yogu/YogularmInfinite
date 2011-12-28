@@ -2,8 +2,7 @@ package de.yogularm.building;
 
 import java.util.Random;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.components.Stone;
+import de.yogularm.components.general.Stone;
 
 public class Gaps extends BuilderBase {
 	private static final int MIN_LENGTH = 1;

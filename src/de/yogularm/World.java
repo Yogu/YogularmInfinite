@@ -1,10 +1,17 @@
 package de.yogularm;
 
+import de.yogularm.building.Builder;
 import de.yogularm.building.GroundBuilder;
-import de.yogularm.components.Stone;
+import de.yogularm.components.Component;
+import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.ComponentTree;
+import de.yogularm.components.Player;
+import de.yogularm.components.general.Stone;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Renderable;
 import de.yogularm.drawing.Renderer;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public class World {
 	// private static List<Builder> builders = new ArrayList<Builder>();

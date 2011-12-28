@@ -1,7 +1,6 @@
 package de.yogularm.building;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.components.Bricks;
+import de.yogularm.components.general.Bricks;
 
 public class Castle extends BuilderBase {
 	public void build() {

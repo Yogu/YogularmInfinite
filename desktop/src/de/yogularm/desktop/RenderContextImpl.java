@@ -2,7 +2,6 @@ package de.yogularm.desktop;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
@@ -11,14 +10,14 @@ import javax.media.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.TextureIO;
 
-import de.yogularm.Rect;
-import de.yogularm.Vector;
 import de.yogularm.drawing.AbstractRenderContext;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
 import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 import de.yogularm.utils.Numbers;
 
 public class RenderContextImpl extends AbstractRenderContext implements RenderContext {

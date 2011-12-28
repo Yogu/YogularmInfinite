@@ -1,14 +1,11 @@
 package de.yogularm.desktop;
 
-import java.util.Set;
-
-import de.yogularm.Rect;
-import de.yogularm.Vector;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
-import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public class DummyRenderContext implements RenderContext {
 	public DummyRenderContext() {

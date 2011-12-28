@@ -2,18 +2,16 @@ package de.yogularm.building;
 
 import java.util.Random;
 
-import de.yogularm.Builder;
-import de.yogularm.BuilderBase;
-import de.yogularm.ComponentCollection;
 import de.yogularm.Config;
-import de.yogularm.Vector;
-import de.yogularm.components.Checkpoint;
-import de.yogularm.components.Chicken;
-import de.yogularm.components.Coin;
-import de.yogularm.components.Ladder;
-import de.yogularm.components.Platform;
-import de.yogularm.components.Shooter;
-import de.yogularm.components.Stone;
+import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.general.Checkpoint;
+import de.yogularm.components.general.Chicken;
+import de.yogularm.components.general.Coin;
+import de.yogularm.components.general.Ladder;
+import de.yogularm.components.general.Platform;
+import de.yogularm.components.general.Shooter;
+import de.yogularm.components.general.Stone;
+import de.yogularm.geometry.Vector;
 
 public class Sky2 extends CompositeBuilder {
 	private int index;

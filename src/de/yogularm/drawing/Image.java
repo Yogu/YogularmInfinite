@@ -1,7 +1,7 @@
 package de.yogularm.drawing;
 
-import de.yogularm.Rect;
-import de.yogularm.Vector;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public class Image implements Cloneable, Drawable {
 	private Texture texture;

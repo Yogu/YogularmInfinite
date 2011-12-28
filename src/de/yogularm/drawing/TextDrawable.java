@@ -1,7 +1,7 @@
 package de.yogularm.drawing;
 
 import de.yogularm.Res;
-import de.yogularm.Vector;
+import de.yogularm.geometry.Vector;
 
 public class TextDrawable implements Drawable {
 	//private String text;

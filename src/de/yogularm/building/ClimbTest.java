@@ -1,7 +1,6 @@
 package de.yogularm.building;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.components.Ladder;
+import de.yogularm.components.general.Ladder;
 
 public class ClimbTest extends BuilderBase {	
 	public void build() {

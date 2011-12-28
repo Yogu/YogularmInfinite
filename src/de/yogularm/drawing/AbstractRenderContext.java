@@ -21,7 +21,7 @@ public abstract class AbstractRenderContext implements RenderContext {
 	
 	private int loadTexture(Texture texture) {
 		InputStream stream =
-			getClass().getResourceAsStream("/res/textures/" + texture.getName() + ".png");
+			getClass().getResourceAsStream("/de/yogularm/res/textures/" + texture.getName() + ".png");
 		try {
 			return loadTextureFromStream(stream, texture);
 		} finally {

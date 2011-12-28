@@ -14,9 +14,8 @@ import javax.swing.JFrame;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import de.yogularm.ExceptionHandler;
-import de.yogularm.Rect;
 import de.yogularm.Res;
-import de.yogularm.drawing.Texture;
+import de.yogularm.geometry.Rect;
 
 public class JoglTest {
 	public static void main(String[] args) {

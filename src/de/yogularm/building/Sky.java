@@ -2,7 +2,6 @@ package de.yogularm.building;
 
 import java.util.Random;
 
-import de.yogularm.Builder;
 
 public class Sky extends CompositeBuilder {
 	public Sky() {

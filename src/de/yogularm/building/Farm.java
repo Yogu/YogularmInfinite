@@ -1,8 +1,7 @@
 package de.yogularm.building;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.components.Chicken;
-import de.yogularm.components.Stone;
+import de.yogularm.components.general.Chicken;
+import de.yogularm.components.general.Stone;
 
 public class Farm extends BuilderBase {	
 	public void build() {

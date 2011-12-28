@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.yogularm.Builder;
-import de.yogularm.BuilderBase;
 
 public abstract class CompositeBuilder extends BuilderBase {
 	private Map<Builder, Float> builders = new HashMap<Builder, Float>();

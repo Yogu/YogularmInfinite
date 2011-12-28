@@ -1,6 +1,6 @@
 package de.yogularm.drawing;
 
-import de.yogularm.Vector;
+import de.yogularm.geometry.Vector;
 
 public class SimpleArrow implements Drawable {
 	private static final float HEAD_SIZE = 0.2f;

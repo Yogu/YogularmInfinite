@@ -1,11 +1,10 @@
 package de.yogularm.building;
 
-import de.yogularm.BuilderBase;
-import de.yogularm.ComponentCollection;
-import de.yogularm.Vector;
-import de.yogularm.components.Ladder;
-import de.yogularm.components.Platform;
-import de.yogularm.components.Stone;
+import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.general.Ladder;
+import de.yogularm.components.general.Platform;
+import de.yogularm.components.general.Stone;
+import de.yogularm.geometry.Vector;
 
 public class GroundBuilder extends BuilderBase {
 	private Sky2 sky = new Sky2();

@@ -1,6 +1,6 @@
 package de.yogularm.drawing;
 
-import de.yogularm.Rect;
+import de.yogularm.geometry.Rect;
 
 public class TiledImage {
 	private Texture texture;

@@ -1,9 +1,7 @@
 package de.yogularm.drawing;
 
-import java.util.Set;
-
-import de.yogularm.Rect;
-import de.yogularm.Vector;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public interface RenderContext {
 	void setColor(Color color);

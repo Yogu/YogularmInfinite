@@ -1,6 +1,8 @@
 package de.yogularm;
 
 import de.yogularm.drawing.RenderContext;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public class Camera {
 	private Rect bounds;
