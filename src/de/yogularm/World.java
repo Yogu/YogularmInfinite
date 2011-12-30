@@ -22,6 +22,7 @@ public class World {
 	public static final int MIN_BUFFER_LENGTH = 50;
 	public static final int MAX_BUFFER_LENGTH = Integer.MAX_VALUE;//200;
 	
+	private static final int RENDER_RANGE_BUFFER = 4;
 	private static final int SECTOR_WIDTH = (int)(Config.MAX_VIEW_WIDTH * 1.2);
 	private static final int SECTOR_HEIGHT = (int)(Config.MAX_VIEW_HEIGHT * 1.2);
 
@@ -65,12 +66,18 @@ public class World {
 
 	public void render(RenderContext context) {
 		camera.applyMatrix(context);
+		
+		Vector renderRangeBuffer = new Vector(RENDER_RANGE_BUFFER, RENDER_RANGE_BUFFER);
+		Rect renderRange = camera.getBounds();
+		renderRange = renderRange.changeSize(renderRange.getSize().add(renderRangeBuffer));
 
 		renderCount = 0;
-		for (Component component : components.getComponentsAround(camera.getBounds())) {
+		for (Component component : components.getComponentsAround(renderRange)) {
 			if (component instanceof Renderable && component != player) {
-				Renderer.render(context, (Renderable) component);
-				renderCount++;
+				if (renderRange.contains(component.getPosition())) {
+					Renderer.render(context, (Renderable) component);
+					renderCount++;
+				}
 			}
 		}
 		// To show it above all other components

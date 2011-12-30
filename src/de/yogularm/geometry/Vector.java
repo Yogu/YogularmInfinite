@@ -9,6 +9,8 @@ public class Vector {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public static final Vector ZERO = new Vector(0, 0);
 
 	public static Vector getZero() {
 		return new Vector(0, 0);

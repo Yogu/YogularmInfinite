@@ -9,6 +9,8 @@ public class Point {
 		this.y = y;
 	}
 	
+	public static final Point ZERO = new Point(0, 0);
+	
 	public static Point getZero() {
 		return new Point(0, 0);
 	}
@@ -22,7 +24,7 @@ public class Point {
 	}
 	
 	public String toString() {
-		return x + ", " + y;
+		return String.format("(%d, %d)", x, y);
 	}
 	
 	public Vector toVector() {

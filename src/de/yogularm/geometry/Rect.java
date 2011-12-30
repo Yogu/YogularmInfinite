@@ -131,4 +131,8 @@ public class Rect {
 		return point.getX() >= getLeft() && point.getX() <= getRight()
 			&& point.getY() >= getBottom() && point.getY() <= getTop();
 	}
+	
+	public String toString() {
+		return String.format("Rect[%s, %s]", minVector, maxVector);
+	}
 }

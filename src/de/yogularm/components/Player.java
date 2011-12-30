@@ -18,7 +18,7 @@ public class Player extends Character {
 		super(collection);
 		setDrawable(Res.images.yogu);
 		setBounds(new Rect(0.18721875f, 0.080890625f, 0.801515625f, 0.9359375f));
-		setLife(Config.MAX_LIFE);
+		setLife(Config.INIT_LIFE);
 		setMass(20);
 		setCanClimb(true);
 		checkpoint = getPosition();

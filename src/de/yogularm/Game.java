@@ -122,7 +122,7 @@ public class Game {
 		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
 
 		// Debug
-		if (Config.DISPLAY_DEGBUG_INFO) {
+		if (Config.DEBUG_DISPLAY_RENDER_INFO) {
 			context.drawText(new Vector(10, 40), font2, String.format(
 					"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms", 1 / frameTime,
 					frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));

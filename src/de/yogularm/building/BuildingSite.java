@@ -24,10 +24,11 @@ public class BuildingSite {
 
 	private static final int SECTOR_WIDTH = 20;
 	private static final int SECTOR_HEIGHT = 15;
-	
+
 	private static final byte FLAG_BLOCKED = 0x01;
 	private static final byte FLAG_KEEP_FREE = 0x02;
 	private static final byte FLAG_SAFE = 0x04;
+	private static final byte FLAG_TAKEN = 0x08; // by non-solid component
 	
 	public BuildingSite(ComponentCollection components) {
 		this.components = components;
@@ -38,11 +39,17 @@ public class BuildingSite {
 	}
 	
 	public boolean place(Component component, Point position) {
-		if (!canPlace(position))
+		byte flags = getFlags(position);
+		boolean isSolid = component instanceof Body && ((Body)component).isSolid();
+		
+		if ((flags & FLAG_TAKEN) != 0 || (!isSolid && (flags & FLAG_KEEP_FREE) != 0))
 			return false;
 		
-		if (component instanceof Body && ((Body)component).isSolid())
+		flags |= FLAG_TAKEN;
+		if (isSolid) {
 			makeSafe(position.add(0, 1));
+			flags |= FLAG_BLOCKED;
+		}
 		
 		component.setPosition(position.toVector());
 		components.add(component);
@@ -67,9 +74,14 @@ public class BuildingSite {
 		return true;
 	}
 	
+	public boolean canPlaceSolid(Point position) {
+		byte flags = getFlags(position);
+		return (flags & FLAG_TAKEN) == 0 && (flags & FLAG_KEEP_FREE) == 0;
+	}
+	
 	public boolean canPlace(Point position) {
 		byte flags = getFlags(position);
-		return (flags & FLAG_BLOCKED) == 0 && (flags & FLAG_KEEP_FREE) == 0;
+		return (flags & FLAG_TAKEN) == 0;
 	}
 	
 	private boolean makeSafe(Point position) {
@@ -84,8 +96,8 @@ public class BuildingSite {
 	private byte[][] getFlagArrayOfPosition(Point position, boolean createIfMissing) {
 		// -1 / x = 0, but we want it to be in sector -1
 		Point point = new Point(
-			position.getX() / SECTOR_WIDTH - (position.getX() < 0 ? 1 : 0),
-	  	position.getY() / SECTOR_HEIGHT - (position.getY() < 0 ? 1 : 0));
+			getSector(position.getX(), SECTOR_WIDTH),
+			getSector(position.getY(), SECTOR_HEIGHT));
 		
 	  if (map.containsKey(point))
 	  	return map.get(point);
@@ -97,6 +109,19 @@ public class BuildingSite {
 	  	return null;
 	}
 	
+	private int getSector(int position, int cellSize) {
+		if (position < 0)
+			// position -1 is the last entry in sector -1; -20 is the first one in sector -1
+			return (position - 1) % cellSize - 1;
+		else
+			return position % cellSize;
+	}
+	
+	private int getOffsetInSector(int position, int cellSize) {
+		int tmp = position % cellSize;
+		return tmp < 0 ? tmp + cellSize : tmp;
+	}
+	
 	private byte getFlags(Point position) {
 		byte[][] arr = getFlagArrayOfPosition(position, false);
 		if (arr != null)
@@ -106,9 +131,8 @@ public class BuildingSite {
 	}
 	
 	private byte getFlags(Point position, byte[][] arr) {
-		// position -1 is the last entry in sector -1
-		int x = position.getX() % SECTOR_WIDTH + (position.getX() < 0 ? SECTOR_WIDTH : 0);
-		int y = position.getY() % SECTOR_HEIGHT + (position.getY() < 0 ? SECTOR_HEIGHT : 0);
+		int x = getOffsetInSector(position.getX(), SECTOR_WIDTH);
+		int y = getOffsetInSector(position.getY(), SECTOR_HEIGHT);
 		return arr[x][y];
 	}
 	
@@ -118,9 +142,8 @@ public class BuildingSite {
 	}
 	
 	private void setFlags(Point position, byte flags, byte[][] arr) {
-		// position -1 is the last entry in sector -1
-		int x = position.getX() % SECTOR_WIDTH + (position.getX() < 0 ? SECTOR_WIDTH : 0);
-		int y = position.getY() % SECTOR_HEIGHT + (position.getY() < 0 ? SECTOR_HEIGHT : 0);
+		int x = getOffsetInSector(position.getX(), SECTOR_WIDTH);
+		int y = getOffsetInSector(position.getY(), SECTOR_HEIGHT);
 		arr[x][y] = flags;
 	}
 }

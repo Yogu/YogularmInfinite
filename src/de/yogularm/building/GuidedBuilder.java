@@ -29,7 +29,7 @@ public abstract class GuidedBuilder implements Builder2 {
 	  		builder.build();
 	  		buildCalls++;
 	  		if (buildCalls > MAX_BUILD_CALLS)
-	  			throw new RuntimeException("Path builder seems to be stuck");
+	  			break;//throw new RuntimeException("Path builder seems to be stuck");
 	  	}
 	  }
   }

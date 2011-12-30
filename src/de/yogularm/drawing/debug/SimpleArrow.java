@@ -1,5 +1,8 @@
-package de.yogularm.drawing;
+package de.yogularm.drawing.debug;
 
+import de.yogularm.drawing.Drawable;
+import de.yogularm.drawing.RenderContext;
+import de.yogularm.drawing.RenderTransformation;
 import de.yogularm.geometry.Vector;
 
 public class SimpleArrow implements Drawable {

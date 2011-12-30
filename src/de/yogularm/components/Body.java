@@ -8,7 +8,7 @@ import de.yogularm.Config;
 import de.yogularm.drawing.CombinedDrawable;
 import de.yogularm.drawing.Drawable;
 import de.yogularm.drawing.RenderTransformation;
-import de.yogularm.drawing.SimpleArrow;
+import de.yogularm.drawing.debug.SimpleArrow;
 import de.yogularm.geometry.Axis;
 import de.yogularm.geometry.Direction;
 import de.yogularm.geometry.Rect;
@@ -78,7 +78,7 @@ public class Body extends Component {
 		setIsShiftable(false);
 		shiftSpeed = Vector.getZero();
 		actualShiftSpeed = shiftSpeed;
-		if (Config.DISPLAY_FORCES) {
+		if (Config.DEBUG_DISPLAY_FORCES) {
 			forces = new ArrayList<Vector>();
 			collectedForces = new ArrayList<Vector>();
 		}
