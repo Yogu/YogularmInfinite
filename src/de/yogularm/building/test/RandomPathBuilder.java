@@ -19,21 +19,34 @@ public class RandomPathBuilder extends PathBuilder {
   public void build() {
 		List<Point> reachablePositions = getPath().getReachablePositions();
 		List<Point> rightPositions = new ArrayList<Point>();
-		
+
 	  for (Point point : reachablePositions) {
-	  	getSite().place(new Coin(getComponents()), point);
 	  	if (point.getX() > getPath().getCurrentWaypoint().getX())
 	  		rightPositions.add(point);
 	  }
-	  
-	  //if (rightPositions.size() == 0)
-	  	rightPositions = reachablePositions;
 
 		Random random = new Random();
-		Point newWaypoint =	rightPositions.get(random.nextInt(rightPositions.size()));
-		getSite().place(new Stone(getComponents()), newWaypoint.add(0, -1));
-		getPath().setWaypoint(newWaypoint);
+		Point newWaypoint;
+		do {
+			if (rightPositions.size() == 0) {
+				rightPositions = reachablePositions;
+				System.out.println("No right position available");
+			}
+			if (reachablePositions.size() == 0) {
+				System.out.println("Stuck!");
+				return;
+			}
+			
+			newWaypoint =	rightPositions.get(random.nextInt(rightPositions.size()));
+			getSite().place(new Stone(getComponents()), newWaypoint.add(0, -1));
+			rightPositions.remove(newWaypoint);
+			reachablePositions.remove(newWaypoint);
+		} while (!getPath().setWaypoint(newWaypoint));
 		System.out.println(newWaypoint);
+
+	  for (Point point : getPath().getLastTrace()) {
+	  	getSite().place(new Coin(getComponents()), point);
+	  }
 	  
 	  //getSite().place(new Stone(getComponents()), new Point(1000, 999));
 	  //getPath().setWaypoint(new Point(1000, 1000));

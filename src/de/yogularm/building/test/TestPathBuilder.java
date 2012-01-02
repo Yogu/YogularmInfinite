@@ -1,8 +1,6 @@
 package de.yogularm.building.test;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.yogularm.building.BuildingPath;
 import de.yogularm.building.PathBuilder;
@@ -18,14 +16,17 @@ public class TestPathBuilder extends PathBuilder {
 	@Override
   public void build() {
 		getPath().place(new Stone(getComponents()), new Point(0, 2));
-		getPath().place(new Stone(getComponents()), new Point(1, 0));
-		getPath().place(new Stone(getComponents()), new Point(-2, 0));
+		getPath().place(new Stone(getComponents()), new Point(-3, -11));
+		//getPath().place(new Stone(getComponents()), new Point(-2, 0));
 
-		List<Point> reachablePositions = getPath().getReachablePositions();
+		//List<Point> reachablePositions = getPath().getReachablePositions();
+		Point c = getPath().getCurrentWaypoint();
+		List<Point> trace = getPath().getTrace(c, c.add(-3, -1));
 		
-	  for (Point point : reachablePositions) {
-	  	getPath().place(new Coin(getComponents()), point);
-	  }
+		if (trace != null)
+		  for (Point point : trace) {
+		  	getPath().place(new Coin(getComponents()), point);
+		  }
 	  
 	  getSite().place(new Stone(getComponents()), new Point(1000, 999));
 	  getPath().setWaypoint(new Point(1000, 1000));

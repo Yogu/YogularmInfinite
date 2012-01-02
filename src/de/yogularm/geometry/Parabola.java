@@ -12,6 +12,12 @@ public class Parabola {
 		this.e = e;
 	}
 	
+	public Parabola(float a, Vector apex) {
+		this.a = a;
+		this.d = apex.getX();
+		this.e = apex.getY();
+	}
+	
 	public Parabola(Vector apex, Vector other) {
 		d = apex.getX();
 		e = apex.getY();

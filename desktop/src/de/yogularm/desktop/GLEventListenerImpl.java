@@ -14,8 +14,8 @@ import de.yogularm.drawing.RenderContext;
 public class GLEventListenerImpl implements GLEventListener {
 	private FPSAnimator animator;
 	private Game game;
-	//private RenderContextImpl context;
-	private RenderContext context;
+	private RenderContextImpl context;
+	//private RenderContext context;
 	private ExceptionHandler exceptionHandler;
 	
 	public GLEventListenerImpl(Game game) {
@@ -34,7 +34,7 @@ public class GLEventListenerImpl implements GLEventListener {
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-			//context.checkErrors();
+			context.checkErrors();
 		} catch (Exception e) {
 			if (exceptionHandler != null)
 				exceptionHandler.handleException(e);

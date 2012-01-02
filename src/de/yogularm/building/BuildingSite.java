@@ -42,7 +42,7 @@ public class BuildingSite {
 		byte flags = getFlags(position);
 		boolean isSolid = component instanceof Body && ((Body)component).isSolid();
 		
-		if ((flags & FLAG_TAKEN) != 0 || (!isSolid && (flags & FLAG_KEEP_FREE) != 0))
+		if ((flags & FLAG_TAKEN) != 0 || (isSolid && (flags & FLAG_KEEP_FREE) != 0))
 			return false;
 		
 		flags |= FLAG_TAKEN;
@@ -53,6 +53,7 @@ public class BuildingSite {
 		
 		component.setPosition(position.toVector());
 		components.add(component);
+		setFlags(position, flags);
 		return true;
 	}
 	

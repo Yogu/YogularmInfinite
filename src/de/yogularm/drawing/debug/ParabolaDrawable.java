@@ -21,8 +21,8 @@ public class ParabolaDrawable implements Drawable {
 	 */
 	public ParabolaDrawable(Parabola parabola, float minX, float maxX, float precision) {
 		this.parabola = parabola;
-		this.minX = minX;
-		this.maxX = maxX;
+		this.minX = Math.min(minX, maxX);
+		this.maxX = Math.max(minX, maxX);
 		this.precision = precision;
 	}
 	
