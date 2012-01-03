@@ -1,6 +1,8 @@
 package de.yogularm.building;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 import de.yogularm.Config;
@@ -11,24 +13,71 @@ import de.yogularm.geometry.Parabola;
 import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Vector;
 
+// TODO: BuildingPath should support push/pop for fields like currentWaypoint and reachablePositions
+
 public class BuildingPath {
+  private class StackEntry {
+  	private Point currentWaypoint;
+  	private List<Point> reachablePositions;
+  	private List<Point> lastTrace;
+  }
+  
 	private BuildingSite buildingSite;
-	private Point currentWaypoint;
-	private List<Point> reachablePositions;
-	private List<Point> lastTrace;
+	private Deque<StackEntry> stack = new ArrayDeque<StackEntry>();
 	
 	private static final int MAX_REACHABLE_DISTANCE = 5;
 	
 	public BuildingPath(BuildingSite buildingSite, Point startPoint) {
 		this.buildingSite = buildingSite;
-		currentWaypoint = startPoint;
+		StackEntry first = new StackEntry();
+		first.currentWaypoint = startPoint;
+		stack.push(first);
+	}
+	
+	public void push() {
+		StackEntry entry = new StackEntry();
+		entry.currentWaypoint = stack.peek().currentWaypoint;
+		stack.push(entry);
+		buildingSite.push();
+	}
+	
+	/**
+	 * Applies all changes made in the deepest sandbox
+	 * 
+	 * @throws java.lang.IllegalStateException pop is called more often than push
+	 */
+	public void popAndApply() {
+		if (!canPop())
+			throw new IllegalStateException("Tried to call pop more often than push");
+		
+		StackEntry entry = stack.pop();
+		stack.pop();
+		stack.push(entry);
+		buildingSite.popAndApply();
+	}
+	
+	/**
+	 * Discards the changes made in the deepest sandbox
+	 * 
+	 * @throws java.lang.IllegalStateException pop is called more often than push
+	 */
+	public void popAndDiscard() {
+		if (!canPop())
+			throw new IllegalStateException("Tried to call pop more often than push");
+		stack.pop();
+		buildingSite.popAndDiscard();
+	}
+	
+	public boolean canPop() {
+		return stack.size() > 1 && buildingSite.canPop();
 	}
 	
 	public boolean setWaypoint(Point position) {
 		if (!buildingSite.isFree(position) || !buildingSite.isSafe(position))
 			return false;
 		
-		List<Point> trace = getTrace(currentWaypoint, position);
+		StackEntry entry = stack.peek();
+		List<Point> trace = getTrace(entry.currentWaypoint, position);
 		if (trace == null)
 			return false;
 		
@@ -36,20 +85,20 @@ public class BuildingPath {
 			getBuildingSite().keepFree(p);
 		}
 		
-		lastTrace = trace;
-		currentWaypoint = position;
+		entry.lastTrace = trace;
+		entry.currentWaypoint = position;
 		buildingSite.keepFree(position);
-		reachablePositions = null;
+		entry.reachablePositions = null;
 		return true;
 	}
 	
 	public Point getCurrentWaypoint() {
-		return currentWaypoint;
+		return stack.peek().currentWaypoint;
 	}
 	
 	public void place(Component component, Point position) {
 		buildingSite.place(component, position);
-		reachablePositions = null;
+		stack.peek().reachablePositions = null;
 	}
 	
 	public BuildingSite getBuildingSite() {
@@ -61,13 +110,14 @@ public class BuildingPath {
 	}
 	
 	public List<Point> getReachablePositions() {
-		if (reachablePositions == null)
-			reachablePositions = calculateReachablePositions();
-		return reachablePositions;
+		StackEntry entry = stack.peek();
+		if (entry.reachablePositions == null)
+			entry.reachablePositions = calculateReachablePositions();
+		return entry.reachablePositions;
 	}
 	
 	public List<Point> getLastTrace() {
-		return lastTrace;
+		return stack.peek().lastTrace;
 	}
 	
 	private List<Point> calculateReachablePositions() {
@@ -79,10 +129,9 @@ public class BuildingPath {
 		// Jump apex (Maximum turning point)
 		float apexTime = Config.PLAYER_JUMP_SPEED / Config.GRAVITY_ACCELERATION; // v0 = g*t
 		float apexY = 0.5f * Config.GRAVITY_ACCELERATION * apexTime * apexTime; // s = 0.5*a*t^2
-		float apexX = apexTime * Config.PLAYER_SPEED;
+		//float apexX = apexTime * Config.PLAYER_SPEED;
 		// x = v*t => t = x/v
 		// y = 0.5*g*t^2     => y = 0.5 * g * (x/v)^2 = 0.5 * g/v^2 * x^2
-		// Apex is source, factor a is 0.5 * g/v^2
 		float a = - 0.5f * Config.GRAVITY_ACCELERATION / Config.PLAYER_SPEED / Config.PLAYER_SPEED;
 		Parabola parabola = new Parabola(a, /*new Vector(apexX, apexY), */Vector.ZERO);
 		

@@ -21,27 +21,36 @@ public class RandomPathBuilder extends PathBuilder {
 		List<Point> rightPositions = new ArrayList<Point>();
 
 	  for (Point point : reachablePositions) {
-	  	if (point.getX() > getPath().getCurrentWaypoint().getX())
+	  	//if (point.getX() > getPath().getCurrentWaypoint().getX())
 	  		rightPositions.add(point);
 	  }
 
 		Random random = new Random();
-		Point newWaypoint;
-		do {
+		Point newWaypoint = null;
+		while (reachablePositions.size() > 0) {
 			if (rightPositions.size() == 0) {
 				rightPositions = reachablePositions;
 				System.out.println("No right position available");
 			}
-			if (reachablePositions.size() == 0) {
-				System.out.println("Stuck!");
-				return;
-			}
+			
+			getPath().push();
 			
 			newWaypoint =	rightPositions.get(random.nextInt(rightPositions.size()));
 			getSite().place(new Stone(getComponents()), newWaypoint.add(0, -1));
-			rightPositions.remove(newWaypoint);
-			reachablePositions.remove(newWaypoint);
-		} while (!getPath().setWaypoint(newWaypoint));
+			if (getPath().setWaypoint(newWaypoint)) {
+				getPath().popAndApply();
+				break;
+			} else {
+				reachablePositions.remove(newWaypoint);
+				getPath().popAndDiscard();
+			}
+		}
+		
+		if (reachablePositions.size() == 0) {
+			System.out.println("Stuck!");
+			return;
+		}
+		
 		System.out.println(newWaypoint);
 
 	  for (Point point : getPath().getLastTrace()) {

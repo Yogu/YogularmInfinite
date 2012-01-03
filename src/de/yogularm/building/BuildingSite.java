@@ -1,7 +1,11 @@
 package de.yogularm.building;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import de.yogularm.components.Body;
 import de.yogularm.components.Component;
@@ -11,7 +15,8 @@ import de.yogularm.geometry.Point;
 /**
  * Every grid position can have the following flags:
  * 
- *  - blocked
+ *  - blocked (by solid body)
+ *  - taken (by any component)
  *  - keep free
  *  - safe (player can stay here)
  * 
@@ -19,8 +24,15 @@ import de.yogularm.geometry.Point;
  *
  */
 public class BuildingSite {
+	@SuppressWarnings("serial")
+  private class FlagMap extends HashMap<Point, byte[][]> { }
+  private class StackEntry {
+  	public FlagMap flagMap = new FlagMap();
+  	public List<Component> components = new ArrayList<Component>();
+  }
+	
 	private ComponentCollection components;
-	private Map<Point, byte[][]> map = new HashMap<Point, byte[][]>();
+	private Deque<StackEntry> stack = new ArrayDeque<StackEntry>();
 
 	private static final int SECTOR_WIDTH = 20;
 	private static final int SECTOR_HEIGHT = 15;
@@ -32,10 +44,58 @@ public class BuildingSite {
 	
 	public BuildingSite(ComponentCollection components) {
 		this.components = components;
+		StackEntry first = new StackEntry();
+		first.components = null; // Use this.components instead
+		stack.push(first);
 	}
 
 	public ComponentCollection getComponents() {
 		return components;
+	}
+	
+	/**
+	 * Pushes an entry to the stack so that changes will be made inside a sandbox
+	 */
+	public void push() {
+		stack.push(new StackEntry());
+	}
+	
+	/**
+	 * Applies all changes made in the deepest sandbox
+	 * 
+	 * @throws java.lang.IllegalStateException pop is called more often than push
+	 */
+	public void popAndApply() {
+		if (stack.size() <= 1)
+			throw new IllegalStateException("Tried to call pop more often than push");
+		
+		StackEntry entry = stack.pop();
+		for (Point sector : entry.flagMap.keySet()) {
+			stack.peek().flagMap.put(sector, entry.flagMap.get(sector));
+		}
+		List<Component> components = stack.peek().components;
+		for (Component component : entry.components) {
+			if (components != null)
+				components.add(component);
+			else
+				this.components.add(component);
+		}
+	}
+	
+	/**
+	 * Discards the changes made in the deepest sandbox
+	 * 
+	 * @throws java.lang.IllegalStateException pop is called more often than push
+	 */
+	public void popAndDiscard() {
+		if (stack.size() <= 1)
+			throw new IllegalStateException("Tried to call pop more often than push");
+		
+		stack.pop();
+	}
+	
+	public boolean canPop() {
+		return stack.size() > 1;
 	}
 	
 	public boolean place(Component component, Point position) {
@@ -52,7 +112,11 @@ public class BuildingSite {
 		}
 		
 		component.setPosition(position.toVector());
-		components.add(component);
+		StackEntry entry = stack.peek();
+		if (entry.components != null)
+			stack.peek().components.add(component);
+		else
+			components.add(component);
 		setFlags(position, flags);
 		return true;
 	}
@@ -94,28 +158,47 @@ public class BuildingSite {
 			return false;
 	}
 	
-	private byte[][] getFlagArrayOfPosition(Point position, boolean createIfMissing) {
+	/**
+	 * 
+	 * @param position
+	 * @param forWriteAccess
+	 * @return may be null if forWriteAccess is false
+	 */
+	private byte[][] getFlagArrayOfPosition(Point position, boolean forWriteAccess) {
 		// -1 / x = 0, but we want it to be in sector -1
 		Point point = new Point(
 			getSector(position.getX(), SECTOR_WIDTH),
 			getSector(position.getY(), SECTOR_HEIGHT));
 		
-	  if (map.containsKey(point))
-	  	return map.get(point);
-	  else if (createIfMissing) {
-	  	byte[][] array = new byte[SECTOR_WIDTH][SECTOR_HEIGHT];
-	  	map.put(point, array);
-	  	return array;
-	  } else
-	  	return null;
+		boolean isHead = true;
+		for (StackEntry entry : stack) {
+			if (entry.flagMap.containsKey(point)) {
+				byte[][] arr = entry.flagMap.get(point);
+				// If this array doesn't exist in the last (current) stack entry, copy it
+				if (!isHead && forWriteAccess) {
+					arr = Arrays.copyOf(arr, arr.length);
+					stack.peek().flagMap.put(point, arr);
+				}
+				return arr;
+			}
+			isHead = false;
+		}
+
+		// Start of stack reached, and no array found, so create one
+		if (forWriteAccess) {
+	  	byte[][] arr = new byte[SECTOR_WIDTH][SECTOR_HEIGHT];
+			stack.getLast().flagMap.put(point, arr);
+			return arr;
+		} else
+			return null;
 	}
 	
 	private int getSector(int position, int cellSize) {
 		if (position < 0)
 			// position -1 is the last entry in sector -1; -20 is the first one in sector -1
-			return (position - 1) % cellSize - 1;
+			return (position - 1) / cellSize - 1;
 		else
-			return position % cellSize;
+			return position / cellSize;
 	}
 	
 	private int getOffsetInSector(int position, int cellSize) {

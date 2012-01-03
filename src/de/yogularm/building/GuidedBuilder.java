@@ -27,6 +27,8 @@ public abstract class GuidedBuilder implements Builder2 {
 	  	int buildCalls = 0;
 	  	while (bounds.contains(builder.getPath().getCurrentWaypoint().toVector())) {
 	  		builder.build();
+	  		if (buildingSite.canPop())
+	  			throw new RuntimeException("Path builder missed to pop");
 	  		buildCalls++;
 	  		if (buildCalls > MAX_BUILD_CALLS)
 	  			break;//throw new RuntimeException("Path builder seems to be stuck");
