@@ -5,6 +5,7 @@ import de.yogularm.components.ComponentCollection;
 import de.yogularm.drawing.Renderable;
 import de.yogularm.drawing.debug.ParabolaDrawable;
 import de.yogularm.geometry.Parabola;
+import de.yogularm.geometry.Vector;
 
 /**
  * Creates a component that shows a parabola
@@ -20,6 +21,8 @@ public class ParabolaComponent extends Component implements Renderable {
 		float maxX, float precision)
 	{
 	  super(components);
-	  setDrawable(new ParabolaDrawable(parabola, minX, maxX, precision));
+	  setPosition(getPosition().add(parabola.getApex()));
+	  Parabola p = parabola.changeApex(Vector.ZERO);
+	  setDrawable(new ParabolaDrawable(p, minX, maxX, precision));
   }
 }

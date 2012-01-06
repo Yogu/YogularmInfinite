@@ -52,4 +52,62 @@ public class Parabola {
 		// y = a * (x - d)^2 + e
 		return a * (x - d) * (x - d) + e;
 	}
+	
+	public float min() {
+		if (a < 0)
+			return Float.NEGATIVE_INFINITY;
+		else
+			return e;
+	}
+	
+	public float max() {
+		if (a > 0)
+			return Float.POSITIVE_INFINITY;
+		else
+			return e;
+	}
+	
+	/**
+	 * Calculates the minimum y value in the specified range
+	 * @param minX The left border of the range for x
+	 * @param maxX The right border of the range for x
+	 * @return The minimum y value within the specified range
+	 */
+	public float min(float minX, float maxX) {
+		float min = Math.min(minX, maxX);
+		float max = Math.max(minX, maxX);
+		float result = Math.min(getY(minX), getY(maxX));
+		
+		// If the apex is within the range, include it 
+		if (min <= d && d <= max)
+			result = Math.min(result, e);
+		
+		return result;
+	}
+	
+	/**
+	 * Calculates the maximum y value in the specified range
+	 * @param minX The left border of the range for x
+	 * @param maxX The right border of the range for x
+	 * @return The maximum y value within the specified range
+	 */
+	public float max(float minX, float maxX) {
+		float min = Math.min(minX, maxX);
+		float max = Math.max(minX, maxX);
+		float result = Math.max(getY(minX), getY(maxX));
+		
+		// If the apex is within the range, include it 
+		if (min <= d && d <= max)
+			result = Math.max(result, e);
+		
+		return result;
+	}
+	
+	public Vector getApex() {
+		return new Vector(d, e);
+	}
+	
+	public Parabola changeApex(Vector newApex) {
+		return new Parabola(a, newApex);
+	}
 }

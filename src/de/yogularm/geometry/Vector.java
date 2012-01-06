@@ -48,6 +48,10 @@ public class Vector {
 		return new Vector(x * other.x, y * other.y);
 	}
 
+	public Vector multiply(float x, float y) {
+		return new Vector(this.x * x, this.y * y);
+	}
+
 	public Vector multiply(float value) {
 		return new Vector(x * value, y * value);
 	}
