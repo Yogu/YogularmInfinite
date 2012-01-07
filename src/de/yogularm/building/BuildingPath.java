@@ -183,8 +183,10 @@ public class BuildingPath {
 		protected List<Point> getTrace(Point source, Point target, boolean jump) {
 			if (!jump && (target.getY() >= source.getY()))
 				return null;
-			if (jump && (target.getY() > source.getY() + getJumpApex().getY()))
+			if (jump && (target.getY() > source.getY() + getJumpApex().getY())) {
+				System.out.println("Target too high");
 				return null;
+			}
 
 			List<Point> list = new ArrayList<Point>();
 			int dir = target.getX() > source.getX() ? 1 : -1;
@@ -196,7 +198,7 @@ public class BuildingPath {
 			Vector apex = source.toVector().add(dir > 0 ? 1 : 0, 0);
 			if (jump)
 				apex = apex.add(getJumpApex().multiply(dir, 1));
-			Parabola parabola = new Parabola(a, apex); // bottom center
+			Parabola parabola = new Parabola(a, apex); // bottom center in worst case (small feet)
 			/*Parabola bottomInner = parabola.move(new Vector(-dir, 0));
 			Parabola topOuter = parabola.move(new Vector(dir, 1));
 			Parabola bottomOuter = parabola.move(new Vector(dir, 0));*/
@@ -210,11 +212,12 @@ public class BuildingPath {
 				getComponents().add(new ParabolaComponent(getComponents(), topOuter, debugMin, debugMax, 10));*/
 			}
 
-			int min = Math.min(source.getX() + (!jump ? dir : 0), target.getX());
-			int max = Math.max(source.getX() + (!jump ? dir : 0), target.getX());
+			int min = Math.min(source.getX(), target.getX());
+			int max = Math.max(source.getX(), target.getX());
 			for (int x = min; x <= max; x++) {
-				int innerX = Math.min(max, Math.max(min, x - dir));
-				int outerX = Math.min(max, Math.max(min, x + dir));
+				float centerX = x + 0.5f;
+				float innerX = Math.min(max, Math.max(min, centerX - 0.5f * dir)); // small feet, large body of player 
+				float outerX = Math.min(max, Math.max(min, centerX + dir)); // large feet, large body
 				
 				int minY = (int)Math.floor(parabola.min(innerX, outerX));
 				int maxY = (int)Math.ceil(parabola.max(innerX, outerX)); 
@@ -227,17 +230,30 @@ public class BuildingPath {
 				// Target reached, now break and fall down to the target
 				if (x == target.getX()) {
 					// Make sure that player is above target
-					// Don't use minY becuase it's enaugh to reach the target with the front
-					int innerMinY = (int)Math.floor(parabola.min(x, innerX));
-					if (innerMinY < target.getY())
+					// parabola is worst-case scenario (small feet -> jump begins and ends early)
+					float worstCaseInnerX = centerX - 0.5f * dir;
+					// If the position is before the apex, take the apex (the player then doesn't move any more forward)
+					if ((dir > 0 && worstCaseInnerX < apex.getX()) || (dir < 0 && worstCaseInnerX > apex.getX())) {
+						worstCaseInnerX = apex.getX();
+						maxY = target.getY();
+					} else {
+						minY = target.getY();
+					}
+					int worstCaseY = (int)Math.floor(parabola.getY(worstCaseInnerX));
+					if (worstCaseY < target.getY()) {
+						System.out.printf("Not reaching target (%d), only at height %d\n", target.getY(), worstCaseY);;
 						return null;
-					minY = Math.min(minY, target.getY());
+					}
+				} else if (x == source.getX()) {
+					minY = Math.max(minY, source.getY());
 				}
 
 				for (int y = minY; y <= maxY; y++) {
 					Point p = new Point(x, y);
-					if (!getBuildingSite().isFree(p))
+					if (!getBuildingSite().isFree(p)) {
+						System.out.println("Blocked: " + p);
 						return null;
+					}
 					list.add(p);
 				}
 			}

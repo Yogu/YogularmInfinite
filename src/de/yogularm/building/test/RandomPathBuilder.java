@@ -18,31 +18,35 @@ public class RandomPathBuilder extends PathBuilder {
 	@Override
   public void build() {
 		List<Point> reachablePositions = getPath().getReachablePositions();
-		List<Point> rightPositions = new ArrayList<Point>();
+		List<Point> goodPositions = new ArrayList<Point>();
 
 	  for (Point point : reachablePositions) {
 	  	//if (point.getX() > getPath().getCurrentWaypoint().getX())
-	  		rightPositions.add(point);
+	  	if (point.getY() > getPath().getCurrentWaypoint().getY())
+	  		goodPositions.add(point);
 	  }
 
 		Random random = new Random();
 		Point newWaypoint = null;
 		while (reachablePositions.size() > 0) {
-			if (rightPositions.size() == 0) {
-				rightPositions = reachablePositions;
+			if (goodPositions.size() == 0) {
+				goodPositions = reachablePositions;
 				System.out.println("No right position available");
 			}
 			
 			getPath().push();
 			
-			newWaypoint =	rightPositions.get(random.nextInt(rightPositions.size()));
+			newWaypoint =	goodPositions.get(random.nextInt(goodPositions.size()));
+			System.out.printf("Trying: %s -> %s\n", getPath().getCurrentWaypoint(), newWaypoint);
 			getSite().place(new Stone(getComponents()), newWaypoint.add(0, -1));
 			if (getPath().setWaypoint(newWaypoint)) {
 				getPath().popAndApply();
 				break;
 			} else {
 				reachablePositions.remove(newWaypoint);
+				goodPositions.remove(newWaypoint);
 				getPath().popAndDiscard();
+				System.out.println("Discarded: " + newWaypoint);
 			}
 		}
 		

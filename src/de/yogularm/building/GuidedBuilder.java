@@ -31,7 +31,7 @@ public abstract class GuidedBuilder implements Builder2 {
 	  			throw new RuntimeException("Path builder missed to pop");
 	  		buildCalls++;
 	  		if (buildCalls > MAX_BUILD_CALLS)
-	  			throw new RuntimeException("Path builder seems to be stuck");
+	  			return;//throw new RuntimeException("Path builder seems to be stuck");
 	  	}
 	  }
   }
