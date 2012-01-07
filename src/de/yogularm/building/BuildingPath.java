@@ -25,7 +25,7 @@ public class BuildingPath {
 	private BuildingSite buildingSite;
 	private Deque<StackEntry> stack = new ArrayDeque<StackEntry>();
 
-	private static final int MAX_REACHABLE_DISTANCE = 5;
+	private static final int MAX_REACHABLE_DISTANCE = 4;
 
 	public BuildingPath(BuildingSite buildingSite, Point startPoint) {
 		this.buildingSite = buildingSite;
@@ -168,7 +168,7 @@ public class BuildingPath {
 				int min = Math.min(source.getX(), target.getX());
 				int max = Math.max(source.getX(), target.getX());
 				for (int x = min; x <= max; x++) {
-					Point p = new Point(x, source.getX());
+					Point p = new Point(x, source.getY());
 					if (!getBuildingSite().isSafe(p) || !getBuildingSite().isFree(p))
 						return null;
 					list.add(p);
@@ -195,58 +195,75 @@ public class BuildingPath {
 			// y = 0.5*g*t^2 => y = 0.5 * g * (x/v)^2 = 0.5 * g/v^2 * x^2
 			// Apex is source, factor a is 0.5 * g/v^2
 			float a = -0.5f * Config.GRAVITY_ACCELERATION / Config.PLAYER_SPEED / Config.PLAYER_SPEED;
-			Vector apex = source.toVector().add(dir > 0 ? 1 : 0, 0);
+			Vector apex = source.toVector().add(dir > 0 ? 1 : 0, 0); // bottom center in worst case (small feet)
 			if (jump)
 				apex = apex.add(getJumpApex().multiply(dir, 1));
-			Parabola parabola = new Parabola(a, apex); // bottom center in worst case (small feet)
-			/*Parabola bottomInner = parabola.move(new Vector(-dir, 0));
-			Parabola topOuter = parabola.move(new Vector(dir, 1));
-			Parabola bottomOuter = parabola.move(new Vector(dir, 0));*/
-			if (Config.DEBUG_BUILDING) {
+			Parabola parabola = new Parabola(a, apex);
+
+			// Is target before apex?
+			boolean isTargetBeforeApex = 
+				((dir > 0 && target.getX() < apex.getX())
+				|| (dir < 0 && target.getX() + 1 > apex.getX())); // +1: right edge of target
+			
+			/*if (Config.DEBUG_BUILDING) {
 				int debugMin = -100;
 				int debugMax = 100;
 				// source.getX() + dir > 0 ? 0 : 1, target.getX() + 5 * dir
 				getComponents().add(new ParabolaComponent(getComponents(), parabola, debugMin, debugMax, 10));
-				/*getComponents().add(new ParabolaComponent(getComponents(), parabola, debugMin, debugMax, 10));
-				getComponents().add(new ParabolaComponent(getComponents(), bottomInner, debugMin, debugMax, 10));
-				getComponents().add(new ParabolaComponent(getComponents(), topOuter, debugMin, debugMax, 10));*/
-			}
+			}*/
 
 			int min = Math.min(source.getX(), target.getX());
 			int max = Math.max(source.getX(), target.getX());
 			for (int x = min; x <= max; x++) {
 				float centerX = x + 0.5f;
-				float innerX = Math.min(max, Math.max(min, centerX - 0.5f * dir)); // small feet, large body of player 
-				float outerX = Math.min(max, Math.max(min, centerX + dir)); // large feet, large body
+				float innerX = centerX - 0.5f * dir;
+				float outerX = centerX + 0.5f * dir;
+				float bodyInnerX = innerX - 0.5f * dir; // worst-case parabola, large body
+				float bodyOuterX = outerX + dir; // best-case parabola, large body
+				bodyInnerX = Math.min(max + 1, Math.max(min, bodyInnerX)); // max + 1 because right-most block is 1 wide 
+				bodyOuterX = Math.min(max + 1, Math.max(min, bodyOuterX));
 				
-				int minY = (int)Math.floor(parabola.min(innerX, outerX));
-				int maxY = (int)Math.ceil(parabola.max(innerX, outerX)); 
-				
+				int minY = (int)Math.floor(parabola.min(bodyInnerX, bodyOuterX));
+				int maxY = (int)Math.ceil(parabola.max(bodyInnerX, bodyOuterX)); 
+
+				// Never fall "through" the safe source or target position
+				// If before apex (apex-x in same direction as target-source), then source, otherwise target
+				// x == source.getX() is required because apex.getX() == outerX when falling
+				if (x == source.getX() || Math.signum(apex.getX() - outerX) == dir)
+					minY = Math.max(minY, source.getY());
+				else 
+					minY = Math.max(minY, target.getY());
+					
 				/*// Just (int) does not behave like floor!
 				int minY = Math.max(target.getY(), (int) Math.floor(bottomInner.getY(outerX)));
 				// -1 because x and y represent the grid positions
 				int maxY = (int) Math.ceil(topOuter.getY(innerX) - 1);*/
-
-				// Target reached, now break and fall down to the target
-				if (x == target.getX()) {
+				
+				if (isTargetBeforeApex && x == target.getX() - dir) {
+					// Maybe the player has to stop before the target and wait until it falls down again
+					maxY = Math.max(maxY, (int)Math.ceil(apex.getY()));
+				} else if (x == target.getX()) {
 					// Make sure that player is above target
-					// parabola is worst-case scenario (small feet -> jump begins and ends early)
-					float worstCaseInnerX = centerX - 0.5f * dir;
 					// If the position is before the apex, take the apex (the player then doesn't move any more forward)
-					if ((dir > 0 && worstCaseInnerX < apex.getX()) || (dir < 0 && worstCaseInnerX > apex.getX())) {
-						worstCaseInnerX = apex.getX();
-						maxY = target.getY();
+					float theX = isTargetBeforeApex ? apex.getX() : innerX;
+					float theY = parabola.getY(theX);
+
+					minY = target.getY();
+						
+					if (isTargetBeforeApex) {
+						// Player ends the upwards-moving before or at the target and then falls down
+						maxY =  Math.max(maxY, (int)Math.ceil(apex.getY()));
 					} else {
-						minY = target.getY();
+						// The player moves until the target and then falls down
 					}
-					int worstCaseY = (int)Math.floor(parabola.getY(worstCaseInnerX));
-					if (worstCaseY < target.getY()) {
-						System.out.printf("Not reaching target (%d), only at height %d\n", target.getY(), worstCaseY);;
+					
+					if (theY < target.getY()) {
+						System.out.printf("Not reaching target (%d), only at height %f\n", target.getY(), theY);;
 						return null;
 					}
-				} else if (x == source.getX()) {
-					minY = Math.max(minY, source.getY());
 				}
+				
+				System.out.printf("%d: %d - %d\n", x, minY, maxY);
 
 				for (int y = minY; y <= maxY; y++) {
 					Point p = new Point(x, y);
@@ -257,6 +274,7 @@ public class BuildingPath {
 					list.add(p);
 				}
 			}
+			System.out.println("Works" + (jump ? " with jumping" : " without jumping"));
 			return list;
 		}
 	}

@@ -6,7 +6,6 @@ import de.yogularm.Config;
 import de.yogularm.building.BuildingPath;
 import de.yogularm.building.PathBuilder;
 import de.yogularm.components.general.Coin;
-import de.yogularm.components.general.Heart;
 import de.yogularm.components.general.Stone;
 import de.yogularm.geometry.Point;
 
@@ -18,7 +17,8 @@ public class TestPathBuilder extends PathBuilder {
 
 	@Override
   public void build() {
-		Point offset = new Point(-4, 1);
+		Point offset = new Point(-2, -2);
+		
 		Point current = getPath().getCurrentWaypoint();
 		Point target = current.add(offset);
 		getPath().place(new Stone(getComponents()), target.add(0, -1));
@@ -29,10 +29,10 @@ public class TestPathBuilder extends PathBuilder {
 		  for (Point point : trace) {
 		  	getPath().place(new Coin(getComponents()), point);
 		  }
-			for (int x = -5; x < 5; x++)
+			/*for (int x = -5; x < 5; x++)
 				for (int y = -5; y < 5;y++) {
 			  	getPath().place(new Heart(getComponents()), current.add(x, y));
-				}
+				}*/
 		}
 		Config.DEBUG_BUILDING = false;
 	  

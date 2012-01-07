@@ -3,6 +3,8 @@ package de.yogularm.building;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.yogularm.components.ComponentCollection;
+import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
 
 public abstract class GuidedBuilder implements Builder2 {
@@ -14,6 +16,11 @@ public abstract class GuidedBuilder implements Builder2 {
 	@Override
   public void init(BuildingSite buildingSite) {
 	  this.buildingSite = buildingSite;
+	  
+	  makeOriginSafe();
+	  if (!buildingSite.isSafe(Point.ZERO))
+	  	throw new RuntimeException("Guided buidler can't make origin safe");
+	  
 	  pathBuilders = new ArrayList<PathBuilder>();
 	  PathBuilder builder = getFirstPathBuilder(buildingSite);
 	  if (builder == null)
@@ -36,5 +43,15 @@ public abstract class GuidedBuilder implements Builder2 {
 	  }
   }
 	
+	public BuildingSite getBuildingSite() {
+		return buildingSite;
+	}
+	
+	protected ComponentCollection getComponents() {
+		return buildingSite.getComponents();
+	}
+	
 	protected abstract PathBuilder getFirstPathBuilder(BuildingSite site);
+	
+	protected abstract void makeOriginSafe();
 }

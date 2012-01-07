@@ -22,7 +22,7 @@ public class RandomPathBuilder extends PathBuilder {
 
 	  for (Point point : reachablePositions) {
 	  	//if (point.getX() > getPath().getCurrentWaypoint().getX())
-	  	if (point.getY() > getPath().getCurrentWaypoint().getY())
+	  	if ((Math.random() > 0.75) || (point.getY() > getPath().getCurrentWaypoint().getY()))
 	  		goodPositions.add(point);
 	  }
 

@@ -58,10 +58,10 @@ public class World {
 		
 		currentBuilder.init(buildingSite);
 
-		// First place
+		/*// First place
 		Stone stone = new Stone(components);
 		stone.setPosition(new Vector(0, -1));
-		components.add(stone);
+		components.add(stone);*/
 	}
 
 	public void render(RenderContext context) {

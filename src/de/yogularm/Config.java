@@ -2,8 +2,8 @@ package de.yogularm;
 
 public class Config {
 	// Display
-	public static float MAX_VIEW_WIDTH = 50;//25;
-	public static float MAX_VIEW_HEIGHT = 30;//15;
+	public static float MAX_VIEW_WIDTH = 25;
+	public static float MAX_VIEW_HEIGHT = 15;
 	public static float SCROLL_SPEED = 2; // scroll meter/second per meter distance
 	public static float GAMEOVER_LENGTH = 3; // [s]
 	//the player can move in this fraction of the screen without causing the camera to scroll
@@ -31,7 +31,7 @@ public class Config {
 	public static int CHECKPOINT_RANGE = 21; // every x structures a checkpoint
 	
 	// Debug
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	public static boolean DEBUG_DISPLAY_FORCES = DEBUG && false;
 	public static boolean DEBUG_DISPLAY_RENDER_INFO = DEBUG && true;
 	public static boolean DEBUG_BUILDING = DEBUG && true;
