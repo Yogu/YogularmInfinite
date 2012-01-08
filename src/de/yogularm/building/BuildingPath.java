@@ -25,7 +25,7 @@ public class BuildingPath {
 	private BuildingSite buildingSite;
 	private Deque<StackEntry> stack = new ArrayDeque<StackEntry>();
 
-	private static final int MAX_REACHABLE_DISTANCE = 4;
+	private static final int MAX_REACHABLE_DISTANCE = 3;
 
 	public BuildingPath(BuildingSite buildingSite, Point startPoint) {
 		this.buildingSite = buildingSite;
@@ -173,6 +173,7 @@ public class BuildingPath {
 						return null;
 					list.add(p);
 				}
+				System.out.println("    Works with straight move");
 				return list;
 			} else
 				return null;
@@ -184,7 +185,7 @@ public class BuildingPath {
 			if (!jump && (target.getY() >= source.getY()))
 				return null;
 			if (jump && (target.getY() > source.getY() + getJumpApex().getY())) {
-				System.out.println("Target too high");
+				System.out.println("   Target too high");
 				return null;
 			}
 
@@ -258,23 +259,23 @@ public class BuildingPath {
 					}
 					
 					if (theY < target.getY()) {
-						System.out.printf("Not reaching target (%d), only at height %f\n", target.getY(), theY);;
+						System.out.printf("    Not reaching target (%d), only at height %f\n", target.getY(), theY);;
 						return null;
 					}
 				}
 				
-				System.out.printf("%d: %d - %d\n", x, minY, maxY);
+				//System.out.printf("%d: %d - %d\n", x, minY, maxY);
 
 				for (int y = minY; y <= maxY; y++) {
 					Point p = new Point(x, y);
 					if (!getBuildingSite().isFree(p)) {
-						System.out.println("Blocked: " + p);
+						System.out.println("    Blocked: " + p);
 						return null;
 					}
 					list.add(p);
 				}
 			}
-			System.out.println("Works" + (jump ? " with jumping" : " without jumping"));
+			System.out.println("    Works" + (jump ? " with jumping" : " without jumping"));
 			return list;
 		}
 	}

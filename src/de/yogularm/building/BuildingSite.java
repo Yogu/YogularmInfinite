@@ -176,7 +176,7 @@ public class BuildingSite {
 				byte[][] arr = entry.flagMap.get(point);
 				// If this array doesn't exist in the last (current) stack entry, copy it
 				if (!isHead && forWriteAccess) {
-					arr = Arrays.copyOf(arr, arr.length);
+					arr = deepCopyArray(arr);
 					stack.peek().flagMap.put(point, arr);
 				}
 				return arr;
@@ -187,10 +187,18 @@ public class BuildingSite {
 		// Start of stack reached, and no array found, so create one
 		if (forWriteAccess) {
 	  	byte[][] arr = new byte[SECTOR_WIDTH][SECTOR_HEIGHT];
-			stack.getLast().flagMap.put(point, arr);
+			stack.peek().flagMap.put(point, arr);
 			return arr;
 		} else
 			return null;
+	}
+	
+	private byte[][] deepCopyArray(byte[][] arr) {
+		byte[][] newArr = Arrays.copyOf(arr, arr.length);
+		for (int x = 0; x < arr.length; x++) {
+			newArr[x] = Arrays.copyOf(newArr[x], newArr[x].length);
+		}
+		return newArr;
 	}
 	
 	private int getSector(int position, int cellSize) {
@@ -227,7 +235,7 @@ public class BuildingSite {
 	
 	private void setFlags(Point position, byte flags, byte[][] arr) {
 		int x = getOffsetInSector(position.getX(), SECTOR_WIDTH);
-		int y = getOffsetInSector(position.getY(), SECTOR_HEIGHT);
+ 		int y = getOffsetInSector(position.getY(), SECTOR_HEIGHT);
 		arr[x][y] = flags;
 	}
 }

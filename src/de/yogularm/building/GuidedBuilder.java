@@ -11,7 +11,7 @@ public abstract class GuidedBuilder implements Builder2 {
 	private List<PathBuilder> pathBuilders;
 	private BuildingSite buildingSite;
 	
-	private static final int MAX_BUILD_CALLS = 100;
+	private static final int MAX_BUILD_CALLS = 30;
 	
 	@Override
   public void init(BuildingSite buildingSite) {
@@ -30,6 +30,7 @@ public abstract class GuidedBuilder implements Builder2 {
 
 	@Override
   public void build(Rect bounds) {
+		List<PathBuilder> toRemove = null;
 	  for (PathBuilder builder : pathBuilders) {
 	  	int buildCalls = 0;
 	  	while (bounds.contains(builder.getPath().getCurrentWaypoint().toVector())) {
@@ -37,10 +38,19 @@ public abstract class GuidedBuilder implements Builder2 {
 	  		if (buildingSite.canPop())
 	  			throw new RuntimeException("Path builder missed to pop");
 	  		buildCalls++;
-	  		if (buildCalls > MAX_BUILD_CALLS)
-	  			return;//throw new RuntimeException("Path builder seems to be stuck");
+	  		if (buildCalls > MAX_BUILD_CALLS) {
+	  			System.out.println("Path builder got stuck!");
+	  			if (toRemove == null)
+	  				toRemove = new ArrayList<PathBuilder>();
+	  			toRemove.add(builder);
+	  			break;//throw new RuntimeException("Path builder seems to be stuck");
+	  		}
 	  	}
 	  }
+	  
+	  if (toRemove != null)
+		  for (PathBuilder builder : toRemove)
+		  	pathBuilders.remove(builder);
   }
 	
 	public BuildingSite getBuildingSite() {

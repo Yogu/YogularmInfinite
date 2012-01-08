@@ -28,7 +28,7 @@ public class Game {
 	private long renderTime;
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.4.0*";
+	public static final String VERSION = "0.4pre1";
 	
 	public Game() {
 		// Init world
@@ -119,7 +119,7 @@ public class Game {
 		context.setColor(Color.black);
 
 		Font font2 =  new Font(12, EnumSet.of(FontStyle.BOLD));
-		context.drawText(new Vector(width - 165, height - 20), font2, "Yogularm Infinite " + VERSION);
+		context.drawText(new Vector(width - 185, height - 20), font2, "Yogularm Infinite " + VERSION);
 
 		// Debug
 		if (Config.DEBUG_DISPLAY_RENDER_INFO) {

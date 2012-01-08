@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.yogularm.Config;
 import de.yogularm.building.BuildingPath;
 import de.yogularm.building.PathBuilder;
 import de.yogularm.components.general.Coin;
@@ -11,6 +12,8 @@ import de.yogularm.components.general.Stone;
 import de.yogularm.geometry.Point;
 
 public class RandomPathBuilder extends PathBuilder {
+	private boolean stuck = false;
+	
 	public RandomPathBuilder(BuildingPath path) {
 	  super(path);
   }
@@ -21,9 +24,9 @@ public class RandomPathBuilder extends PathBuilder {
 		List<Point> goodPositions = new ArrayList<Point>();
 
 	  for (Point point : reachablePositions) {
-	  	//if (point.getX() > getPath().getCurrentWaypoint().getX())
-	  	if ((Math.random() > 0.75) || (point.getY() > getPath().getCurrentWaypoint().getY()))
-	  		goodPositions.add(point);
+	  	if ((Math.random() > 0.8) || (point.getX() > getPath().getCurrentWaypoint().getX()))
+		  	if ((Math.random() > 0.8) || (point.getY() > getPath().getCurrentWaypoint().getY()))
+		  		goodPositions.add(point);
 	  }
 
 		Random random = new Random();
@@ -31,13 +34,13 @@ public class RandomPathBuilder extends PathBuilder {
 		while (reachablePositions.size() > 0) {
 			if (goodPositions.size() == 0) {
 				goodPositions = reachablePositions;
-				System.out.println("No right position available");
+				System.out.println("  No right position available");
 			}
 			
 			getPath().push();
 			
 			newWaypoint =	goodPositions.get(random.nextInt(goodPositions.size()));
-			System.out.printf("Trying: %s -> %s\n", getPath().getCurrentWaypoint(), newWaypoint);
+			System.out.printf("  Trying: %s -> %s\n", getPath().getCurrentWaypoint(), newWaypoint);
 			getSite().place(new Stone(getComponents()), newWaypoint.add(0, -1));
 			if (getPath().setWaypoint(newWaypoint)) {
 				getPath().popAndApply();
@@ -46,19 +49,21 @@ public class RandomPathBuilder extends PathBuilder {
 				reachablePositions.remove(newWaypoint);
 				goodPositions.remove(newWaypoint);
 				getPath().popAndDiscard();
-				System.out.println("Discarded: " + newWaypoint);
 			}
 		}
 		
 		if (reachablePositions.size() == 0) {
-			System.out.println("Stuck!");
+			if (!stuck)
+				System.out.println("Stuck!");
+			stuck = true;
 			return;
 		}
 		
-		System.out.println(newWaypoint);
+		System.out.printf("OK: %s\n", newWaypoint);
 
 	  for (Point point : getPath().getLastTrace()) {
-	  	getSite().place(new Coin(getComponents()), point);
+	  	if (Config.DEBUG_BUILDING || Math.random() < 0.15)
+	  		getPath().place(new Coin(getComponents()), point);
 	  }
 	  
 	  //getSite().place(new Stone(getComponents()), new Point(1000, 999));

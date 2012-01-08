@@ -17,7 +17,7 @@ public class TestPathBuilder extends PathBuilder {
 
 	@Override
   public void build() {
-		Point offset = new Point(-2, -2);
+		Point offset = new Point(-1, -2);
 		
 		Point current = getPath().getCurrentWaypoint();
 		Point target = current.add(offset);

@@ -2,17 +2,16 @@ package de.yogularm;
 
 import de.yogularm.building.Builder2;
 import de.yogularm.building.BuildingSite;
-import de.yogularm.building.old.BuilderConverter;
-import de.yogularm.building.old.general.Sky2;
 import de.yogularm.building.test.TestBuilder;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.ComponentTree;
 import de.yogularm.components.Player;
-import de.yogularm.components.general.Stone;
+import de.yogularm.drawing.Color;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Renderable;
 import de.yogularm.drawing.Renderer;
+import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
@@ -80,6 +79,38 @@ public class World {
 				}
 			}
 		}
+		
+		if (Config.DEBUG_BUILDING) {
+			context.unbindTexture();
+			int minX = (int)Math.floor(renderRange.getLeft());
+			int maxX = (int)Math.ceil(renderRange.getRight());
+			int minY = (int)Math.floor(renderRange.getBottom());
+			int maxY = (int)Math.ceil(renderRange.getTop());
+			Color freeColor = new Color(0, 1, 0, 0.2f);
+			Color takenColor = new Color(1, 0.5f, 0, 0.5f);
+			Color blockedColor = new Color(1, 0, 0, 0.5f);
+			Color safeColor = new Color(0, 0, 1, 0.2f);
+			for (int x = minX; x <= maxX; x++) {
+				for (int y = minY; y <= maxY; y++) {
+					Point p = new Point(x, y);
+					Rect r = new Rect(x, y, x + 1, y + 1);
+					if (buildingSite.canPlace(p))
+						context.setColor(freeColor);
+					else if (buildingSite.isFree(p))
+						context.setColor(takenColor);
+					else
+						context.setColor(blockedColor);
+					context.drawRect(r);
+					
+					if (buildingSite.isSafe(p)) {
+						r = new Rect(x, y, x + 1, y + 0.25f);
+						context.setColor(safeColor);
+						context.drawRect(r);
+					}
+				}
+			}
+		}
+		
 		// To show it above all other components
 		Renderer.render(context, player);
 	}
