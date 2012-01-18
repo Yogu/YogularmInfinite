@@ -3,6 +3,7 @@ package de.yogularm.desktop;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import de.yogularm.Config;
 import de.yogularm.input.DigitalInput;
 
 public class InputImpl extends DigitalInput {
@@ -65,6 +66,14 @@ public class InputImpl extends DigitalInput {
 			break;
 		case KeyEvent.VK_DOWN:
 			isDown = isPressed;
+			break;
+		case KeyEvent.VK_F1:
+			if (isPressed)
+				Config.DEBUG_DISPLAY_RENDER_INFO = !Config.DEBUG_DISPLAY_RENDER_INFO;
+			break;
+		case KeyEvent.VK_F2:
+			if (isPressed)
+				Config.DEBUG_BUILDING = !Config.DEBUG_BUILDING;
 			break;
 		}
 	}

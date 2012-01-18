@@ -2,9 +2,11 @@ package de.yogularm.test;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
 import de.yogularm.building.BuildingSite;
 import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.general.Ladder;
 import de.yogularm.components.general.Stone;
 import de.yogularm.geometry.Point;
 import de.yogularm.test.mock.MockComponentCollection;
@@ -17,13 +19,13 @@ public class BuildingSiteTest {
 		components = new MockComponentCollection();
   }
 
-	@org.junit.Test
+	@Test
 	public void testInitState() {
 		BuildingSite site = new BuildingSite(components);
 		Assert.assertFalse(site.canPop());
 	}
-	
-	@org.junit.Test
+
+	@Test
 	public void testFlags() {
 		Point[] points = new Point[] {
 			new Point(0, 0),
@@ -47,7 +49,7 @@ public class BuildingSiteTest {
 		}
 	}
 
-	@org.junit.Test
+	@Test
 	public void testPush() {
 		BuildingSite site = new BuildingSite(components);
 		site.push();
@@ -58,7 +60,7 @@ public class BuildingSiteTest {
 		Assert.assertFalse(site.canPop());
 	}
 
-	@org.junit.Test
+	@Test
 	public void testPopAndApply() {
 		BuildingSite site = new BuildingSite(components);
 		site.push();
@@ -68,7 +70,8 @@ public class BuildingSiteTest {
 		Assert.assertFalse(site.isFree(Point.ZERO));
 		Assert.assertFalse(site.isFree(new Point(5, 0)));
 	}
-	
+
+	@Test
 	public void testPopAndApplyWithUnpushed() {
 		BuildingSite site = new BuildingSite(components);
 		site.place(new Stone(components), new Point(3, 0));
@@ -80,7 +83,7 @@ public class BuildingSiteTest {
 		Assert.assertFalse(site.isFree(new Point(5, 0)));
 	}
 
-	@org.junit.Test
+	@Test
 	public void testPopAndDiscard() {
 		BuildingSite site = new BuildingSite(components);
 		site.push();
@@ -91,7 +94,7 @@ public class BuildingSiteTest {
 		Assert.assertTrue(site.isFree(new Point(5, 0)));
 	}
 
-	@org.junit.Test
+	@Test
 	public void testPopAndDiscardWithUnpushed() {
 		BuildingSite site = new BuildingSite(components);
 		site.place(new Stone(components), new Point(3, 0));
@@ -101,6 +104,13 @@ public class BuildingSiteTest {
 		site.popAndDiscard();
 		Assert.assertTrue(site.isFree(Point.ZERO));
 		Assert.assertTrue(site.isFree(new Point(5, 0)));
+	}
+	
+	@Test
+	public void testLadders() {
+		BuildingSite site = new BuildingSite(components);
+		site.place(new Ladder(components), new Point(0, 0));
+		Assert.assertTrue(site.isSafe(new Point(0, 0)));
 	}
 	
 	private void placeSolid(BuildingSite site, Point position) {

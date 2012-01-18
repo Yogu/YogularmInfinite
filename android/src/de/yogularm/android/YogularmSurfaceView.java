@@ -3,7 +3,7 @@ package de.yogularm.android;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
-import de.yogularm.Vector;
+import de.yogularm.geometry.Vector;
 
 public class YogularmSurfaceView extends GLSurfaceView {
 	private InputImpl input;

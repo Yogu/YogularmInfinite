@@ -80,39 +80,49 @@ public class World {
 			}
 		}
 		
-		if (Config.DEBUG_BUILDING) {
-			context.unbindTexture();
-			int minX = (int)Math.floor(renderRange.getLeft());
-			int maxX = (int)Math.ceil(renderRange.getRight());
-			int minY = (int)Math.floor(renderRange.getBottom());
-			int maxY = (int)Math.ceil(renderRange.getTop());
-			Color freeColor = new Color(0, 1, 0, 0.2f);
-			Color takenColor = new Color(1, 0.5f, 0, 0.5f);
-			Color blockedColor = new Color(1, 0, 0, 0.5f);
-			Color safeColor = new Color(0, 0, 1, 0.2f);
-			for (int x = minX; x <= maxX; x++) {
-				for (int y = minY; y <= maxY; y++) {
-					Point p = new Point(x, y);
-					Rect r = new Rect(x, y, x + 1, y + 1);
-					if (buildingSite.canPlace(p))
-						context.setColor(freeColor);
-					else if (buildingSite.isFree(p))
-						context.setColor(takenColor);
-					else
-						context.setColor(blockedColor);
-					context.drawRect(r);
-					
-					if (buildingSite.isSafe(p)) {
-						r = new Rect(x, y, x + 1, y + 0.25f);
-						context.setColor(safeColor);
-						context.drawRect(r);
-					}
-				}
-			}
-		}
+		if (Config.DEBUG_BUILDING)
+			renderFlagMap(context, renderRange);
 		
 		// To show it above all other components
 		Renderer.render(context, player);
+	}
+	
+	private void renderFlagMap(RenderContext context, Rect renderRange) {
+		context.unbindTexture();
+		int minX = (int)Math.floor(renderRange.getLeft());
+		int maxX = (int)Math.ceil(renderRange.getRight());
+		int minY = (int)Math.floor(renderRange.getBottom());
+		int maxY = (int)Math.ceil(renderRange.getTop());
+		Color freeColor = new Color(0, 1, 0, 0.2f);
+		//Color takenColor = new Color(1, 0.5f, 0, 0.5f);
+		Color blockedColor = new Color(1, 0, 0, 0.5f);
+		Color keepFreeColor = new Color(0.5f, 0.5f, 1, 0.2f);
+		Color safeColor = new Color(0, 0, 1, 0.2f);
+		for (int x = minX; x <= maxX; x++) {
+			for (int y = minY; y <= maxY; y++) {
+				Point p = new Point(x, y);
+				Rect r = new Rect(x, y, x + 1, y + 1);
+				if (buildingSite.isKeptFree(p))
+					context.setColor(keepFreeColor);
+				else if (buildingSite.canPlace(p))
+					context.setColor(freeColor);
+				else
+					context.setColor(blockedColor);
+				context.drawRect(r);
+				
+				if (buildingSite.isSafe(p)) {
+					r = new Rect(x, y, x + 1, y + 0.25f);
+					context.setColor(safeColor);
+					context.drawRect(r);
+				}
+				
+				/*if (buildingSite.isFree(p) && !buildingSite.canPlace(p)) {
+					r = new Rect(x + 0.75f, y + 0.75f, x + 1, y + 1);
+					context.setColor(takenColor);
+					context.drawRect(r);
+				}*/
+			}
+		}
 	}
 
 	public void update(float elapsedTime) {

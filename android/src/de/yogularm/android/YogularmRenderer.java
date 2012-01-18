@@ -7,9 +7,9 @@ import android.opengl.GLSurfaceView;
 import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
 import de.yogularm.Res;
-import de.yogularm.Vector;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.RenderTransformation;
+import de.yogularm.geometry.Vector;
 
 public class YogularmRenderer implements GLSurfaceView.Renderer {
 	private RenderContextImpl context;

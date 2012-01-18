@@ -80,6 +80,13 @@ public class Vector {
 		return x == other.x && y == other.y;
 	}
 	
+	public boolean equals(Object other) {
+		if (other instanceof Vector)
+			return equals((Vector)other);
+		else
+			return super.equals(other);
+	}
+	
 	public int hashCode() {
 		// copyied from Point2D.hashCode();
     long bits = Double.doubleToLongBits(x);
@@ -95,12 +102,20 @@ public class Vector {
 			return new Vector(x / length, y / length);
 	}
 
+	/**
+	 * 
+	 * @return the the angle in degrees
+	 */
 	public float getAngleToXAxis() {
 		Vector norm = normalize();
 		return (float) Math.toDegrees(Math.atan2(norm.y, norm.x));
 				//- Math.atan2(0, -1));
 	}
-	
+
+	/**
+	 * 
+	 * @return the the angle in degrees
+	 */
 	public static float getAngle(Vector v1, Vector v2) {
     return (float)Math.toDegrees(Math.acos(getDotProduct(v1.normalize(), v2.normalize())));
 	}

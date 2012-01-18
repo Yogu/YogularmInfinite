@@ -1,9 +1,7 @@
 package de.yogularm.building;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,6 +9,8 @@ import de.yogularm.components.Body;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.geometry.Point;
+import de.yogularm.utils.ArrayDeque;
+import de.yogularm.utils.Deque;
 
 /**
  * Every grid position can have the following flags:
@@ -98,9 +98,20 @@ public class BuildingSite {
 		return stack.size() > 1;
 	}
 	
+	/**
+	 * Places the specified component and makes related changes to the flag set
+	 * 
+	 * @param component The component to add
+	 * @param position The position which overrides the component's original position
+	 * @return true, if the component has successfully been added, or false if the flag set denies
+	 *   the component to be placed
+	 * @see #canPlace canPlace() to check whether a non-solid block can be placed
+	 * @see #canPlaceSolid canPlaceSolid() to check whether a solid block can be placed
+	 */
 	public boolean place(Component component, Point position) {
 		byte flags = getFlags(position);
 		boolean isSolid = component instanceof Body && ((Body)component).isSolid();
+		boolean isClimbable = component instanceof Body && ((Body)component).isClimbable();
 		
 		if ((flags & FLAG_TAKEN) != 0 || (isSolid && (flags & FLAG_KEEP_FREE) != 0))
 			return false;
@@ -109,7 +120,8 @@ public class BuildingSite {
 		if (isSolid) {
 			makeSafe(position.add(0, 1));
 			flags |= FLAG_BLOCKED;
-		}
+		} else if (isClimbable)
+			flags |= FLAG_SAFE;
 		
 		component.setPosition(position.toVector());
 		StackEntry entry = stack.peek();
@@ -121,6 +133,15 @@ public class BuildingSite {
 		return true;
 	}
 	
+	/**
+	 * Checks whether the player can freely move in the specified position.
+	 * 
+	 * Note that this method returns <code>true</code> on an item although no more component can be
+	 * placed there. See {@link #canPlace(Point)}) to check whether a component can be placed.
+	 *   
+	 * @param position
+	 * @return <code>true</code>, if the specified position is free for moving
+	 */
 	public boolean isFree(Point position) {
 		return (getFlags(position) & FLAG_BLOCKED) == 0;
 	}
@@ -137,6 +158,10 @@ public class BuildingSite {
 		
 		setFlags(position, (byte)(flags | FLAG_KEEP_FREE));
 		return true;
+	}
+	
+	public boolean isKeptFree(Point position) {
+		return (getFlags(position) & FLAG_KEEP_FREE) != 0;
 	}
 	
 	public boolean canPlaceSolid(Point position) {

@@ -11,7 +11,8 @@ public abstract class GuidedBuilder implements Builder2 {
 	private List<PathBuilder> pathBuilders;
 	private BuildingSite buildingSite;
 	
-	private static final int MAX_BUILD_CALLS = 30;
+	private static final int MAX_BUILD_CALLS = 5;
+	private static final boolean REMOVE_WHEN_STUCK = false;
 	
 	@Override
   public void init(BuildingSite buildingSite) {
@@ -28,7 +29,8 @@ public abstract class GuidedBuilder implements Builder2 {
 	  pathBuilders.add(builder);
   }
 
-	@Override
+  @SuppressWarnings("unused")
+  @Override
   public void build(Rect bounds) {
 		List<PathBuilder> toRemove = null;
 	  for (PathBuilder builder : pathBuilders) {
@@ -40,14 +42,16 @@ public abstract class GuidedBuilder implements Builder2 {
 	  		buildCalls++;
 	  		if (buildCalls > MAX_BUILD_CALLS) {
 	  			System.out.println("Path builder got stuck!");
-	  			if (toRemove == null)
-	  				toRemove = new ArrayList<PathBuilder>();
-	  			toRemove.add(builder);
+	  			if (REMOVE_WHEN_STUCK) {
+		  			if (toRemove == null)
+		  				toRemove = new ArrayList<PathBuilder>();
+		  			toRemove.add(builder);
+	  			}
 	  			break;//throw new RuntimeException("Path builder seems to be stuck");
 	  		}
 	  	}
 	  }
-	  
+
 	  if (toRemove != null)
 		  for (PathBuilder builder : toRemove)
 		  	pathBuilders.remove(builder);

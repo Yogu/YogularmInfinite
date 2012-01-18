@@ -11,6 +11,7 @@ import de.yogularm.drawing.TextDrawable;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 import de.yogularm.input.Input;
+import de.yogularm.utils.ValueSmoothener;
 
 public class Game {
 	private World world;
@@ -22,13 +23,15 @@ public class Game {
 	private float gameoverTime = 0;
 
 	private long lastFrameTime;
+	private float frameTime;
 	private long frameCount = 0;
-	private float frameTime = 0;
-	private long updateTime;
-	private long renderTime;
+	private ValueSmoothener smoothFrameTime = new ValueSmoothener(SMOOTH_TIME);
+	private ValueSmoothener smoothUpdateTime = new ValueSmoothener(SMOOTH_TIME);;
+	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);;
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.4pre1";
+	public static final String VERSION = "0.4pre2";
+	private static final double SMOOTH_TIME = 0.33f; // [second]
 	
 	public Game() {
 		// Init world
@@ -73,7 +76,7 @@ public class Game {
 		context.clear(CLEAR_COLOR);
 		world.render(context);
 		renderGUI(context);
-		renderTime = System.nanoTime() - time;
+		smoothRenderTime.set((System.nanoTime() - time) / 1000000000.0); // ns to s
 	}
 
 	private void doTick() {
@@ -87,7 +90,7 @@ public class Game {
 			isGameover = true;
 		}
 
-		updateTime = System.nanoTime() - time;
+		smoothUpdateTime.set((System.nanoTime() - time) / 1000000000.0); // ns to s
 	}
 
 	private void renderGUI(RenderContext context) {
@@ -124,8 +127,11 @@ public class Game {
 		// Debug
 		if (Config.DEBUG_DISPLAY_RENDER_INFO) {
 			context.drawText(new Vector(10, 40), font2, String.format(
-					"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms", 1 / frameTime,
-					frameTime * 1000, updateTime / 1000000f, renderTime / 1000000f));
+					"%.0f FPS;    Total Time: %.3f ms;    Update: %.3f ms;    Render: %.3f ms",
+					1 / smoothFrameTime.getSmooth(), 
+					smoothFrameTime.getSmooth() * 1000, 
+					smoothUpdateTime.getSmooth() * 1000,
+					smoothRenderTime.getSmooth() * 1000));
 			context.drawText(new Vector(10, 25), font2, String.format(
 					"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d", world.getComponents()
 							.getCount(), world.renderCount, world.updateCount, world.inRangeCount));
@@ -142,6 +148,7 @@ public class Game {
 		lastFrameTime = newTime;
 		// System.out.println((1 / frameTime) + " FPS");
 		frameTime = Math.min(frameTime, Config.MAX_FRAMETIME);
+		smoothFrameTime.set(frameTime);
 	}
 
 	private void restart() {

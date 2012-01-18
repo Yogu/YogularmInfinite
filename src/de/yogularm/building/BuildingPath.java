@@ -1,8 +1,6 @@
 package de.yogularm.building;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 import de.yogularm.Config;
@@ -12,6 +10,8 @@ import de.yogularm.components.debug.ParabolaComponent;
 import de.yogularm.geometry.Parabola;
 import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Vector;
+import de.yogularm.utils.ArrayDeque;
+import de.yogularm.utils.Deque;
 
 // TODO: BuildingPath should support push/pop for fields like currentWaypoint and reachablePositions
 
@@ -96,9 +96,11 @@ public class BuildingPath {
 		return stack.peek().currentWaypoint;
 	}
 
-	public void place(Component component, Point position) {
-		buildingSite.place(component, position);
-		stack.peek().reachablePositions = null;
+	public boolean place(Component component, Point position) {
+		boolean success = buildingSite.place(component, position);
+		if (success)
+			stack.peek().reachablePositions = null;
+		return success;
 	}
 
 	public BuildingSite getBuildingSite() {
@@ -132,12 +134,12 @@ public class BuildingPath {
 		float a = -0.5f * Config.GRAVITY_ACCELERATION / Config.PLAYER_SPEED / Config.PLAYER_SPEED;
 		Parabola parabola = new Parabola(a, jumpApex);
 
-		if (Config.DEBUG_BUILDING) {
+		/*if (Config.DEBUG_BUILDING) {
 			ParabolaComponent parabolaComponent =
 			  new ParabolaComponent(getComponents(), parabola, 0, 20, 20);
 			parabolaComponent.setPosition(c);
 			getComponents().add(parabolaComponent);
-		}
+		}*/
 
 		for (int y = (int) jumpApex.getY(); y >= -MAX_REACHABLE_DISTANCE; y--) {
 			float maxX = parabola.getX2(y);
@@ -180,7 +182,26 @@ public class BuildingPath {
 		}
 	}
 
-	private abstract class FallMoveStrategy implements MovingStrategy {
+	private class ClimbStrategy implements MovingStrategy {
+		public List<Point> getTrace(Point source, Point target) {
+			if (source.getX() == target.getX()) {
+				List<Point> list = new ArrayList<Point>();
+				int min = Math.min(source.getY(), target.getY());
+				int max = Math.max(source.getY(), target.getY());
+				for (int y = min; y <= max; y++) {
+					Point p = new Point(source.getX(), y);
+					if (!getBuildingSite().isSafe(p) || !getBuildingSite().isFree(p))
+						return null;
+					list.add(p);
+				}
+				System.out.println("    Works with climbing");
+				return list;
+			} else
+				return null;
+		}
+	}
+
+	private abstract class FallStrategy implements MovingStrategy {
 		protected List<Point> getTrace(Point source, Point target, boolean jump) {
 			if (!jump && (target.getY() >= source.getY()))
 				return null;
@@ -280,13 +301,13 @@ public class BuildingPath {
 		}
 	}
 
-	private class FreeFallMoveStrategy extends FallMoveStrategy {
+	private class FreeFallStrategy extends FallStrategy {
 		public List<Point> getTrace(Point source, Point target) {
 			return super.getTrace(source, target, false);
 		}
 	}
 
-	private class JumpMoveStrategy extends FallMoveStrategy {
+	private class JumpStrategy extends FallStrategy {
 		public List<Point> getTrace(Point source, Point target) {
 			return super.getTrace(source, target, true);
 		}
@@ -296,8 +317,9 @@ public class BuildingPath {
 	private List<MovingStrategy> movingStrategies = new ArrayList<MovingStrategy>() {
 		{
 			add(new StraightMoveStrategy());
-			add(new FreeFallMoveStrategy());
-			add(new JumpMoveStrategy());
+			add(new ClimbStrategy());
+			add(new FreeFallStrategy());
+			add(new JumpStrategy());
 		}
 	};
 
