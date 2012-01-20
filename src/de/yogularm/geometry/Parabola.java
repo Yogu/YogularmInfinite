@@ -1,6 +1,6 @@
 package de.yogularm.geometry;
 
-public class Parabola {
+public class Parabola implements NumericFunction {
 	// y = a * (x - d)^2 + e
 	private float a;
 	private float d;
@@ -73,7 +73,7 @@ public class Parabola {
 	 * @param maxX The right border of the range for x
 	 * @return The minimum y value within the specified range
 	 */
-	public float min(float minX, float maxX) {
+	public float getMinY(float minX, float maxX) {
 		float min = Math.min(minX, maxX);
 		float max = Math.max(minX, maxX);
 		float result = Math.min(getY(minX), getY(maxX));
@@ -91,7 +91,7 @@ public class Parabola {
 	 * @param maxX The right border of the range for x
 	 * @return The maximum y value within the specified range
 	 */
-	public float max(float minX, float maxX) {
+	public float getMaxY(float minX, float maxX) {
 		float min = Math.min(minX, maxX);
 		float max = Math.max(minX, maxX);
 		float result = Math.max(getY(minX), getY(maxX));

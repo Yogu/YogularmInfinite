@@ -1,6 +1,6 @@
 package de.yogularm.geometry;
 
-public class Straight {
+public class Straight implements NumericFunction {
 	private Vector p1;
 	private Vector p2;
 	
@@ -44,5 +44,19 @@ public class Straight {
 	
 	public boolean isBelow(Vector point) {
 		return getY(point.getX()) < point.getY();
+	}
+
+	public float getMinY(float minX, float maxX) {
+		if (isVertical())
+			return Math.min(p1.getY(), p2.getY());
+		else
+			return Math.min(getY(minX), getY(maxX));
+	}
+
+	public float getMaxY(float minX, float maxX) {
+		if (isVertical())
+			return Math.max(p1.getY(), p2.getY());
+		else
+			return Math.max(getY(minX), getY(maxX));
 	}
 }

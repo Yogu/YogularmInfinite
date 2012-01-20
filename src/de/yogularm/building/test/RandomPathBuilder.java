@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.yogularm.Config;
 import de.yogularm.building.BuildingPath;
 import de.yogularm.building.PathBuilder;
 import de.yogularm.components.general.Coin;
