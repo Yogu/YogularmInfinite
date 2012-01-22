@@ -11,6 +11,8 @@ import de.yogularm.components.general.Stone;
 import de.yogularm.geometry.Point;
 import de.yogularm.test.mock.MockComponentCollection;
 
+// TODO: Test nested pop&push
+
 public class BuildingSiteTest {
 	private ComponentCollection components;
 

@@ -10,9 +10,9 @@ import de.yogularm.geometry.Point;
 public class TestBuilder extends GuidedBuilder {
 	@Override
   protected PathBuilder getFirstPathBuilder(BuildingSite site) {
-		//return new RandomPathBuilder(new BuildingPath(site, Point.getZero()));
+		return new RandomPathBuilder(new BuildingPath(site, Point.getZero()));
 		//return new TestPathBuilder(new BuildingPath(site, Point.getZero()));
-		return new PlatformTestPathBuilder(new BuildingPath(site, Point.getZero()));
+		//return new PlatformTestPathBuilder(new BuildingPath(site, Point.getZero()));
   }
 
 	@Override

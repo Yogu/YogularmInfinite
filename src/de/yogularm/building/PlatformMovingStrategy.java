@@ -39,7 +39,7 @@ class PlatformMovingStrategy implements MovingStrategy {
 		List<IndexedVector> sortedTargets = getSortedTargets(move);
 		
 		for (IndexedVector startTarget : sortedTargets) {
-			MovingDetails firstMove = new MovingDetails(move.source, startTarget.vector.toPoint(), null);
+			MovingDetails firstMove = new MovingDetails(move.source, startTarget.vector.toPoint().add(0, 1), null);
 			Collection<Point> firstTrace = buildingPath.getTrace(firstMove);
 			if (firstTrace != null) {
 				System.out.println("   Can reach platform target " + startTarget.index);
@@ -52,7 +52,7 @@ class PlatformMovingStrategy implements MovingStrategy {
 					secondTrace.addAll(newTrace);
 					if (buildingPath.getBuildingSite().areFree(secondTrace)) {
 						System.out.println("   Can ride to target " + currentIndex);
-						MovingDetails thirdMove = new MovingDetails(currentTarget.toPoint(), move.target, null);
+						MovingDetails thirdMove = new MovingDetails(currentTarget.toPoint().add(0, 1), move.target, null);
 						Collection<Point> thirdTrace = buildingPath.getTrace(thirdMove);
 						if (thirdTrace != null) {
 							System.out.println("   Works with platform");

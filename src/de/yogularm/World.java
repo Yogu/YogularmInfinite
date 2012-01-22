@@ -93,7 +93,7 @@ public class World {
 		int maxX = (int)Math.ceil(renderRange.getRight());
 		int minY = (int)Math.floor(renderRange.getBottom());
 		int maxY = (int)Math.ceil(renderRange.getTop());
-		Color keepFreeColor = new Color(0.5f, 0.5f, 1, 0.2f);
+		Color keepFreeColor = new Color(0, 0, 0.5f, 0.12f);
 		Color freeColor = new Color(0, 1, 0, 0.2f);
 		Color temporarilyBlockedColor = new Color(1, 0.5f, 0, 0.5f);
 		Color blockedColor = new Color(1, 0, 0, 0.5f);

@@ -258,8 +258,9 @@ public class BuildingSite {
 				}
 			popAndApply();
 			return true;
-		} finally {
+		} catch (RuntimeException e) {
 			popAndDiscard();
+			throw e;
 		}
 	}
 	
@@ -386,7 +387,7 @@ public class BuildingSite {
 	private Collection<Point> getPlatformCells(Platform platform) {
 		Vector[] targets = platform.getTargets();
 		Vector origin = platform.getOrigin();
-		Rect dimensions = new Rect(0, 0, 1, 1);
+		Rect dimensions = new Rect(-0.5f, -0.5f, 1.5f, 1.5f); // platforms are inaccurate
 		Collection<Point> cells = new ArrayList<Point>();
 		for (int i = 0; i < targets.length; i++) {
 			Vector source = origin.add(targets[i]);

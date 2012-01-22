@@ -74,7 +74,7 @@ public class Game {
 
 	public void render(RenderContext context) {
 		long time = System.nanoTime();
-		context.clear(CLEAR_COLOR);
+		context.clear(Config.DEBUG_BUILDING ? Color.white : CLEAR_COLOR);
 		world.render(context);
 		renderGUI(context);
 		smoothRenderTime.set((System.nanoTime() - time) / 1000000000.0); // ns to s

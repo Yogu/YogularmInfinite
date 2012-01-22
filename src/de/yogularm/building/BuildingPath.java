@@ -117,7 +117,7 @@ public class BuildingPath {
 	public List<Point> getReachablePositions() {
 		StackEntry entry = stack.peek();
 		if (entry.reachablePositions == null)
-			entry.reachablePositions = calculateReachablePositions();
+			entry.reachablePositions = calculateReachablePositions(getCurrentWaypoint());
 		return entry.reachablePositions;
 	}
 
@@ -125,18 +125,17 @@ public class BuildingPath {
 		return stack.peek().lastTrace;
 	}
 
-	private List<Point> calculateReachablePositions() {
+	public List<Point> calculateReachablePositions(Point origin) {
 		List<Point> list = new ArrayList<Point>();
-		Point s = getCurrentWaypoint();
 		Parabola parabola = new Parabola(getParabolaFactor(), getJumpApex());
 
 		for (int y = (int) jumpApex.getY(); y >= -MAX_REACHABLE_DISTANCE; y--) {
 			float maxX = parabola.getX2(y);
 			for (int x = 1; x <= maxX; x++) {
-				Point p = s.add(x, y);
+				Point p = origin.add(x, y);
 				if (getBuildingSite().isFree(p))
 					list.add(p);
-				p = s.add(-x, y);
+				p = origin.add(-x, y);
 				if (getBuildingSite().isFree(p))
 					list.add(p);
 			}
@@ -161,9 +160,11 @@ public class BuildingPath {
 	 */
 	List<Point> getTrace(MovingDetails move) {
 		for (MovingStrategy strategy : movingStrategies) {
-			List<Point> trace = strategy.getTrace(move);
-			if (trace != null)
-				return trace;
+			if (move.platform == null || strategy instanceof PlatformMovingStrategy) {
+				List<Point> trace = strategy.getTrace(move);
+				if (trace != null)
+					return trace;
+			}
 		}
 		return null;
 	}

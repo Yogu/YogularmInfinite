@@ -18,13 +18,13 @@ public class Config {
 	public static float GRAVITY_ACCELERATION = 9.81f;
 	public static float ARROW_SPEED = 20f;
 	public static float ADHESION = 10;
-	public static float AIR_ADHESION = 1;
+	public static float AIR_ADHESION = 1.5f;//1;
 	public static float EPSILON = 0.00001f;
 	public static float ON_GROUND_EPSILON = 0.1f;
 	
 	// Gameplay
 	public static float MAX_FRAMETIME = 0.1f;
-	public static float DEATH_FALL_SPEED = 30;//20;
+	public static float DEATH_FALL_SPEED = 20;
 	// public static float DEATH_Y_POS = -120;
 	public static float INIT_LIFE = 1;//3;
 	public static float IMMUNE_TIME = 2;
