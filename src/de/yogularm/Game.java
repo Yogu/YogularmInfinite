@@ -24,7 +24,8 @@ public class Game {
 
 	private long lastFrameTime;
 	private float frameTime;
-	private long frameCount = 0;
+	@SuppressWarnings("unused")
+  private long frameCount = 0;
 	private ValueSmoothener smoothFrameTime = new ValueSmoothener(SMOOTH_TIME);
 	private ValueSmoothener smoothUpdateTime = new ValueSmoothener(SMOOTH_TIME);;
 	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);;

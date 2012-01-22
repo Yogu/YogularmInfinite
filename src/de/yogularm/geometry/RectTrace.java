@@ -29,7 +29,7 @@ public class RectTrace {
 	public Collection<Point> getCollidingCells() {
 		List<Point> list = new ArrayList<Point>();
 		IntegerRange xRange = getColumnRange();
-		for (int x = xRange.getMin(); x < xRange.getMax(); x++) {
+		for (int x = xRange.getMin(); x <= xRange.getMax(); x++) {
 			IntegerRange yRange = getColumnYRange(x);
 			for (int y = yRange.getMin(); y <= yRange.getMax(); y++)
 				list.add(new Point(x, y));
@@ -56,7 +56,7 @@ public class RectTrace {
 	 */
 	public IntegerRange getColumnYRange(int gridX) {
 		float totalLeftX = Math.min(startX, targetX) + rectDimensions.getLeft();
-		float totalRightX = Math.max(startX, targetX) + rectDimensions.getRight();
+		float totalRightX = Math.max(startX, targetX) + rectDimensions.getRight() - 1; // grid positions
 		
 		int leftX = gridX;
 		int rightX = gridX + 1;
@@ -64,8 +64,10 @@ public class RectTrace {
 		// left cell edge touches right rect edge
 		float funcX1 = Math.max(totalLeftX, leftX - rectDimensions.getRight());
 		float funcX2 = Math.min(totalRightX, rightX - rectDimensions.getLeft());
-		int minY = (int)Math.floor(baseFunction.getMinY(funcX1, funcX2));
-		int maxY = (int)Math.ceil(baseFunction.getMaxY(funcX1, funcX2)) - 1; // grid positions
+		float funcMinY = baseFunction.getMinY(funcX1, funcX2);
+		float funcMaxY = baseFunction.getMaxY(funcX1, funcX2);
+		int minY = (int)Math.floor(funcMinY + rectDimensions.getBottom());
+		int maxY = (int)Math.ceil(funcMaxY + rectDimensions.getTop()) - 1; // grid positions
 		return new IntegerRange(minY, maxY);
 	}
 }

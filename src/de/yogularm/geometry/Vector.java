@@ -208,4 +208,13 @@ public class Vector {
 		else
 			return Direction.NONE;
 	}
+	
+	/**
+	 * Rounds this vector and converts it into a point
+	 * 
+	 * @return A point
+	 */
+	public Point toPoint() {
+		return new Point(Math.round(x), Math.round(y));
+	}
 }

@@ -12,7 +12,10 @@ package de.yogularm.utils;
 // removed link to collections framework docs
 // END android-note
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;

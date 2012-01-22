@@ -41,7 +41,7 @@ public abstract class GuidedBuilder implements Builder2 {
 	  			throw new RuntimeException("Path builder missed to pop");
 	  		buildCalls++;
 	  		if (buildCalls > MAX_BUILD_CALLS) {
-	  			System.out.println("Path builder got stuck!");
+	  			//System.out.println("Path builder got stuck!");
 	  			if (REMOVE_WHEN_STUCK) {
 		  			if (toRemove == null)
 		  				toRemove = new ArrayList<PathBuilder>();

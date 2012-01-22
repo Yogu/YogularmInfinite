@@ -59,4 +59,8 @@ public class Straight implements NumericFunction {
 		else
 			return Math.max(getY(minX), getY(maxX));
 	}
+	
+	public String toString() {
+		return String.format("Straight through %s and %s", p1, p2);
+	}
 }

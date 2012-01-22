@@ -93,10 +93,12 @@ public class World {
 		int maxX = (int)Math.ceil(renderRange.getRight());
 		int minY = (int)Math.floor(renderRange.getBottom());
 		int maxY = (int)Math.ceil(renderRange.getTop());
-		Color freeColor = new Color(0, 1, 0, 0.2f);
-		//Color takenColor = new Color(1, 0.5f, 0, 0.5f);
-		Color blockedColor = new Color(1, 0, 0, 0.5f);
 		Color keepFreeColor = new Color(0.5f, 0.5f, 1, 0.2f);
+		Color freeColor = new Color(0, 1, 0, 0.2f);
+		Color temporarilyBlockedColor = new Color(1, 0.5f, 0, 0.5f);
+		Color blockedColor = new Color(1, 0, 0, 0.5f);
+		
+		//Color takenColor = new Color(1, 0.5f, 0, 0.5f);
 		Color safeColor = new Color(0, 0, 1, 0.2f);
 		for (int x = minX; x <= maxX; x++) {
 			for (int y = minY; y <= maxY; y++) {
@@ -104,8 +106,10 @@ public class World {
 				Rect r = new Rect(x, y, x + 1, y + 1);
 				if (buildingSite.isKeptFree(p))
 					context.setColor(keepFreeColor);
-				else if (buildingSite.canPlace(p))
+				else if (buildingSite.isAlwaysFree(p))
 					context.setColor(freeColor);
+				else if (buildingSite.isFree(p))
+					context.setColor(temporarilyBlockedColor);
 				else
 					context.setColor(blockedColor);
 				context.drawRect(r);

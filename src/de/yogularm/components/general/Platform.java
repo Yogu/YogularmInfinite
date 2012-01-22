@@ -85,6 +85,10 @@ public class Platform extends Block {
 		origin = value;
 	}
 	
+	public Vector getOrigin() {
+		return origin;
+	}
+	
 	public boolean isBreakingEnabled() {
 		return enableBreaking;	
 	}
@@ -98,7 +102,7 @@ public class Platform extends Block {
 		
 		if (targets.length > 1) {
 			Vector target = targets[currentTarget].add(origin);
-			Vector source = currentTarget >= targets.length - 1 ? targets[0] : targets[currentTarget + 1];
+			Vector source = currentTarget < 1 ? targets[targets.length - 1] : targets[currentTarget - 1];
 			source = source.add(origin);
 			if (hasArrived(source, target)) {
 				if (enableBreaking && elapsedPauseTime < pauseTime) {

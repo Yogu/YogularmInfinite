@@ -2,18 +2,24 @@ package de.yogularm.building;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import de.yogularm.components.Body;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.general.Platform;
 import de.yogularm.geometry.Point;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.RectTrace;
+import de.yogularm.geometry.Straight;
+import de.yogularm.geometry.Vector;
 import de.yogularm.utils.ArrayDeque;
 import de.yogularm.utils.Deque;
 
 /**
- * Every grid position can have the following flags:
+ * Every grid cell can have the following flags:
  * 
  *  - blocked (by solid body)
  *  - taken (by any component)
@@ -38,9 +44,11 @@ public class BuildingSite {
 	private static final int SECTOR_HEIGHT = 15;
 
 	private static final byte FLAG_BLOCKED = 0x01;
-	private static final byte FLAG_KEEP_FREE = 0x02;
+	private static final byte FLAG_TEMPORARILY_BLOCKED = 0x10; // by platforms
+	private static final byte FLAG_KEEP_FREE = 0x02; // may be blocked temporarily
+	
 	private static final byte FLAG_SAFE = 0x04;
-	private static final byte FLAG_TAKEN = 0x08; // by non-solid component
+	private static final byte FLAG_TAKEN = 0x08; // by solid or non-solid component
 	
 	public BuildingSite(ComponentCollection components) {
 		this.components = components;
@@ -110,18 +118,32 @@ public class BuildingSite {
 	 */
 	public boolean place(Component component, Point position) {
 		byte flags = getFlags(position);
-		boolean isSolid = component instanceof Body && ((Body)component).isSolid();
+		boolean isPlatform = component instanceof Platform;
+		boolean isSolid = !isPlatform && component instanceof Body && ((Body)component).isSolid();
 		boolean isClimbable = component instanceof Body && ((Body)component).isClimbable();
+
+		Collection<Point> platformCells;
 		
-		if ((flags & FLAG_TAKEN) != 0 || (isSolid && (flags & FLAG_KEEP_FREE) != 0))
-			return false;
+		// ============== Check ==============
 		
-		flags |= FLAG_TAKEN;
-		if (isSolid) {
-			makeSafe(position.add(0, 1));
-			flags |= FLAG_BLOCKED;
-		} else if (isClimbable)
-			flags |= FLAG_SAFE;
+		if (component instanceof Platform) {
+			platformCells = getPlatformCells((Platform)component);
+			if (!areAlwaysFree(platformCells))
+				return false;
+		} else {
+			if ((flags & FLAG_TAKEN) != 0 || (isSolid && (flags & FLAG_KEEP_FREE) != 0))
+				return false;
+			
+			flags |= FLAG_TAKEN;
+			if (isSolid) {
+				flags |= FLAG_BLOCKED;
+			} else if (isClimbable)
+				flags |= FLAG_SAFE;
+			
+			platformCells = null;
+		}
+
+		// ============== Do ==============
 		
 		component.setPosition(position.toVector());
 		StackEntry entry = stack.peek();
@@ -130,14 +152,26 @@ public class BuildingSite {
 		else
 			components.add(component);
 		setFlags(position, flags);
+		
+		if (isSolid)
+			makeSafe(position.add(0, 1));
+		if (platformCells != null) {
+			for (Point cell : platformCells) {
+				addFlags(cell, FLAG_TEMPORARILY_BLOCKED);
+			}
+		}
+		
 		return true;
 	}
 	
 	/**
 	 * Checks whether the player can freely move in the specified position.
 	 * 
-	 * Note that this method returns <code>true</code> on an item although no more component can be
-	 * placed there. See {@link #canPlace(Point)}) to check whether a component can be placed.
+	 * <p>If the cell is temporarily blocked (e.g. by a moving platform), this method returns
+	 * <code>true</code>, anyway. See {@link #isAlwaysFree(Point)}.</p>
+	 * 
+	 * <p>Note that this method returns <code>true</code> on an item although no more component can be
+	 * placed there. See {@link #canPlace(Point)} to check whether a component can be placed.</p>
 	 *   
 	 * @param position
 	 * @return <code>true</code>, if the specified position is free for moving
@@ -146,11 +180,58 @@ public class BuildingSite {
 		return (getFlags(position) & FLAG_BLOCKED) == 0;
 	}
 	
+	public boolean areFree(Collection<Point> cells) {
+		for (Point cell : cells)
+			if (!isFree(cell))
+				return false;
+		return true;
+	}
+	
+	/**
+	 * Checks whether the specified cell is never blocked.
+	 * 
+	 * <p>Note that this method returns <code>true</code> on an item although no more component can be
+	 * placed there. See {@link #canPlace(Point)} to check whether a component can be placed.</p>
+	 *   
+	 * @param position
+	 * @return <code>true</code>, if the specified position is free for moving
+	 */
+	public boolean isAlwaysFree(Point position) {
+		return (getFlags(position) & (FLAG_BLOCKED | FLAG_TEMPORARILY_BLOCKED)) == 0;
+	}
+	
+	public boolean areAlwaysFree(Collection<Point> cells) {
+		for (Point cell : cells)
+			if (!isAlwaysFree(cell))
+				return false;
+		return true;
+	}
+	
+	/**
+	 * Checks whether the player can stay at the specified cell without falling down
+	 * 
+	 * @param position the cell to check
+	 * @return <code>true</code>, if the specified cell is safe
+	 */
 	public boolean isSafe(Point position) {
 		byte flags = getFlags(position);
 		return (flags & FLAG_SAFE) != 0 && (flags & FLAG_BLOCKED) == 0;
 	}
 	
+	public boolean areSafe(Collection<Point> cells) {
+		for (Point cell : cells)
+			if (!isSafe(cell))
+				return false;
+		return true;
+	}
+	
+	/**
+	 * Prevents the specified cell from being blocked in future. The cell may be blocked temporarily,
+	 * anyway.
+	 * 
+	 * @param position the cell to keep free
+	 * @return <code>false</code>, if flag is already blocked 
+	 */
 	public boolean keepFree(Point position) {
 		byte flags = getFlags(position);
 		if ((flags & FLAG_BLOCKED) != 0)
@@ -160,8 +241,37 @@ public class BuildingSite {
 		return true;
 	}
 	
+	/**
+	 * Tries to keep all specified cells free. If one cell can't be kept free, nothing is done.
+	 * 
+	 * @param cells The cells to keep free
+	 * @return
+	 */
+	public boolean keepFree(Collection<Point> cells) {
+		// Maybe check first, then apply? May be faster than push&pop
+		push();
+		try {
+			for (Point cell : cells)
+				if (!keepFree(cell)) {
+					popAndDiscard();
+					return false;
+				}
+			popAndApply();
+			return true;
+		} finally {
+			popAndDiscard();
+		}
+	}
+	
 	public boolean isKeptFree(Point position) {
 		return (getFlags(position) & FLAG_KEEP_FREE) != 0;
+	}
+	
+	public boolean areKeptFree(Collection<Point> cells) {
+		for (Point cell : cells)
+			if (!isKeptFree(cell))
+				return false;
+		return true;
 	}
 	
 	public boolean canPlaceSolid(Point position) {
@@ -262,5 +372,29 @@ public class BuildingSite {
 		int x = getOffsetInSector(position.getX(), SECTOR_WIDTH);
  		int y = getOffsetInSector(position.getY(), SECTOR_HEIGHT);
 		arr[x][y] = flags;
+	}
+	
+	private void addFlags(Point position, byte flags) {
+		setFlags(position, (byte)(getFlags(position) | flags));
+	}
+	
+	@SuppressWarnings("unused")
+  private void removeFlags(Point position, byte flags) {
+		setFlags(position, (byte)(getFlags(position) & ~flags));
+	}
+	
+	private Collection<Point> getPlatformCells(Platform platform) {
+		Vector[] targets = platform.getTargets();
+		Vector origin = platform.getOrigin();
+		Rect dimensions = new Rect(0, 0, 1, 1);
+		Collection<Point> cells = new ArrayList<Point>();
+		for (int i = 0; i < targets.length; i++) {
+			Vector source = origin.add(targets[i]);
+			Vector target = origin.add(targets[(i + 1 < targets.length) ? i + 1 : 0]);
+			Straight straight = new Straight(source, target);
+			RectTrace trace = new RectTrace(straight, dimensions, source.getX(), target.getX());
+			cells.addAll(trace.getCollidingCells());
+		}
+		return cells;
 	}
 }
