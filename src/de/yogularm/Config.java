@@ -12,7 +12,7 @@ public class Config {
 	// Physics
 	public static float PLAYER_SPEED = 4;
 	public static float PLAYER_CLIMB_SPEED = 2;
-	public static float CLIMB_ACCELERATION = 20;
+	public static float CLIMB_ACCELERATION = 30;//20;
 	//public static float PLAYER_ACCELERATION = 20;
 	public static float PLAYER_JUMP_SPEED = 5.2f;
 	public static float GRAVITY_ACCELERATION = 9.81f;

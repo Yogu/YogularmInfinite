@@ -131,7 +131,8 @@ public class BuildingSite {
 			if (!areAlwaysFree(platformCells))
 				return false;
 		} else {
-			if ((flags & FLAG_TAKEN) != 0 || (isSolid && (flags & FLAG_KEEP_FREE) != 0))
+			if ((flags & FLAG_TAKEN) != 0
+				|| (isSolid && (flags & (FLAG_KEEP_FREE | FLAG_TEMPORARILY_BLOCKED)) != 0))
 				return false;
 			
 			flags |= FLAG_TAKEN;

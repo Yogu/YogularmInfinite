@@ -26,7 +26,7 @@ public class GroundBuilder extends BuilderBase {
 	private static final int INIT_SKY_HEIGHT = 10;
 	private static final int HIGH_SKY_HEIGHT = 30; // sky is forced to go downward
 	private static final int MAX_SKY_HEIGHT = 40; // sky is removed temporarily
-	private static final int SKY_RECREATE_DELAY = 10; // distance without sky if removed [m]
+	//private static final int SKY_RECREATE_DELAY = 10; // distance without sky if removed [m]
 	private static final int SKY_DELAY = 5; // sky is created x meters behind the ground
 
 	public void init(ComponentCollection components, Vector buildingPosition) {
@@ -118,11 +118,11 @@ public class GroundBuilder extends BuilderBase {
 		}
 	}
 
-	private boolean isCheckpoint(int indexOffset) {
+	/*private boolean isCheckpoint(int indexOffset) {
 		return false;
 		/*
 		 * int index = getCurrentIndex() + indexOffset; return index %
 		 * Config.CHECKPOINT_RANGE == Config.CHECKPOINT_RANGE - 1;
 		 */
-	}
+	//}
 }

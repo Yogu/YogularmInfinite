@@ -31,7 +31,7 @@ public class Game {
 	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);;
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
-	public static final String VERSION = "0.4pre2";
+	public static final String VERSION = "0.4pre3";
 	private static final double SMOOTH_TIME = 0.33f; // [second]
 	
 	public Game() {

@@ -38,17 +38,13 @@ public class RandomPathBuilder extends PathBuilder {
 				System.out.println("  No right position available");
 			}
 
-			getPath().push();
-
 			newWaypoint = goodPositions.get(random.nextInt(goodPositions.size()));
 			System.out.printf("  Trying: %s -> %s\n", getPath().getCurrentWaypoint(), newWaypoint);
 			if (tryBuildTo(newWaypoint)) {
-				getPath().popAndApply();
 				break;
 			} else {
 				reachablePositions.remove(newWaypoint);
 				goodPositions.remove(newWaypoint);
-				getPath().popAndDiscard();
 			}
 		}
 
@@ -86,12 +82,17 @@ public class RandomPathBuilder extends PathBuilder {
 	private boolean tryBuildTo(Point target) {
 		WeightedCollection<StructureBuilder> builders = getStructureBuilders();
 		while (builders.size() > 0) {
+			getPath().push();
+			
 			StructureBuilder builder = builders.getRandom();
 			System.out.println("   Trying with " + builder.getClass().getSimpleName());
-			if (builder.tryBuildTo(target))
+			if (builder.tryBuildTo(target)) {
+				getPath().popAndApply();
 				return true;
-			else
-				builders.remove(builder);
+			}
+			
+			builders.remove(builder);
+			getPath().popAndDiscard();
 		}
 		return false;
 	}
@@ -100,7 +101,7 @@ public class RandomPathBuilder extends PathBuilder {
 		WeightedCollection<StructureBuilder> structureBuilders =
 		  new WeightedCollection<StructureBuilder>();
 		structureBuilders.add(new StoneBuilder(), 50);
-		//structureBuilders.add(new LadderBuilder(), 0.5f);
+		structureBuilders.add(new LadderBuilder(), 0.5f);
 		structureBuilders.add(new PlatformBuilder(), 1);
 		return structureBuilders;
 	}
@@ -112,7 +113,8 @@ public class RandomPathBuilder extends PathBuilder {
 		}
 	}
 
-	private class LadderBuilder implements StructureBuilder {
+	@SuppressWarnings("unused")
+  private class LadderBuilder implements StructureBuilder {
 		public boolean tryBuildTo(Point target) {
 			int y = 0;
 			while (y < MIN_LADDER_LENGTH || (Math.random() <= LADDER_LENGTH_FACTOR)) {
@@ -133,7 +135,7 @@ public class RandomPathBuilder extends PathBuilder {
 			Random random = new Random();
 
 			Platform platform = new Platform(getComponents());
-			platform.setOrigin(target.toVector());
+			platform.setOrigin(target.add(0, -1).toVector());
 			boolean platformPlaced = false;
 			Point platformDelta = Point.ZERO;
 			for (int i = 0; i < MAX_DELTA_TRIES; i++) {

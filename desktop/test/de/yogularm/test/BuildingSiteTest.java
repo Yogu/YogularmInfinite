@@ -1,28 +1,20 @@
 package de.yogularm.test;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import de.yogularm.building.BuildingSite;
+import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.general.Ladder;
 import de.yogularm.components.general.Stone;
 import de.yogularm.geometry.Point;
 import de.yogularm.test.mock.MockComponentCollection;
 
-// TODO: Test nested pop&push
-
 public class BuildingSiteTest {
-	private ComponentCollection components;
-
-  @Before
-  public void setUp() {
-		components = new MockComponentCollection();
-  }
-
 	@Test
 	public void testInitState() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		Assert.assertFalse(site.canPop());
 	}
@@ -46,17 +38,21 @@ public class BuildingSiteTest {
 			new Point(0, 16)
 		};
 		for (Point p : points) {
+			ComponentCollection components = new MockComponentCollection();
 			BuildingSite site = new BuildingSite(components);
-			placeSolid(site, p);
+			placeSolid(components, site, p);
 		}
 	}
 
 	@Test
 	public void testPush() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
+		placeSolid(components, site, new Point(5, 5));
 		site.push();
-		placeSolid(site, Point.ZERO);
-		placeSolid(site, new Point(-1, -1));
+		Assert.assertFalse(site.isFree(new Point(5, 5)));
+		placeSolid(components, site, Point.ZERO);
+		placeSolid(components, site, new Point(-1, -1));
 		Assert.assertTrue(site.canPop());
 		site.popAndDiscard();
 		Assert.assertFalse(site.canPop());
@@ -64,17 +60,21 @@ public class BuildingSiteTest {
 
 	@Test
 	public void testPopAndApply() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		site.push();
-		site.place(new Stone(components), Point.ZERO);
+		Component component = new Stone(components);
+		site.place(component, Point.ZERO);
 		site.place(new Stone(components), new Point(5, 0));
 		site.popAndApply();
 		Assert.assertFalse(site.isFree(Point.ZERO));
 		Assert.assertFalse(site.isFree(new Point(5, 0)));
+		Assert.assertTrue(components.contains(component));
 	}
 
 	@Test
 	public void testPopAndApplyWithUnpushed() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		site.place(new Stone(components), new Point(3, 0));
 		site.push();
@@ -87,17 +87,21 @@ public class BuildingSiteTest {
 
 	@Test
 	public void testPopAndDiscard() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		site.push();
-		site.place(new Stone(components), Point.ZERO);
+		Component component = new Stone(components);
+		site.place(component, Point.ZERO);
 		site.place(new Stone(components), new Point(5, 0));
 		site.popAndDiscard();
 		Assert.assertTrue(site.isFree(Point.ZERO));
 		Assert.assertTrue(site.isFree(new Point(5, 0)));
+		Assert.assertFalse(components.contains(component));
 	}
 
 	@Test
 	public void testPopAndDiscardWithUnpushed() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		site.place(new Stone(components), new Point(3, 0));
 		site.push();
@@ -107,15 +111,34 @@ public class BuildingSiteTest {
 		Assert.assertTrue(site.isFree(Point.ZERO));
 		Assert.assertTrue(site.isFree(new Point(5, 0)));
 	}
+
+	@Test
+	public void testDeepPop() {
+		ComponentCollection components = new MockComponentCollection();
+		BuildingSite site = new BuildingSite(components);
+		site.place(new Stone(components), Point.ZERO);
+		site.push();
+			site.place(new Stone(components), new Point(1, 0));
+			site.push();
+				Assert.assertFalse(site.isFree(new Point(1, 0)));
+				site.place(new Stone(components), new Point(2, 0));
+				Assert.assertFalse(site.isFree(new Point(2, 0)));
+			site.popAndDiscard();
+			Assert.assertTrue(site.isFree(new Point(2, 0)));
+		site.popAndDiscard();
+		Assert.assertTrue(site.isFree(new Point(1, 0)));
+		Assert.assertTrue(site.isFree(new Point(2, 0)));
+	}
 	
 	@Test
 	public void testLadders() {
+		ComponentCollection components = new MockComponentCollection();
 		BuildingSite site = new BuildingSite(components);
 		site.place(new Ladder(components), new Point(0, 0));
 		Assert.assertTrue(site.isSafe(new Point(0, 0)));
 	}
 	
-	private void placeSolid(BuildingSite site, Point position) {
+	private void placeSolid(ComponentCollection components, BuildingSite site, Point position) {
 		//System.out.printf("Placing solid to %s\n", position);
 		Assert.assertTrue(site.canPlace(position));
 		Assert.assertTrue(site.canPlaceSolid(position));

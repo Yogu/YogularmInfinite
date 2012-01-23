@@ -103,7 +103,7 @@ public class WeightedCollection<T> implements Collection<T> {
   public boolean removeAll(Collection<?> c) {
 		boolean changed = false;
 	  for (Object e : c) {
-	  	if (remove(c))
+	  	if (remove(e))
 	  		changed = true;
 	  }
 	  return changed;	  	

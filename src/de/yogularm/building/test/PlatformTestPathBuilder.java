@@ -24,7 +24,8 @@ public class PlatformTestPathBuilder extends PathBuilder {
 		finished = true;
 	}
 	
-	private void build1() {
+	@SuppressWarnings("unused")
+  private void build1() {
 		Point target = new Point(8, 2);
 		Point origin = new Point(2, 0);
 		Platform platform = new Platform(getComponents());
@@ -35,7 +36,8 @@ public class PlatformTestPathBuilder extends PathBuilder {
 		getPath().place(new Stone(getComponents()), target.add(0, -1));
 		getPath().setWaypointUsingPlatform(target, platform);
 	}
-	
+
+	@SuppressWarnings("unused")
 	private void build2() {
 		Point target = new Point(8, 10);
 		Point origin = new Point(2, 0);
