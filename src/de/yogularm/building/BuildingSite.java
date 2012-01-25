@@ -119,29 +119,34 @@ public class BuildingSite {
 	public boolean place(Component component, Point position) {
 		byte flags = getFlags(position);
 		boolean isPlatform = component instanceof Platform;
-		boolean isSolid = !isPlatform && component instanceof Body && ((Body)component).isSolid();
+		boolean isCharacter = component instanceof de.yogularm.components.Character;
+		boolean isBlock = !isPlatform && !isCharacter
+			&& component instanceof Body && ((Body)component).isSolid();
 		boolean isClimbable = component instanceof Body && ((Body)component).isClimbable();
 
-		Collection<Point> platformCells;
+		Collection<Point> platformCells = null;
 		
 		// ============== Check ==============
 		
-		if (component instanceof Platform) {
+		if (isPlatform) {
 			platformCells = getPlatformCells((Platform)component);
 			if (!areAlwaysFree(platformCells))
 				return false;
+		} else if (isCharacter) {
+			// Don't place characters in platform's area
+			if ((flags & (FLAG_BLOCKED | FLAG_TEMPORARILY_BLOCKED)) != 0)
+				return false;
+			flags |= FLAG_TEMPORARILY_BLOCKED;
 		} else {
 			if ((flags & FLAG_TAKEN) != 0
-				|| (isSolid && (flags & (FLAG_KEEP_FREE | FLAG_TEMPORARILY_BLOCKED)) != 0))
+				|| (isBlock && (flags & (FLAG_KEEP_FREE | FLAG_TEMPORARILY_BLOCKED)) != 0))
 				return false;
 			
 			flags |= FLAG_TAKEN;
-			if (isSolid) {
+			if (isBlock) {
 				flags |= FLAG_BLOCKED;
 			} else if (isClimbable)
 				flags |= FLAG_SAFE;
-			
-			platformCells = null;
 		}
 
 		// ============== Do ==============
@@ -154,8 +159,9 @@ public class BuildingSite {
 			components.add(component);
 		setFlags(position, flags);
 		
-		if (isSolid)
+		if (isBlock)
 			makeSafe(position.add(0, 1));
+		
 		if (platformCells != null) {
 			for (Point cell : platformCells) {
 				addFlags(cell, FLAG_TEMPORARILY_BLOCKED);
@@ -331,9 +337,9 @@ public class BuildingSite {
 	}
 	
 	private byte[][] deepCopyArray(byte[][] arr) {
-		byte[][] newArr = Arrays.copyOf(arr, arr.length);
+		byte[][] newArr = de.yogularm.utils.Arrays.copyOf(arr, arr.length);
 		for (int x = 0; x < arr.length; x++) {
-			newArr[x] = Arrays.copyOf(newArr[x], newArr[x].length);
+			newArr[x] = de.yogularm.utils.Arrays.copyOf(newArr[x], newArr[x].length);
 		}
 		return newArr;
 	}

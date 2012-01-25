@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="de.yogularm.android"
-      android:versionName="0.4.0* Alpha" android:versionCode="5">
+      android:versionName="0.4pre3 Alpha" android:versionCode="6">
     <uses-sdk android:minSdkVersion="8" />
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">

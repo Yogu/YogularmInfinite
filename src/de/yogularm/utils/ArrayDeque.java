@@ -802,7 +802,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     public ArrayDeque<E> clone() {
         try {
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();
-            result.elements = Arrays.copyOf(elements, elements.length);
+            result.elements = de.yogularm.utils.Arrays.copyOf(elements, elements.length);
             return result;
 
         } catch (CloneNotSupportedException e) {

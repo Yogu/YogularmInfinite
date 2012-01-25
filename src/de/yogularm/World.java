@@ -18,7 +18,7 @@ import de.yogularm.geometry.Vector;
 public class World {
 	// private static List<Builder> builders = new ArrayList<Builder>();
 
-	public static final int MIN_BUFFER_LENGTH = 50;
+	public static final int MIN_BUFFER_LENGTH = (int)(Config.MAX_VIEW_WIDTH * 2);
 	public static final int MAX_BUFFER_LENGTH = Integer.MAX_VALUE;//200;
 	
 	private static final int RENDER_RANGE_BUFFER = 4;
