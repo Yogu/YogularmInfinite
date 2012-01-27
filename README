@@ -19,24 +19,27 @@ How to develop
 
 1. Eclipse (http://eclipse.org/) must be installed, and this repository
    downloaded completely.
-2. Create a new Java project, but do not use the default location but the one
-   this repository is placed.
-3. Setup the JOGL user library:
-   1. Select Window > Preferences > Java > Build Path > User Libraries > New and
-      name it JOGL
-   2. Click Add JARs to add ./Thirdparty/jogl/jar/*.all.jar and
-      ./Thirdparty/jogl/jar/*.your-platform.jar
-   3. Expand the platform specific jars, and set the library location to
-      ./Thirdparty/jogl/your-platform
-   4. Select Project > Properties > Java Build Path > Libraries and include the
-      JOGL user library
-4. Build the project and launch it using the de.yogularm.launcher.SwingLauncher
-   class
-
-You can export the project to a jar file using File > Export.
-
-Java WebStart is a little bit more complicated to set up. Instructions can be
-found at http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start
+   - If you want to develop for android, install the android sdk next:
+     http://developer.android.com/sdk/index.html
+2. Import the projects (de.yogularm.common and is required, the others are
+   optional) into your workspace.
+3. If you want to develop for desktop, set up the correct native libraries:
+   - Right-click on de.yogularm.desktop > Properties > Java Build Path >
+     Libraries
+   - Expand gluegen-rt.jar, select Native Library Location, and click edit
+   - Click Workspace... and browse to de.yogular.desktop > lib > jogl
+   - Select the folder that corresponds to your system (e.g. windows-amd64)
+   - two times OK
+4. If you want to distribute your own edition of Yogularm, you should set up
+   Java WebStart. If you only want to run it locally, you don't need this step.
+   - Read the article about how to create keystore [1]
+   - Save the keystore as de.yogularm.desktop/build/keystore
+   - Copy de.yogularm.desktop/build/default.properties to build.properties and
+     insert the storepass as value for sign.storepass
+5. Build the complete workspace. It may be neccessary to open a java file, make
+   a little change, save it, undo the change and save it again before compiling.
+6. Open the file de.yogularm.desktop/src/de.yogularm.desktop/SwingLauncher.java
+   and run it as a Java Application.
 
 It is recommended to fork the git repository available on
 http://github.com/Yogu/YogularmInfinite. If you do so, please .gitignore the
@@ -49,3 +52,9 @@ http://www.yogularm.de/infinite
 http://github.com/Yogu/YogularmInfinite
 
 info@yogularm.de
+
+
+References
+==========
+
+[1] http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start#Signing_your_JARs
