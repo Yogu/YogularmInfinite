@@ -19,7 +19,7 @@
     <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
     <property name="sun.java2d.noddraw" value="true"/>
     <extension name="JOGL" href="jogl.jnlp" />
-    <jar href="yogularm-0.3.3.jar" main="true" />
+    <jar href="yogularm-0.4.jar" main="true" />
   </resources>
 
   <application-desc

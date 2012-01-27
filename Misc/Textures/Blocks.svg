@@ -18,7 +18,7 @@
    sodipodi:docname="Blocks.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="../../src/res/textures/blocks.png"
+   inkscape:export-filename="../../common/src/de/yogularm/res/textures/blocks.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -5540,9 +5540,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.234375"
-     inkscape:cx="228.54268"
-     inkscape:cy="299.02631"
+     inkscape:zoom="1.5449219"
+     inkscape:cx="246.93805"
+     inkscape:cy="158.90771"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -5663,7 +5663,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -13653,11 +13653,11 @@
              sodipodi:cy="795.61218"
              sodipodi:rx="14.5"
              sodipodi:ry="1.5"
-             d="m 325.5,795.61218 a 14.5,1.5 0 1 1 -29,0 14.5,1.5 0 1 1 29,0 z"
+             d="m 325.5,795.61218 c 0,0.82843 -6.49187,1.5 -14.5,1.5 -8.00813,0 -14.5,-0.67157 -14.5,-1.5 0,-0.82842 6.49187,-1.5 14.5,-1.5 8.00813,0 14.5,0.67158 14.5,1.5 z"
              transform="matrix(1.2662846,0,0,5.185156,47.824363,-4533.6055)" />
           <path
              transform="matrix(1.2662846,0,0,5.185156,83.312251,-4533.6055)"
-             d="m 325.5,795.61218 a 14.5,1.5 0 1 1 -29,0 14.5,1.5 0 1 1 29,0 z"
+             d="m 325.5,795.61218 c 0,0.82843 -6.49187,1.5 -14.5,1.5 -8.00813,0 -14.5,-0.67157 -14.5,-1.5 0,-0.82842 6.49187,-1.5 14.5,-1.5 8.00813,0 14.5,0.67158 14.5,1.5 z"
              sodipodi:ry="1.5"
              sodipodi:rx="14.5"
              sodipodi:cy="795.61218"

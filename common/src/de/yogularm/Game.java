@@ -33,7 +33,7 @@ public class Game {
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
 	private static final double SMOOTH_TIME = 0.33f; // [second]
 	
-	public static final String VERSION = "0.4pre3";
+	public static final String VERSION = "0.4";
 	
 	public Game() {
 		// Init world
@@ -124,7 +124,7 @@ public class Game {
 		context.setColor(Color.black);
 
 		Font font2 =  new Font(12, EnumSet.of(FontStyle.BOLD));
-		context.drawText(new Vector(width - 185, height - 20), font2, "Yogularm Infinite " + VERSION);
+		context.drawText(new Vector(width - 153, height - 20), font2, "Yogularm Infinite " + VERSION);
 
 		// Debug
 		if (Config.DEBUG_DISPLAY_RENDER_INFO) {

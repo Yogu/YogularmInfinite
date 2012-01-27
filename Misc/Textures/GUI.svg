@@ -18,7 +18,7 @@
    sodipodi:docname="GUI.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1"
-   inkscape:export-filename="../../src/res/textures/ui.png"
+   inkscape:export-filename="../../common/src/de/yogularm/res/textures/ui.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -314,9 +314,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="27.387471"
-     inkscape:cy="75.00267"
+     inkscape:zoom="3.1679688"
+     inkscape:cx="81.680936"
+     inkscape:cy="59.851005"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showguides="true"
@@ -369,7 +369,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

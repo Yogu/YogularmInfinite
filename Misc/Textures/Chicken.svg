@@ -18,7 +18,7 @@
    sodipodi:docname="Chicken.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="../../src/res/textures/chicken.png"
+   inkscape:export-filename="../../common/src/de/yogularm/res/textures/chicken.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -8260,9 +8260,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.1679688"
-     inkscape:cx="261.09902"
-     inkscape:cy="243.95251"
+     inkscape:zoom="1.5449219"
+     inkscape:cx="256"
+     inkscape:cy="256"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"

@@ -37,14 +37,14 @@ public class Res {
 		public Image ladder;
 		public Image platform;
 		public Image platformPropeller;
-		
+
 		public Image yogu;
 		public Image yoguWalkingLeft1;
 		public Image yoguWalkingLeft2;
 		public Image yoguWalkingRight1;
 		public Image yoguWalkingRight2;
 		public Image yoguFalling;
-		
+
 		public Image chicken;
 		public Image chickenWalkingLeft1;
 		public Image chickenWalkingLeft2;
@@ -56,9 +56,9 @@ public class Res {
 		public Image chickenExploding2;
 		public Image chickenExploding3;
 		public Image chickenExploding4;
-		
+
 		public Image arrowKey;
-		
+
 		public Map<java.lang.Character, Image> numbers;
 
 		public void load() {
@@ -98,7 +98,7 @@ public class Res {
 
 			tiles = new TiledImage(Res.textures.ui, 1, 1);
 			arrowKey = tiles.get(0, 0);
-			
+
 			tiles = new TiledImage(Res.textures.numbers, 4, 4);
 			numbers = new HashMap<java.lang.Character, Image>();
 			numbers.put('1', tiles.get(0, 0));
@@ -127,20 +127,25 @@ public class Res {
 		public Animation chickenExploding;
 
 		public void load() {
-			yoguWalking = new Animation(new Image[] { Res.images.yogu, Res.images.yoguWalkingLeft1,
-				Res.images.yoguWalkingLeft2, Res.images.yoguWalkingLeft1, Res.images.yogu, Res.images.yoguWalkingRight1,
-				Res.images.yoguWalkingRight2, Res.images.yoguWalkingRight1, Res.images.yogu }, 0.1f);
+			yoguWalking =
+			  new Animation(
+			    new Image[] { Res.images.yogu, Res.images.yoguWalkingLeft1, Res.images.yoguWalkingLeft2,
+			      Res.images.yoguWalkingLeft1, Res.images.yogu, Res.images.yoguWalkingRight1,
+			      Res.images.yoguWalkingRight2, Res.images.yoguWalkingRight1 }, 0.1f);
 
-			chickenWalking = new Animation(new Image[] { Res.images.chicken, Res.images.chickenWalkingLeft1,
-				Res.images.chickenWalkingLeft2, Res.images.chickenWalkingLeft1, Res.images.chicken,
-				Res.images.chickenWalkingRight1, Res.images.chickenWalkingRight2, Res.images.chickenWalkingRight1,
-				Res.images.chicken }, 0.05f);
+			chickenWalking =
+			  new Animation(new Image[] { Res.images.chicken, Res.images.chickenWalkingLeft1,
+			    Res.images.chickenWalkingLeft2, Res.images.chickenWalkingLeft1, Res.images.chicken,
+			    Res.images.chickenWalkingRight1, Res.images.chickenWalkingRight2,
+			    Res.images.chickenWalkingRight1 }, 0.05f);
 
-			chickenFluttering = new Animation(new Image[] { Res.images.chicken, Res.images.chickenFluttering1,
-				Res.images.chicken, Res.images.chickenFluttering2 }, 0.05f);
+			chickenFluttering =
+			  new Animation(new Image[] { Res.images.chicken, Res.images.chickenFluttering1,
+			    Res.images.chicken, Res.images.chickenFluttering2 }, 0.05f);
 
-			chickenExploding = new Animation(new Image[] { Res.images.chickenExploding1, Res.images.chickenExploding2,
-				Res.images.chickenExploding3, Res.images.chickenExploding4 }, 0.05f);
+			chickenExploding =
+			  new Animation(new Image[] { Res.images.chickenExploding1, Res.images.chickenExploding2,
+			    Res.images.chickenExploding3, Res.images.chickenExploding4 }, 0.05f);
 		}
 	}
 }
