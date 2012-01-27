@@ -149,7 +149,6 @@ public class RandomPathBuilder extends PathBuilder {
 		}
 	}
 
-	@SuppressWarnings("unused")
   private class LadderBuilder implements StructureBuilder {
 		public boolean tryBuildTo(Point target) {
 			int y = 0;

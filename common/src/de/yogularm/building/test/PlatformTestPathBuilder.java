@@ -37,7 +37,6 @@ public class PlatformTestPathBuilder extends PathBuilder {
 		getPath().setWaypointUsingPlatform(target, platform);
 	}
 
-	@SuppressWarnings("unused")
 	private void build2() {
 		Point target = new Point(8, 10);
 		Point origin = new Point(2, 0);

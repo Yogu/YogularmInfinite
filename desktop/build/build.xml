@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="build" name="Prepare Yogularm for Java Web Start">
+	<property file="build.properties" />
+	<property file="build.default" />
+	
+	<target name="jar">
+		<!-- Copy JOGL jar files, native jar files and the Java WebStart JNLP files -->
+		<copy todir="../bin/">
+			<fileset dir="../lib/jogl/jar" includes="*.jar" />
+			<fileset dir="./" includes="*.jnlp" />
+		</copy>
+
+		<!-- Create the jar file -->
+		<jar destfile="../bin/yogularm.jar">
+			<manifest>
+				<attribute name="Main-Class" value="de.yogularm.desktop.SwingLauncher" />
+				<attribute name="Class-Path" value="." />
+			</manifest>
+			<fileset dir="../bin/classes" />
+			<fileset dir="../../common/bin/" />
+		</jar>
+	</target>
+
+	<!--
+	
+	Java Web Start only works if all jar packages are signed. At First read this article about how to
+	create the keys: http://jogamp.org/wiki/index.php/Using_JOGL_in_Java_Web_Start#Signing_your_JARs
+	Place the keystore into file /build/keystore and copy the file default.properties to
+	build.properties. In build.properties, uncomment the sign.storepass line and set your
+	storepass (see linked article) as value.
+	
+	-->
+	
+	<target name="sign" depends="jar" if="sign.storepass">
+		<signjar alias="yogularmKeys" keystore="keystore" lazy="true" storepass="${sign.storepass}">
+			<fileset dir="../bin/" includes="*.jar" />
+		</signjar>
+	</target>
+
+	<target name="clear">
+		<delete dir="../bin">
+			<include name="**/*" />
+		</delete>
+	</target>
+
+	<target name="build" depends="jar, sign" />
+</project>

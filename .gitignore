@@ -1,0 +1,9 @@
+# Binary files
+bin/
+exe/
+
+# Linux
+.directory
+
+# Windows
+Thumbs.db

@@ -74,8 +74,8 @@ public class WeightedCollection<T> implements Collection<T> {
 	  return map.keySet().toArray();
   }
 
-	@Override
-  public <T> T[] toArray(T[] a) {
+  @Override
+  public <TItem> TItem[] toArray(TItem[] a) {
 	  return map.keySet().toArray(a);
   }
 

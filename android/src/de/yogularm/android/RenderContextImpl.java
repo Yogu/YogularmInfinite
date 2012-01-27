@@ -11,13 +11,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
-import de.yogularm.geometry.Rect;
-import de.yogularm.geometry.Vector;
 import de.yogularm.drawing.AbstractRenderContext;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Texture;
+import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 import de.yogularm.utils.Numbers;
 
 public class RenderContextImpl extends AbstractRenderContext implements RenderContext {

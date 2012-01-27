@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://www.yogularm.de/infinite/code/"
+  href="http://www.yogularm.de/infinite/code/yogularm.jnlp">
+
+  <information>
+    <title>Yogularm Infinite</title>
+    <vendor>Yogu</vendor>
+    <homepage href="http://yogularm.de/"/>
+    <description>An infinite jump'n'run game</description>
+    <offline-allowed />
+  </information>
+  <update check="background" policy="always"/>
+
+  <security>
+    <all-permissions/>
+  </security>
+
+  <resources>
+    <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+    <property name="sun.java2d.noddraw" value="true"/>
+    <extension name="JOGL" href="jogl.jnlp" />
+    <jar href="yogularm-0.3.3.jar" main="true" />
+  </resources>
+
+  <application-desc
+  	main-class="de.yogularm.desktop.SwingLauncher" />
+</jnlp>

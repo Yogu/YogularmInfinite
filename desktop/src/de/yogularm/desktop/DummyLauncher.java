@@ -1,12 +1,9 @@
 package de.yogularm.desktop;
 
-import de.yogularm.Game;
-import de.yogularm.drawing.RenderContext;
-import de.yogularm.input.Input;
-
 public class DummyLauncher {
 	public static void main(String[] args) {
-		System.out.println("Creating game");
+		// causes trouble with eclipse
+		/*System.out.println("Creating game");
 		Game game = new Game();
 		Input input = new InputImpl();
 		RenderContext renderContext = new DummyRenderContext();
@@ -20,6 +17,6 @@ public class DummyLauncher {
 			} catch (InterruptedException e) {
 				break;
 			}
-		}
+		}*/
 	}
 }

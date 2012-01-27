@@ -17,7 +17,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.AbstractCollection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -109,6 +108,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
      *
      * @param numElements  the number of elements to hold
      */
+    @SuppressWarnings("unchecked")
     private void allocateElements(int numElements) {
         int initialCapacity = MIN_INITIAL_CAPACITY;
         // Find the best power of two to hold elements.
@@ -132,6 +132,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
      * Double the capacity of this deque.  Call only when full, i.e.,
      * when head and tail have wrapped around to become equal.
      */
+    @SuppressWarnings("unchecked")
     private void doubleCapacity() {
         assert head == tail;
         int p = head;
@@ -170,6 +171,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
      * Constructs an empty array deque with an initial capacity
      * sufficient to hold 16 elements.
      */
+    @SuppressWarnings("unchecked")
     public ArrayDeque() {
         elements = (E[]) new Object[16];
     }
@@ -781,6 +783,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
      *         this deque
      * @throws NullPointerException if the specified array is null
      */
+    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
         int size = size();
         if (a.length < size)
@@ -801,6 +804,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
      */
     public ArrayDeque<E> clone() {
         try {
+            @SuppressWarnings("unchecked")
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();
             result.elements = de.yogularm.utils.Arrays.copyOf(elements, elements.length);
             return result;
@@ -837,6 +841,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     /**
      * Deserialize this deque.
      */
+    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream s)
             throws IOException, ClassNotFoundException {
         s.defaultReadObject();
