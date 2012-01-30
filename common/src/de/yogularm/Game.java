@@ -27,8 +27,8 @@ public class Game {
 	@SuppressWarnings("unused")
   private long frameCount = 0;
 	private ValueSmoothener smoothFrameTime = new ValueSmoothener(SMOOTH_TIME);
-	private ValueSmoothener smoothUpdateTime = new ValueSmoothener(SMOOTH_TIME);;
-	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);;
+	private ValueSmoothener smoothUpdateTime = new ValueSmoothener(SMOOTH_TIME);
+	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
 	private static final double SMOOTH_TIME = 0.33f; // [second]
