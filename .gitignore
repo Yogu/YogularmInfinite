@@ -4,6 +4,7 @@ exe/
 
 # Linux
 .directory
+*~
 
 # Windows
 Thumbs.db

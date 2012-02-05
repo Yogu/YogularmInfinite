@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="src" path="/de.yogularm.common"/>
-	<classpathentry kind="lib" path="lib/jogl/jar/jogl.all.jar"/>
-	<classpathentry kind="lib" path="lib/jogl/jar/nativewindow.all.jar"/>
-	<classpathentry kind="lib" path="lib/jogl/jar/newt.all.jar" />
-	<classpathentry kind="lib" path="lib/jogl/jar/gluegen-rt.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="de.yogularm.desktop/lib/jogl/windows-amd64"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="bin/classes"/>
-</classpath>
+build/.classpath-linux64
