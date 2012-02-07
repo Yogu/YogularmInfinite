@@ -3,7 +3,7 @@ package de.yogularm.network;
 public class Player {
 	private String name;
 	
-	private static final String NAME_REGEX = "[a-zA-Z0-9_#+-]+";
+	private static final String NAME_REGEX = "[a-zA-Z0-9_-]+";
 	
 	public Player(String name) {
 		if (name == null)

@@ -17,6 +17,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import de.yogularm.Game;
 import de.yogularm.event.ExceptionHandler;
@@ -37,6 +39,7 @@ public class SwingLauncher {
 
 	public void run() {
 		GLProfile.initSingleton(true);
+		initUI();
 
 		Game game = new Game();
 		canvas = createWindow();
@@ -59,6 +62,20 @@ public class SwingLauncher {
 		eventListener.start(canvas);
 	}
 
+	public void initUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			System.out.println("Failed to load system look and feel " + e.getMessage());
+		} catch (InstantiationException e) {
+			System.out.println("Failed to load system look and feel " + e.getMessage());
+		} catch (IllegalAccessException e) {
+			System.out.println("Failed to load system look and feel " + e.getMessage());
+		} catch (UnsupportedLookAndFeelException e) {
+			System.out.println("Failed to load system look and feel " + e.getMessage());
+		}
+	}
+
 	public GLCanvas createWindow() {
 		window = new JFrame("Yogularm Infinite");
 		window.addWindowListener(new WindowAdapter() {
@@ -77,8 +94,8 @@ public class SwingLauncher {
 		window.getContentPane().add(canvas, BorderLayout.CENTER);
 
 		// Load icon
-		window
-			.setIconImages(getIconImages(new String[] { "res/icon-16.png", "res/icon-32.png", "res/icon-48.png" }));
+		window.setIconImages(getIconImages(new String[] { "res/icon-16.png", "res/icon-32.png",
+				"res/icon-48.png" }));
 
 		return canvas;
 	}

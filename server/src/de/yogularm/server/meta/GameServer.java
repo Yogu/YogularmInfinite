@@ -47,7 +47,8 @@ public class GameServer {
 				while (isRunning) {
 					try {
 						final Socket clientSocket = socket.accept();
-						log("Accepted client: " + clientSocket.getInetAddress().toString());
+						final String address = clientSocket.getInetAddress().toString();
+						log("Accepted client: " + address);
 
 						final GameClient client = new GameClient(clientSocket.getInputStream(),
 							clientSocket.getOutputStream(), data);
@@ -63,9 +64,9 @@ public class GameServer {
 									synchronized (clients) {
 										clients.remove(client);
 									}
-									log("Client socket closed");
+									log("Client socket closed: " + address);
 								} catch (IOException e) {
-									log("Unable to close client socket");
+									log("Unable to close client socket " + address);
 								}
 							}
 						});

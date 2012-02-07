@@ -25,7 +25,7 @@ public class GameConnection {
 	private int port;
 	private Player player;
 
-	private ConnectionState state = ConnectionState.CONNECTING;
+	private ConnectionState state = ConnectionState.IDLE;
 
 	public GameConnection(String host, int port, String playerName) {
 		if (!Player.isValidName(playerName))
@@ -34,7 +34,6 @@ public class GameConnection {
 		this.host = host;
 		this.port = port;
 		this.player = new Player(playerName);
-		initThread();
 	}
 
 	/**
@@ -46,17 +45,26 @@ public class GameConnection {
 	 * An event that is called when there is a critical network error
 	 */
 	public final Event<EventArgs> onStateChanged = new Event<EventArgs>(this);
+	
+	public void start() {
+		if (state != ConnectionState.IDLE)
+			throw new IllegalStateException("Start can only be called in IDLE state");
+		
+		initThread();
+	}
 
 	public ConnectionState getState() {
 		return state;
 	}
 
 	private void initThread() {
+		state = ConnectionState.IDLE;
 		new Thread(new Runnable() {
 			public void run() {
 				try {
 					if (initSocket() && login()) {
-						login();
+						setState(ConnectionState.CONNECTED);
+						// TODO
 					}
 				} catch (IOException e) {
 					setState(ConnectionState.NETWORK_ERROR);
@@ -72,7 +80,7 @@ public class GameConnection {
 			socket = new Socket(host, port);
 			state = ConnectionState.CONNECTED;
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintStream(out);
+			out = new PrintStream(socket.getOutputStream());
 			return true;
 		} catch (UnknownHostException e) {
 			setState(ConnectionState.NETWORK_ERROR);
@@ -113,7 +121,7 @@ public class GameConnection {
 			if (parts.length == 0)
 				throw new IOException("Unknown error");
 			try {
-				error = CommunicationError.valueOf(parts[1]);
+				error = CommunicationError.valueOf(parts[0]);
 			} catch (IllegalArgumentException e) {
 				throw new IOException(
 						"Invalid error identifier, maybe server and client versions are not compatible");

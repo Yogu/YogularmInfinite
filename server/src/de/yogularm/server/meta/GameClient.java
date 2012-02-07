@@ -57,9 +57,14 @@ public class GameClient extends Thread {
 			while (!isInterrupted()) {
 				try {
 					String line = reader.readLine();
-					executeCommand(line);
+					if (line == null)
+						break; // socket closed
+					else
+						executeCommand(line);
 				} catch (Exception e) {
 					log("Exception in GameClient thread: " + Exceptions.formatException(e));
+					e.printStackTrace();
+					break;
 				}
 			}
 		} finally {

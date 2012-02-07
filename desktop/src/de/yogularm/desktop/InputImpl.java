@@ -75,6 +75,10 @@ public class InputImpl extends DigitalInput {
 			if (isPressed)
 				Config.DEBUG_BUILDING = !Config.DEBUG_BUILDING;
 			break;
+		case KeyEvent.VK_F12:
+			if (isPressed)
+					NetworkFrame.open();
+			break;
 		}
 	}
 }

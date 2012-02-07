@@ -16,6 +16,8 @@ public class HelloCommand extends CommandHandlerUtils implements CommandHandler 
 		if (p == null)
 			return err(CommunicationError.NAME_NOT_AVAILABLE);
 		
+		System.out.println("Player " + parameter + " says hello");
+		
 		data.player = p;
 		return ok(data.key);
   }
