@@ -1,4 +1,4 @@
-package de.yogularm.server.network;
+package de.yogularm.server.meta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,9 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
+import de.yogularm.server.ClientData;
 import de.yogularm.server.ServerData;
 import de.yogularm.utils.Exceptions;
 
@@ -44,6 +46,7 @@ public class GameClient extends Thread {
 		//this.out = out;
 		this.serverData = serverData;
 		this.clientData = new ClientData();
+		serverData.clientData.put(clientData.key, clientData);
 		clientData.serverData = serverData;
 		reader = new BufferedReader(new InputStreamReader(in));
 		writer = new PrintStream(out);
@@ -78,9 +81,16 @@ public class GameClient extends Thread {
 		NetworkCommand command = NetworkCommand.fromString(commandStr);
 		String parameter = parts.length > 1 ? parts[1].trim() : "";
 		
-		if (command == NetworkCommand.PASSIVE) {
-			writer.println("OK");
-			doPassive();
+		if ((command == NetworkCommand.PASSIVE) || (command == NetworkCommand.RENEW)) {
+			ClientData data = serverData.clientData.get(parameter);
+			if (data == null)
+				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
+			else {
+				writer.println("OK");
+				
+				if (command == NetworkCommand.PASSIVE)
+					doPassive();
+			}
 		} else {
 			CommandHandler handler = command == null ? null : commandHandlers.get(command);
 			if (handler == null)

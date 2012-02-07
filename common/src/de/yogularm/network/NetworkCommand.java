@@ -1,7 +1,7 @@
 package de.yogularm.network;
 
 public enum NetworkCommand {
-	VERSION, HELLO, PASSIVE, CREATE, JOIN, LEAVE, LIST, START, PAUSE, RESUME, CANCEL, SAY;
+	VERSION, HELLO, PASSIVE, RENEW, CREATE, JOIN, LEAVE, LIST, START, PAUSE, RESUME, CANCEL, SAY;
 	
 	public static NetworkCommand fromString(String str) {
 		for (NetworkCommand command : values()) {

@@ -4,11 +4,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView;
-import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
 import de.yogularm.Res;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.RenderTransformation;
+import de.yogularm.event.ExceptionHandler;
 import de.yogularm.geometry.Vector;
 
 public class YogularmRenderer implements GLSurfaceView.Renderer {

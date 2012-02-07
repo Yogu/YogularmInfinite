@@ -1,4 +1,4 @@
-package de.yogularm.desktop;
+package de.yogularm.test;
 
 public class DummyLauncher {
 	public static void main(String[] args) {

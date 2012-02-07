@@ -7,8 +7,8 @@ import javax.media.opengl.GLEventListener;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
-import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
+import de.yogularm.event.ExceptionHandler;
 
 public class GLEventListenerImpl implements GLEventListener {
 	private FPSAnimator animator;

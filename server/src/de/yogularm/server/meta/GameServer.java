@@ -1,4 +1,4 @@
-package de.yogularm.server.network;
+package de.yogularm.server.meta;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,7 +6,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.yogularm.server.Players;
 import de.yogularm.server.ServerData;
 import de.yogularm.utils.Exceptions;
 

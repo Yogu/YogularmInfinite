@@ -18,7 +18,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.yogularm.Config;
-import de.yogularm.ExceptionHandler;
+import de.yogularm.event.ExceptionHandler;
 
 public class YogularmActivity extends Activity {
 	private GLSurfaceView surfaceView;

@@ -18,8 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import de.yogularm.ExceptionHandler;
 import de.yogularm.Game;
+import de.yogularm.event.ExceptionHandler;
 
 public class SwingLauncher {
 	private final static int INIT_WIDTH = 800;

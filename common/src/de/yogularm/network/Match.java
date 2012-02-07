@@ -1,4 +1,4 @@
-package de.yogularm.server;
+package de.yogularm.network;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +11,10 @@ public class Match {
 	
 	private static final Object idLock = new Object();
 	private static int NEXT_ID = 1;
+	
+	private Match() {
+		
+	}
 	
 	public Match(Player owner) {
 		synchronized (idLock) {
@@ -66,5 +70,47 @@ public class Match {
 	
 	public int getID() {
 		return id;
+	}
+	
+	public String serialize() {
+		String str = id + ":";
+		boolean isFirst = true;
+		for (Player player : players) {
+			if (!isFirst)
+				str += ",";
+			else
+				isFirst = false;
+			str += player.getName();
+		}
+		return str;
+	}
+	
+	public static Match deserialize(String str) {
+		String[] parts = str.split("\\:", 2);
+		if (parts.length < 2)
+			return null;
+
+		Match match = new Match();
+		
+		int id;
+		try {
+			id = Integer.parseInt(parts[0]);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+		if (id <= 0)
+			return null;
+		match.id = id;
+		
+		String[] players = parts[1].split("\\,");
+		for (String playerName : players) {
+			Player player = new Player(playerName);
+			if (!Player.isValidName(playerName))
+				return null;
+			
+			match.players.add(player);
+		}
+		
+		return match;
 	}
 }

@@ -1,4 +1,4 @@
-package de.yogularm.desktop;
+package de.yogularm.test;
 
 import java.awt.BorderLayout;
 
@@ -13,8 +13,9 @@ import javax.swing.JFrame;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
-import de.yogularm.ExceptionHandler;
 import de.yogularm.Res;
+import de.yogularm.desktop.RenderContextImpl;
+import de.yogularm.event.ExceptionHandler;
 import de.yogularm.geometry.Rect;
 
 public class JoglTest {

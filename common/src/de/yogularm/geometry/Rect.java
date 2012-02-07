@@ -132,6 +132,11 @@ public class Rect {
 			&& point.getY() >= getBottom() && point.getY() <= getTop();
 	}
 	
+	@Override
+	public int hashCode() {
+		return minVector.hashCode() ^ maxVector.hashCode();
+	}
+	
 	public String toString() {
 		return String.format("Rect[%s, %s]", minVector, maxVector);
 	}

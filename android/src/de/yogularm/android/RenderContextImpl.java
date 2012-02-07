@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -22,6 +24,9 @@ import de.yogularm.utils.Numbers;
 
 public class RenderContextImpl extends AbstractRenderContext implements RenderContext {
 	private GL10 gl;
+	private Map<Rect, FloatBuffer> rectBufferCache = new HashMap<Rect, FloatBuffer>();
+	private Map<Rect, FloatBuffer> texBufferCache = new HashMap<Rect, FloatBuffer>();
+
 	public RenderContextImpl(GL10 gl) {
 		this.gl = gl;
 	}
@@ -50,14 +55,14 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		Bitmap bmp = BitmapFactory.decodeStream(stream);
 		if (bmp == null)
 			throw new RuntimeException(String.format(
-				"Unable to decode the given texture stream of texture %s", texture.getName()));
+					"Unable to decode the given texture stream of texture %s", texture.getName()));
 		try {
 			int width = bmp.getWidth();
 			int height = bmp.getHeight();
 			if (!Numbers.isPowerOfTwo(width) || !Numbers.isPowerOfTwo(height))
 				throw new RuntimeException(String.format(
-					"Either width (%d) or height (%d) of the texture %s is not a power of two",
-					width, height, texture.getName()));
+						"Either width (%d) or height (%d) of the texture %s is not a power of two", width,
+						height, texture.getName()));
 
 			int[] ids = new int[1];
 			gl.glGenTextures(1, ids, 0);
@@ -66,10 +71,10 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 			gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 			gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 			checkErrors();
-			
+
 			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bmp, 0);
 			checkErrors();
-			
+
 			return id;
 		} finally {
 			bmp.recycle();
@@ -83,10 +88,7 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 
 	@Override
 	public void drawRect(Rect bounds) {
-		FloatBuffer quadVertices =
-			createBuffer(new float[] { bounds.getLeft(), bounds.getTop(), 0, bounds.getLeft(),
-				bounds.getBottom(), 0, bounds.getRight(), bounds.getTop(), 0, bounds.getRight(),
-				bounds.getBottom(), 0 });
+		FloatBuffer quadVertices = getRectBuffer(bounds);
 
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, quadVertices);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
@@ -95,15 +97,8 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 
 	@Override
 	public void drawRect(Rect bounds, Rect textureBounds) {
-		FloatBuffer quadVertices =
-			createBuffer(new float[] { bounds.getLeft(), bounds.getTop(), 0, bounds.getLeft(),
-				bounds.getBottom(), 0, bounds.getRight(), bounds.getTop(), 0, bounds.getRight(),
-				bounds.getBottom(), 0 });
-
-		FloatBuffer quadTexCoords =
-			createBuffer(new float[] { textureBounds.getLeft(), textureBounds.getBottom(),
-				textureBounds.getLeft(), textureBounds.getTop(), textureBounds.getRight(),
-				textureBounds.getBottom(), textureBounds.getRight(), textureBounds.getTop() });
+		FloatBuffer quadVertices = getRectBuffer(bounds);
+		FloatBuffer quadTexCoords = getTexBuffer(textureBounds);
 
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, quadVertices);
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, quadTexCoords);
@@ -131,7 +126,7 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 	}
 
 	protected void destroyFont(Object fontObject) {
-		
+
 	}
 
 	@Override
@@ -178,7 +173,7 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 	@Override
 	public void clear(Color clearColor) {
 		gl.glClearColor(clearColor.getRed(), clearColor.getGreen(), clearColor.getBlue(),
-			clearColor.getAlpha());
+				clearColor.getAlpha());
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		checkErrors();
 	}
@@ -213,6 +208,31 @@ public class RenderContextImpl extends AbstractRenderContext implements RenderCo
 		checkErrors();
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		checkErrors();
+	}
+
+	private FloatBuffer getTexBuffer(Rect textureBounds) {
+		if (texBufferCache.containsKey(textureBounds))
+			return texBufferCache.get(textureBounds);
+		else {
+			FloatBuffer quadVertices = createBuffer(new float[] { textureBounds.getLeft(),
+					textureBounds.getBottom(), textureBounds.getLeft(), textureBounds.getTop(),
+					textureBounds.getRight(), textureBounds.getBottom(), textureBounds.getRight(),
+					textureBounds.getTop() });
+			texBufferCache.put(textureBounds, quadVertices);
+			return quadVertices;
+		}
+	}
+
+	private FloatBuffer getRectBuffer(Rect rect) {
+		if (rectBufferCache.containsKey(rect))
+			return rectBufferCache.get(rect);
+		else {
+			FloatBuffer quadVertices = createBuffer(new float[] { rect.getLeft(), rect.getTop(), 0,
+					rect.getLeft(), rect.getBottom(), 0, rect.getRight(), rect.getTop(), 0, rect.getRight(),
+					rect.getBottom(), 0 });
+			rectBufferCache.put(rect, quadVertices);
+			return quadVertices;
+		}
 	}
 
 	private FloatBuffer createBuffer(float[] vertices) {

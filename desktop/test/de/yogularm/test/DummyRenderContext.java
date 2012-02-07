@@ -1,4 +1,4 @@
-package de.yogularm.desktop;
+package de.yogularm.test;
 
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
