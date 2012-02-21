@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import de.yogularm.Config;
+import de.yogularm.Game;
 import de.yogularm.input.DigitalInput;
 
 public class InputImpl extends DigitalInput {
@@ -33,8 +34,10 @@ public class InputImpl extends DigitalInput {
 	private boolean isUp;
 	private boolean isDown;
 	private KeyListener keyListener;
+	private Game game;
 
-	public InputImpl() {
+	public InputImpl(Game game) {
+		this.game = game;
 		keyListener = new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				updateKey(e.getKeyCode(), true);
@@ -74,6 +77,10 @@ public class InputImpl extends DigitalInput {
 		case KeyEvent.VK_F2:
 			if (isPressed)
 				Config.DEBUG_BUILDING = !Config.DEBUG_BUILDING;
+			break;
+		case KeyEvent.VK_R:
+			if (isPressed && Config.DEBUG_DISPLAY_RENDER_INFO)
+				game.restart();
 			break;
 		}
 	}

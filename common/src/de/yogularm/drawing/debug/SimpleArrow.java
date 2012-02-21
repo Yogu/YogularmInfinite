@@ -24,12 +24,17 @@ public class SimpleArrow implements Drawable {
 
 	public void update(float elapsedTime) { }
 	
-	public static void render(RenderContext context, Vector offset, float length, float angle) {
+	public static Drawable getTransformed(Vector offset, float length, float angle) {
 		SimpleArrow arrow = new SimpleArrow();
 		RenderTransformation transformation = new RenderTransformation(arrow);
 		transformation.setOffset(offset);
 		transformation.setAngle(angle);
 		transformation.setScale(new Vector(length, 1));
-		transformation.draw(context);
+		return transformation;
+	}
+	
+	public static void render(RenderContext context, Vector offset, float length, float angle) {
+		Drawable drawable = getTransformed(offset, length, angle);
+		drawable.draw(context);
 	}
 }

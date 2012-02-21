@@ -153,7 +153,7 @@ public class Game {
 		smoothFrameTime.set(frameTime);
 	}
 
-	private void restart() {
+	public void restart() {
 		world = new World();
 		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
 		gameoverTime = 0;

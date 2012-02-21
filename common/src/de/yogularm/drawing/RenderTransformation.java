@@ -106,8 +106,8 @@ public class RenderTransformation implements Drawable {
 		context.beginTransformation();
 			context.translate(offset.add(new Vector(isVerticallyMirrored ? 1 : 0, 0)));
 			context.translate(rotationCenter);
-			context.scale(scale.multiply(new Vector(isVerticallyMirrored ? -1 : 1, 1)));
 			context.rotate(angle);
+			context.scale(scale.multiply(new Vector(isVerticallyMirrored ? -1 : 1, 1)));
 			context.translate(rotationCenter.negate());
 			drawable.draw(context);
 		context.endTransformation();

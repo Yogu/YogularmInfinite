@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.yogularm.Config;
 import de.yogularm.building.BuildingPath;
 import de.yogularm.building.PathBuilder;
+import de.yogularm.components.debug.ArrowComponent;
 import de.yogularm.components.general.Checkpoint;
 import de.yogularm.components.general.Chicken;
 import de.yogularm.components.general.Coin;
@@ -40,6 +42,7 @@ public class RandomPathBuilder extends PathBuilder {
 		List<Point> goodPositions = calculateGoodPositions(reachablePositions);
 
 		Random random = new Random();
+		Point current = getPath().getCurrentWaypoint();
 		Point target = null;
 		while (reachablePositions.size() > 0) {
 			if (goodPositions.size() == 0) {
@@ -48,7 +51,7 @@ public class RandomPathBuilder extends PathBuilder {
 			}
 
 			target = goodPositions.get(random.nextInt(goodPositions.size()));
-			System.out.printf("  Trying: %s -> %s\n", getPath().getCurrentWaypoint(), target);
+			System.out.printf("  Trying: %s -> %s\n", current, target);
 			if (tryBuildTo(target)) {
 				break;
 			} else {
@@ -63,13 +66,25 @@ public class RandomPathBuilder extends PathBuilder {
 			stuck = true;
 			return;
 		}
+		
+		target = getPath().getCurrentWaypoint();
+
+		if (Config.DEBUG_BUILDING) {
+			Vector c = current.toVector();
+			Vector t = target.toVector();
+			Vector d = t.subtract(c);
+			ArrowComponent arrow = new ArrowComponent(getComponents(), 
+					d.getLength(), d.getAngleToXAxis());
+			arrow.setPosition(c.add(0.5f, 0.5f));
+			getComponents().add(arrow);
+		}
 
 		placeCoins();
 		placeCheckpoints();
 		placeChickens();
 		placeShooters();
 
-		System.out.printf("OK: %s\n", getPath().getCurrentWaypoint());
+		System.out.printf("OK: %s\n", target);
 		structureCounter++;
 	}
 

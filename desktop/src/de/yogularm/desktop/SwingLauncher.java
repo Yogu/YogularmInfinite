@@ -42,7 +42,7 @@ public class SwingLauncher {
 		canvas = createWindow();
 
 		// Input
-		InputImpl input = new InputImpl();
+		InputImpl input = new InputImpl(game);
 		game.setInput(input);
 		canvas.addKeyListener(input.getKeyListener());
 		window.addKeyListener(input.getKeyListener());
