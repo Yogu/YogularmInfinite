@@ -77,7 +77,7 @@ public class InputImpl extends DigitalInput {
 			break;
 		case KeyEvent.VK_F12:
 			if (isPressed)
-					NetworkFrame.open();
+					ConnectFrame.open();
 			break;
 		}
 	}

@@ -38,7 +38,7 @@ public class GameClient extends Thread {
 		commandHandlers.put(NetworkCommand.PAUSE, new PauseCommand());
 		commandHandlers.put(NetworkCommand.RESUME, new ResumeCommand());
 		commandHandlers.put(NetworkCommand.CANCEL, new CancelCommand());
-		//commandHandlers.put(NetworkCommand.SAY, new SayCommand());
+		commandHandlers.put(NetworkCommand.SAY, new SayCommand());
 	}
 
 	public GameClient(InputStream in, OutputStream out, ServerData serverData) throws IOException {

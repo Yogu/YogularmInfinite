@@ -1,253 +1,179 @@
 package de.yogularm.desktop;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.InetSocketAddress;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.text.JTextComponent;
+import javax.swing.border.EmptyBorder;
 
-import de.yogularm.event.EventArgs;
-import de.yogularm.event.EventListener;
-import de.yogularm.event.ExceptionEventArgs;
 import de.yogularm.network.Player;
 import de.yogularm.network.client.GameConnection;
 
-public class NetworkFrame {
-	private JFrame window;
-	private JComponent panel;
-	private JButton okButton;
-	private JButton cancelButton;
-	private JTextField hostField;
-	private JTextField portField;
-	private JTextField nameField;
+public class NetworkFrame extends JFrame {
 	private GameConnection connection;
+	
+	private JPanel contentPane;
+	private JTextField chatInputField;
+	private JButton sendChatMessageButton;
 
-	private static Object lock = new Object();
-	private static NetworkFrame instance;
+	private JTextArea chatField;
 
-	private static final int DEFAULT_PORT = 62602;
+	private JLabel serverLabel;
 
-	public NetworkFrame() {
-		instance = this;
-		init();
-	}
-
-	public static void open() {
-		synchronized (lock) {
-			if (instance == null)
-				instance = new NetworkFrame();
-			else if (instance.window != null)
-				instance.window.toFront();
-		}
-	}
-
-	private void init() {
-		window = new JFrame("Yogularm Infinite - Multiplayer Mode");
-		window.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent windowevent) {
-				close();
+	/**
+	 * Create the frame.
+	 */
+	public NetworkFrame(GameConnection connection) {
+		setTitle("Yogularm Infinite - Multiplayer Mode");
+		this.connection = connection;
+		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 660, 539);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		JSplitPane splitPane = new JSplitPane();
+		contentPane.add(splitPane, BorderLayout.CENTER);
+		
+		JPanel panel = new JPanel();
+		splitPane.setRightComponent(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_3 = new JPanel();
+		panel.add(panel_3, BorderLayout.SOUTH);
+		panel_3.setLayout(new BorderLayout(0, 0));
+		
+		chatInputField = new JTextField();
+		chatInputField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (e.getKeyChar() == '\n')
+					sendChatMessage();
 			}
 		});
-		window.setSize(400, 300);
-
-		createLoginPanel();
-		window.getContentPane().add(panel);
-
-		window.setVisible(true);
-	}
-
-	private void createLoginPanel() {
-		// ------ buttons ------
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-		okButton = new JButton("OK");
-		cancelButton = new JButton("Cancel");
-		buttonPanel.add(Box.createHorizontalGlue());
-		buttonPanel.add(okButton);
-		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(cancelButton);
-
-		// ------ input fields ------
-		panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.gridy = 0;
-		c.insets = new Insets(10, 10, 10, 10);
-
-		JTextArea l = new JTextArea("Enter hostname (ip-address) and port of the Yogularm Infinite "
-				+ "server and chose your nickname.");
-		makeMultilineLabel(l);
-		c.gridwidth = 2;
-		panel.add(l, c);
-		c.gridwidth = 1;
-
-		c.gridy++;
-		JLabel label = new JLabel("Host / IP:");
-		c.gridx = 0;
-		c.weightx = 1;
-		panel.add(label, c);
-		hostField = new JTextField("localhost");
-		c.gridx = 1;
-		c.weightx = 2;
-		panel.add(hostField, c);
-
-		c.gridy++;
-		label = new JLabel("Port:");
-		c.gridx = 0;
-		c.weightx = 1;
-		panel.add(label, c);
-		portField = new JTextField(DEFAULT_PORT + "");
-		c.gridx = 1;
-		c.weightx = 2;
-		panel.add(portField, c);
-
-		c.gridy++;
-		label = new JLabel("Your Name:");
-		c.gridx = 0;
-		c.weightx = 1;
-		panel.add(label, c);
-		nameField = new JTextField("");
-		c.gridx = 1;
-		c.weightx = 2;
-		panel.add(nameField, c);
-
-		c.gridy++;
-		c.gridx = 0;
-		c.weighty = 1;
-		c.gridwidth = 2;
-		c.weightx = 1;
-		panel.add(Box.createGlue(), c);
-
-		c.gridy++;
-		c.weighty = 0;
-		panel.add(buttonPanel, c);
-
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				close();
+		chatInputField.addInputMethodListener(new InputMethodListener() {
+			public void caretPositionChanged(InputMethodEvent arg0) {
+			}
+			public void inputMethodTextChanged(InputMethodEvent arg0) {
+				sendChatMessageButton.setEnabled(!chatInputField.getText().trim().equals(""));
 			}
 		});
-
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String host = hostField.getText().trim();
-				String portStr = portField.getText().trim();
-				String name = nameField.getText().trim();
-
-				if (host.equals("")) {
-					showError(hostField, "Enter the server's hostname or ip address.");
-					return;
-				}
-
-				if (portStr.equals("")) {
-					showError(portField, "Enter the server's port.");
-					return;
-				}
-
-				int port;
-				try {
-					port = Integer.parseInt(portStr);
-				} catch (NumberFormatException e) {
-					showError(portField, "The port must be a valid number.");
-					return;
-				}
-
-				if (port <= 0 || port > 65535) {
-					showError(portField, "The port must be a positive number smaller than 65536.");
-					return;
-				}
-
-				if (name.equals("")) {
-					showError(nameField, "Please chose a name.");
-					return;
-				}
-
-				if (!Player.isValidName(name)) {
-					showError(portField,
-							"The name must neither contain spaces nor any special characters except _ and -");
-					return;
-				}
-
-				enableControls(false);
-
-				connection = new GameConnection(host, port, name);
-				connection.onStateChanged.addListener(new EventListener<EventArgs>() {
-					public void call(Object sender, EventArgs param) {
-						switch (connection.getState()) {
-						case CONNECTED:
-							close();
-							JOptionPane.showMessageDialog(window, "Connected!");
-							break;
-						case NAME_NOT_AVAILABLE:
-							JOptionPane.showMessageDialog(window, "This name is already taken by another user. Please choose a different one.");
-							nameField.selectAll();
-							enableControls(true);
-							nameField.requestFocusInWindow();
-							break;
-						}
-					}
-				});
-				connection.onNetworkError.addListener(new EventListener<ExceptionEventArgs>() {
-					public void call(Object sender, ExceptionEventArgs param) {
-						enableControls(true);
-						showError(hostField, "Could not reach server. Check hostname, port and internet connection.");
-					}
-				});
-				connection.start();
+		chatInputField.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				chatInputField.selectAll();
 			}
 		});
+		panel_3.add(chatInputField, BorderLayout.CENTER);
+		chatInputField.setText("Type to compose...");
+		chatInputField.setColumns(10);
+		
+		sendChatMessageButton = new JButton("Send");
+		sendChatMessageButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sendChatMessage();
+			}
+		});
+		panel_3.add(sendChatMessageButton, BorderLayout.EAST);
+		
+		JSplitPane splitPane_1 = new JSplitPane();
+		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		panel.add(splitPane_1, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		splitPane_1.setLeftComponent(scrollPane);
+		
+		JList playerList = new JList();
+		scrollPane.setViewportView(playerList);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		splitPane_1.setRightComponent(scrollPane_1);
+		
+		chatField = new JTextArea();
+		scrollPane_1.setViewportView(chatField);
+		
+		JLabel lblNewLabel = new JLabel("Other Players on this server:");
+		panel.add(lblNewLabel, BorderLayout.NORTH);
+		
+		JPanel panel_1 = new JPanel();
+		splitPane.setLeftComponent(panel_1);
+		panel_1.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		panel_1.add(scrollPane_2, BorderLayout.CENTER);
+		
+		JList matchList = new JList();
+		scrollPane_2.setViewportView(matchList);
+		
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2, BorderLayout.NORTH);
+		panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		serverLabel = new JLabel("Connected to Server");
+		panel_2.add(serverLabel);
+		updateServerLabel();
+				
+		JButton newMatchButton = new JButton("New Match");
+		panel_2.add(newMatchButton);
+		
+		JButton leaveServerButton = new JButton("Leave Server");
+		panel_2.add(leaveServerButton);
+		
+		initGameConnection();
 	}
-
-	private void close() {
-		window.dispose();
-		instance = null;
-	}
-
-	private void enableControls(boolean enable) {
-		okButton.setEnabled(enable);
-		hostField.setEnabled(enable);
-		portField.setEnabled(enable);
-		nameField.setEnabled(enable);
-	}
-
-	private void showError(JTextComponent component, String error) {
-		JOptionPane.showMessageDialog(window, error, "Error", JOptionPane.ERROR_MESSAGE);
-		if (component != null) {
-			component.selectAll();
-			component.requestFocusInWindow();
+	
+	private void sendChatMessage() {
+		String text = chatInputField.getText().trim();
+		if (!text.trim().equals("")) {
+			connection.sendMessage(text);
+			chatInputField.setText("");
+			logChatMessage(connection.getPlayer(), text);
 		}
 	}
-
-	public static void makeMultilineLabel(JTextComponent area) {
-		area.setFont(UIManager.getFont("Label.font"));
-		area.setEditable(false);
-		area.setOpaque(false);
-		area.setCursor(null);
-		area.setFocusable(false);
-		if (area instanceof JTextArea) {
-			((JTextArea) area).setWrapStyleWord(true);
-			((JTextArea) area).setLineWrap(true);
+		
+	private void logChatMessage(Player player, String message) {
+		chatField.setText(chatField.getText() + "\n" + player.getName() + ": " + message);
+	}
+	
+	private void updateServerLabel() {
+		serverLabel.setText(getConnectionStatus());
+	}
+	
+	private String getConnectionStatus() {
+		switch (connection.getState()) {
+		case CONNECTED:
+			return "Connected to " + connection.getHost();
+		case CONNECTING:
+			return "Connecting to " + connection.getHost() + "...";
+		case CLOSING:
+			return "Closing connection...";
+		case NETWORK_ERROR:
+			return "Network error!";
+		default:
+			return "Not connected";
 		}
+	}
+	
+	private void initGameConnection() {
+		
 	}
 }

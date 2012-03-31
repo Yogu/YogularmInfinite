@@ -1,6 +1,8 @@
 package de.yogularm.network;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Match {
@@ -112,5 +114,26 @@ public class Match {
 		}
 		
 		return match;
+	}
+	
+	public static String serializeMatches(Iterable<Match> matches) {
+		String str = "";
+		for (Match match : matches) {
+			if (match.getState() == MatchState.OPEN) {
+				if (str != "")
+					str += ";";
+				str += match.serialize();
+			}
+		}
+		return str;
+	}
+	
+	public static Map<Integer, Match> deserializeMatches(String str) {
+		Map<Integer, Match> matches = new HashMap<Integer, Match>();
+		for (String matchStr : str.split(";")) {
+			Match match = Match.deserialize(matchStr);
+			matches.put(match.getID(), match);
+		}
+		return matches;
 	}
 }
