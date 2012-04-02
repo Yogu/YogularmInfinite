@@ -1,6 +1,8 @@
 package de.yogularm.network;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
@@ -74,7 +76,9 @@ public class Match extends Observable {
 		if ((state != MatchState.CANCELLED) && (state != MatchState.FINISHED)) {
 			setState(MatchState.CANCELLED);
 			
-			for (Player player: getPlayers()) {
+			// Avoid concurrency issues
+			List<Player> players = new ArrayList<Player>(getPlayers());
+			for (Player player : players) {
 				player.leaveMatch();
 			}
 		} else

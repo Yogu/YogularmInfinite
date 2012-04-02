@@ -1,6 +1,5 @@
 package de.yogularm.desktop;
 
-import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
@@ -10,9 +9,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLCanvas;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -21,15 +18,16 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import de.yogularm.Game;
-import de.yogularm.event.ExceptionHandler;
+import de.yogularm.utils.ArrayDeque;
+import de.yogularm.utils.Deque;
 
 public class SwingLauncher {
 	private final static int INIT_WIDTH = 800;
 	private final static int INIT_HEIGHT = 450;
 
-	private JFrame window;
-	private GLCanvas canvas;
+	private JFrame frame;
 	private boolean exceptionShown;
+	private Deque<Page> pageStack = new ArrayDeque<Page>();
 
 	public static void main(String[] args) {
 		System.out.println("Yoglarm started");
@@ -40,26 +38,11 @@ public class SwingLauncher {
 	public void run() {
 		GLProfile.initSingleton(true);
 		initUI();
+		createWindow();
+		
+		setPage(new StartFrame(this));
 
-		Game game = new Game();
-		canvas = createWindow();
-
-		// Input
-		InputImpl input = new InputImpl();
-		game.setInput(input);
-		canvas.addKeyListener(input.getKeyListener());
-		window.addKeyListener(input.getKeyListener());
-
-		// OpenGL
-		GLEventListenerImpl eventListener = new GLEventListenerImpl(game);
-		canvas.addGLEventListener(eventListener);
-
-		eventListener.setExceptionHandler(new ExceptionHandler() {
-			public void handleException(Throwable e) {
-				SwingLauncher.this.handleException(e);
-			}
-		});
-		eventListener.start(canvas);
+		frame.setVisible(true);
 	}
 
 	public void initUI() {
@@ -76,31 +59,23 @@ public class SwingLauncher {
 		}
 	}
 
-	public GLCanvas createWindow() {
-		window = new JFrame("Yogularm Infinite");
-		window.addWindowListener(new WindowAdapter() {
+	public void createWindow() {
+		frame = new JFrame("Yogularm Infinite");
+		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowevent) {
-				window.dispose();
+				frame.dispose();
 				System.exit(0);
 			}
 		});
-		window.setSize(INIT_WIDTH, INIT_HEIGHT);
-		window.setVisible(true);
-		window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
-		GLProfile glprofile = GLProfile.getDefault();
-		GLCapabilities glcapabilities = new GLCapabilities(glprofile);
-		GLCanvas canvas = new GLCanvas(glcapabilities);
-		window.getContentPane().add(canvas, BorderLayout.CENTER);
+		frame.setSize(INIT_WIDTH, INIT_HEIGHT);
+		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
 		// Load icon
-		window.setIconImages(getIconImages(new String[] { "res/icon-16.png", "res/icon-32.png",
+		frame.setIconImages(getIconImages(new String[] { "res/icon-16.png", "res/icon-32.png",
 				"res/icon-48.png" }));
-
-		return canvas;
 	}
 
-	private void handleException(Throwable e) {
+	public void handleException(Throwable e) {
 		// Down't show exceptions caused by other exceptions
 		if (!exceptionShown) {
 			StringWriter sw = new StringWriter();
@@ -115,13 +90,45 @@ public class SwingLauncher {
 			JTextArea text = new JTextArea(message);
 			text.setEditable(false);
 			text.setBackground(SystemColor.control);
-			JOptionPane.showMessageDialog(window, text, "Runtime Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, text, "Runtime Error", JOptionPane.ERROR_MESSAGE);
 			exceptionShown = true;
 		}
 
-		if (window != null)
-			window.dispose();
+		if (frame != null)
+			frame.dispose();
 		System.exit(1);
+	}
+	
+	public JFrame getFrame() {
+		return frame;
+	}
+	
+	public void setPage(Page page) {
+		if (!pageStack.isEmpty())
+			pageStack.peek().onHidden();
+		
+		pageStack.push(page);
+		replacePage(page);
+		frame.repaint();
+		page.onShown();
+	}
+	
+	public void back() {
+		Page current = pageStack.poll();
+		Page last = pageStack.peek();
+		if (current != null)
+			current.onHidden();
+		if (last == null)
+			last = new StartFrame(this);
+		replacePage(last);
+		last.onShown();
+	}
+	
+	private void replacePage(Page page) {
+		frame.setContentPane(page);
+		frame.pack();
+		frame.repaint();
+		frame.requestFocus();
 	}
 
 	private List<Image> getIconImages(String[] fileNames) {

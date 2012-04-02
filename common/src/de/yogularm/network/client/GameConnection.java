@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -40,6 +43,8 @@ public class GameConnection {
 	private Players otherPlayers = new Players();
 
 	private ConnectionState state = ConnectionState.IDLE;
+	
+	private static final int CONNECTION_TIMEOUT = 5000;
 
 	private interface NetworkAction {
 		public void run(BufferedReader in, PrintStream out) throws IOException;
@@ -213,14 +218,11 @@ public class GameConnection {
 	}
 
 	private void initSocket() throws IOException {
-		try {
-			state = ConnectionState.CONNECTING;
-			activeSocket = new Socket(host, port);
-			in = new BufferedReader(new InputStreamReader(activeSocket.getInputStream()));
-			out = new PrintStream(activeSocket.getOutputStream());
-		} catch (UnknownHostException e) {
-			throw new IOException(e);
-		}
+		state = ConnectionState.CONNECTING;
+		activeSocket = new Socket();
+		activeSocket.connect(new InetSocketAddress(host, port), CONNECTION_TIMEOUT);
+		in = new BufferedReader(new InputStreamReader(activeSocket.getInputStream()));
+		out = new PrintStream(activeSocket.getOutputStream());
 	}
 
 	private boolean login() throws IOException {
@@ -248,8 +250,8 @@ public class GameConnection {
 		Gson gson = GsonFactory.createGson();
 		Type collectionType = new TypeToken<Map<String, Player>>(){}.getType();
 		Map<String, Player> matchMap = gson.fromJson(response, collectionType);
-		/*if (player != null)
-			matchMap.remove(player.getName());*/
+		if (player != null)
+			matchMap.remove(player.getName());
 		otherPlayers.replaceAll(matchMap);
 	}
 	
@@ -265,7 +267,8 @@ public class GameConnection {
 					try {
 						BufferedReader passiveIn;
 						synchronized (sync) {
-							socket = new Socket(host, port);
+							socket = new Socket();
+							socket.connect(new InetSocketAddress(host, port), CONNECTION_TIMEOUT);
 							passiveIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 							PrintStream passiveOut = new PrintStream(socket.getOutputStream());
 							
@@ -319,9 +322,18 @@ public class GameConnection {
 		switch (information) {
 		case MATCH_CREATED:
 			match = GsonFactory.createGson().fromJson(parameter, Match.class);
+
+			// the players in the match are created by deserialization and thus are not identical to
+			// the players used by this GameConnection object.
+			List<Player> players = new ArrayList<Player>(match.getPlayers());
+			match.getPlayers().clear();
+			for (Player p : players) {
+				p = findPlayer(p.getName());
+				if (p != null)
+					p.joinMatch(match);
+			}
+
 			openMatches.add(match);
-			if (match.getPlayers().contains(this.player))
-				this.player.joinMatch(match);
 			break;
 		case MATCH_CANCELLED:
 		case MATCH_PAUSED:
@@ -330,35 +342,19 @@ public class GameConnection {
 			id = Integer.parseInt(parameter);
 			match = openMatches.getByID(id);
 			if (match != null) {
-				Match playersMatch = null;
-				if (this.player.getCurrentMatch() != null && this.player.getCurrentMatch().equals(match))
-					playersMatch = this.player.getCurrentMatch();
-				if (playersMatch == match)
-					playersMatch = null;
-				
 				switch (information) {
 				case MATCH_CANCELLED:
 					match.cancel();
-					openMatches.remove(match); // to be on the safe side...
-					if (playersMatch != null)
-						playersMatch.cancel();
-					this.player.leaveMatch();
+					openMatches.remove(match);
 					break;
 				case MATCH_PAUSED:
 					match.pause();
-					if (playersMatch != null)
-						playersMatch.pause();
 					break;
 				case MATCH_RESUMED:
 					match.resume();
-					if (playersMatch != null)
-						playersMatch.resume();
 					break;
 				case MATCH_STARTED:
 					match.start();
-					//openMatches.remove(match.getID());
-					if (playersMatch != null)
-						playersMatch.start();
 					break;
 				}
 			} else {
@@ -383,7 +379,7 @@ public class GameConnection {
 		case PLAYER_LEFT_MATCH:
 			parts = parameter.split("\\s", 2);
 			assert parts.length >= 2;
-			player = otherPlayers.getByName(parts[0]);
+			player = findPlayer(parts[0]);
 			id = Integer.parseInt(parts[1]);
 			match = openMatches.getByID(id);
 			if (match != null && player != null) {
@@ -391,15 +387,11 @@ public class GameConnection {
 				case PLAYER_JOINED_MATCH:
 					if (player.getCurrentMatch() == null) {
 						player.joinMatch(match);
-						if (this.player.equals(player) && this.player.getCurrentMatch() == null)
-							this.player.joinMatch(match);
 						return;
 					}
 					break;
 				case PLAYER_LEFT_MATCH:
 					player.leaveMatch();
-					if (this.player.equals(player) && this.player.getCurrentMatch() != null)
-						this.player.leaveMatch();
 					return;
 				}
 			}
@@ -468,5 +460,12 @@ public class GameConnection {
 	private void setState(ConnectionState state) {
 		this.state = state;
 		onStateChanged.call(EventArgs.EMPTY);
+	}
+	
+	private Player findPlayer(String name) {
+		if (player != null && player.getName().equals(name))
+			return player;
+		else
+			return otherPlayers.getByName(name);
 	}
 }

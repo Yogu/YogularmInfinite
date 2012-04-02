@@ -7,6 +7,7 @@ import de.yogularm.Config;
 import de.yogularm.input.DigitalInput;
 
 public class InputImpl extends DigitalInput {
+	private GameFrame frame;
 
 	@Override
 	public boolean isLeft() {
@@ -34,7 +35,9 @@ public class InputImpl extends DigitalInput {
 	private boolean isDown;
 	private KeyListener keyListener;
 
-	public InputImpl() {
+	public InputImpl(GameFrame frame) {
+		this.frame = frame;
+		
 		keyListener = new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				updateKey(e.getKeyCode(), true);
@@ -75,9 +78,9 @@ public class InputImpl extends DigitalInput {
 			if (isPressed)
 				Config.DEBUG_BUILDING = !Config.DEBUG_BUILDING;
 			break;
-		case KeyEvent.VK_F12:
+		case KeyEvent.VK_ESCAPE:
 			if (isPressed)
-					ConnectFrame.open();
+					frame.exit();
 			break;
 		}
 	}

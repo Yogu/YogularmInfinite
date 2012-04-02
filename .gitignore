@@ -2,6 +2,9 @@
 bin/
 exe/
 
+# Temporary files
+*.log
+
 # Linux
 .directory
 *~

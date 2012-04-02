@@ -11,7 +11,7 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-public class ObservableMap<K, V extends Observable> implements ListModel {
+public class ObservableMap<K, V extends Observable> extends Observable implements ListModel {
 	private List<ListDataListener> listeners1 = new ArrayList<ListDataListener>();
 	private List<ListListener<V>> listeners2 = new ArrayList<ListListener<V>>();
 	private Map<K, V> map = new HashMap<K, V>();
@@ -89,6 +89,9 @@ public class ObservableMap<K, V extends Observable> implements ListModel {
 				}
 			}
 		}
+		
+		setChanged();
+		notifyObservers();
 	}
 
 	public void add(K key, V item) {
@@ -112,6 +115,9 @@ public class ObservableMap<K, V extends Observable> implements ListModel {
 				listener.itemAdded(item);
 			}
 		}
+		
+		setChanged();
+		notifyObservers();
 	}
 
 	public void remove(K key) {
@@ -141,6 +147,9 @@ public class ObservableMap<K, V extends Observable> implements ListModel {
 				listener.itemRemoved(item);
 			}
 		}
+		
+		setChanged();
+		notifyObservers();
 	}
 	
 	private class TheObserver implements Observer {
@@ -161,6 +170,9 @@ public class ObservableMap<K, V extends Observable> implements ListModel {
 						listener.itemChanged(item);
 					}
 				}
+				
+				setChanged();
+				notifyObservers();
 			}
 		}
 	}

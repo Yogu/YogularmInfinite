@@ -10,11 +10,10 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -23,8 +22,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -36,85 +35,63 @@ import de.yogularm.event.EventArgs;
 import de.yogularm.event.EventListener;
 import de.yogularm.event.ExceptionEventArgs;
 import de.yogularm.network.Match;
+import de.yogularm.network.MatchState;
 import de.yogularm.network.Matches;
 import de.yogularm.network.Player;
 import de.yogularm.network.Players;
 import de.yogularm.network.client.GameConnection;
 import de.yogularm.network.client.MessageEventArgs;
+import javax.swing.border.TitledBorder;
 
-import javax.swing.ListSelectionModel;
+public class NetworkFrame extends Page {
+	private static final long serialVersionUID = 2671570492612526987L;
 
-public class NetworkFrame extends JFrame {
 	private GameConnection connection;
 	
-	private JPanel contentPane;
-	private JTextField chatInputField;
+	private CustomTextField chatInputField;
 	private JButton sendChatMessageButton;
-
 	private JTextArea chatField;
-
 	private JLabel serverLabel;
-
 	private JButton newMatchButton;
-
 	private JButton joinMatchButton;
-
 	private JButton leaveMatchButton;
-
 	private JButton startMatchButton;
-
 	private JButton cancelMatchButton;
+	private JTable matchTable;
 
 	/**
 	 * Create the frame.
 	 */
-	public NetworkFrame(final GameConnection connection) {
+	public NetworkFrame(final SwingLauncher launcher, final GameConnection connection) {
+		super(launcher);
 		this.connection = connection;
-		connection.onStateChanged.addListener(new EventListener<EventArgs>() {
-			@Override
-			public void call(Object sender, EventArgs param) {
-				updateServerLabel();
-			}
-		});
-		connection.onNetworkError.addListener(new EventListener<ExceptionEventArgs>() {
-			public void call(Object sender, ExceptionEventArgs param) {
-				JOptionPane.showMessageDialog(NetworkFrame.this, param.getException().getMessage(), "Network Error", JOptionPane.ERROR_MESSAGE);
-				setVisible(false);
-			}
-		});
-		connection.onMessageReceived.addListener(new EventListener<MessageEventArgs>() {
-			@Override
-			public void call(Object sender, MessageEventArgs param) {
-				logChatMessage(param.getPlayer(), param.getMessage());
-			}
-		});
-
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent windowevent) {
-				dispose();
-				connection.close();
-			}
-		});
 		
-		setTitle("Yogularm Infinite - Multiplayer Mode");
-		setBounds(100, 100, 767, 556);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPane = new JSplitPane();
-		contentPane.add(splitPane, BorderLayout.CENTER);
+		add(splitPane, BorderLayout.CENTER);
 		
 		JPanel rightPanel = new JPanel();
+		rightPanel.setBorder(null);
 		splitPane.setRightComponent(rightPanel);
 		rightPanel.setLayout(new BorderLayout(0, 0));
 		
+		JSplitPane rightSplitPane = new JSplitPane();
+		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		rightPanel.add(rightSplitPane, BorderLayout.CENTER);
+		
 		JPanel rightBottomPanel = new JPanel();
-		rightPanel.add(rightBottomPanel, BorderLayout.SOUTH);
+		rightBottomPanel.setBorder(new TitledBorder(null, "Chat", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		rightSplitPane.setRightComponent(rightBottomPanel);
 		rightBottomPanel.setLayout(new BorderLayout(0, 0));
 		
-		chatInputField = new JTextField();
+		JPanel chatComposePanel = new JPanel();
+		chatComposePanel.setBorder(null);
+		rightBottomPanel.add(chatComposePanel, BorderLayout.SOUTH);
+		chatComposePanel.setLayout(new BorderLayout(0, 0));
+		
+		chatInputField = new CustomTextField();
 		chatInputField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -135,8 +112,8 @@ public class NetworkFrame extends JFrame {
 				chatInputField.selectAll();
 			}
 		});
-		rightBottomPanel.add(chatInputField, BorderLayout.CENTER);
-		chatInputField.setText("Type to compose...");
+		chatComposePanel.add(chatInputField, BorderLayout.CENTER);
+		chatInputField.setPlaceholder("Type to compose...");
 		chatInputField.setColumns(10);
 		
 		sendChatMessageButton = new JButton("Send");
@@ -145,27 +122,25 @@ public class NetworkFrame extends JFrame {
 				sendChatMessage();
 			}
 		});
-		rightBottomPanel.add(sendChatMessageButton, BorderLayout.EAST);
-		
-		JSplitPane rightSplitPane = new JSplitPane();
-		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		rightPanel.add(rightSplitPane, BorderLayout.CENTER);
-		
-		JScrollPane playersScrollPane = new JScrollPane();
-		rightSplitPane.setLeftComponent(playersScrollPane);
-		
-		JList playerList = new JList(new PlayersModel(connection.getOtherPlayers()));
-		playersScrollPane.setViewportView(playerList);
+		chatComposePanel.add(sendChatMessageButton, BorderLayout.EAST);
 		
 		JScrollPane chatScrollPane = new JScrollPane();
-		rightSplitPane.setRightComponent(chatScrollPane);
+		rightBottomPanel.add(chatScrollPane, BorderLayout.CENTER);
 		
 		chatField = new JTextArea();
 		chatField.setEditable(false);
 		chatScrollPane.setViewportView(chatField);
 		
-		JLabel lblNewLabel = new JLabel("Other Players on this server:");
-		rightPanel.add(lblNewLabel, BorderLayout.NORTH);
+		JPanel rightTopPanel = new JPanel();
+		rightTopPanel.setBorder(new TitledBorder(null, "Other players on this server", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		rightSplitPane.setLeftComponent(rightTopPanel);
+		rightTopPanel.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane playersScrollPane = new JScrollPane();
+		rightTopPanel.add(playersScrollPane, BorderLayout.CENTER);
+		
+		JList<String> playerList = new JList<String>(new PlayersModel(connection.getOtherPlayers()));
+		playersScrollPane.setViewportView(playerList);
 		
 		JPanel leftPanel = new JPanel();
 		splitPane.setLeftComponent(leftPanel);
@@ -174,29 +149,36 @@ public class NetworkFrame extends JFrame {
 		JScrollPane matchesScrollPane = new JScrollPane();
 		leftPanel.add(matchesScrollPane, BorderLayout.CENTER);
 		
-		final JTable matchTable = new JTable(new MatchesModel(connection.getOpenMatches()));
+		matchTable = new JTable(new MatchesModel(connection.getOpenMatches()));
 		matchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		matchesScrollPane.setViewportView(matchTable);
 		matchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				boolean selected = matchTable.getSelectedRowCount() > 0;
-				joinMatchButton.setEnabled(connection.getPlayer().getCurrentMatch() == null && selected);
+				joinMatchButton.setEnabled(connection.getPlayer().getCurrentMatch() == null && isOpenMatchSelected());
 			}
 		});
 		
 		JPanel leftTopPanel = new JPanel();
+		leftTopPanel.setBorder(null);
 		leftPanel.add(leftTopPanel, BorderLayout.NORTH);
-		leftTopPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		leftTopPanel.setLayout(new BorderLayout(0, 0));
 		
 		serverLabel = new JLabel("Connected to Server");
 		leftTopPanel.add(serverLabel);
 		updateServerLabel();
 		
 		JButton leaveServerButton = new JButton("Leave Server");
-		leftTopPanel.add(leaveServerButton);
+		leftTopPanel.add(leaveServerButton, BorderLayout.EAST);
+		leaveServerButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				launcher.back();
+			}
+		});
 		
 		JPanel leftBottomPanel = new JPanel();
+		leftBottomPanel.setBorder(null);
 		FlowLayout flowLayout = (FlowLayout) leftBottomPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		leftPanel.add(leftBottomPanel, BorderLayout.SOUTH);
@@ -240,7 +222,7 @@ public class NetworkFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (connection.getPlayer().getCurrentMatch() != null) {
 					connection.leaveMatch();
-					joinMatchButton.setEnabled(matchTable.getSelectedRowCount() > 0);
+					joinMatchButton.setEnabled(isOpenMatchSelected());
 					leaveMatchButton.setEnabled(false);
 					newMatchButton.setEnabled(true);
 					startMatchButton.setEnabled(false);
@@ -269,11 +251,36 @@ public class NetworkFrame extends JFrame {
 				startMatchButton.setEnabled(false);
 				cancelMatchButton.setEnabled(false);
 				newMatchButton.setEnabled(true);
-				joinMatchButton.setEnabled(matchTable.getSelectedRowCount() > 0);
+				joinMatchButton.setEnabled(isOpenMatchSelected());
 				leaveMatchButton.setEnabled(false);
 			}
 		});
 		leftBottomPanel.add(cancelMatchButton);
+		
+		connection.onStateChanged.addListener(new EventListener<EventArgs>() {
+			@Override
+			public void call(Object sender, EventArgs param) {
+				updateServerLabel();
+			}
+		});
+		connection.onNetworkError.addListener(new EventListener<ExceptionEventArgs>() {
+			public void call(Object sender, ExceptionEventArgs param) {
+				JOptionPane.showMessageDialog(NetworkFrame.this, param.getException().getMessage(), "Network Error", JOptionPane.ERROR_MESSAGE);
+				setVisible(false);
+			}
+		});
+		connection.onMessageReceived.addListener(new EventListener<MessageEventArgs>() {
+			@Override
+			public void call(Object sender, MessageEventArgs param) {
+				logChatMessage(param.getPlayer(), param.getMessage());
+			}
+		});
+		
+		// Calls updateButtonsEnabled() if required
+		Observer observer = new UpdateObserver();
+		connection.getOpenMatches().addObserver(observer);
+		connection.getOtherPlayers().addObserver(observer);
+		connection.getPlayer().addObserver(observer);
 	}
 	
 	private void sendChatMessage() {
@@ -286,17 +293,45 @@ public class NetworkFrame extends JFrame {
 	}
 		
 	private void logChatMessage(String player, String message) {
-		chatField.setText(chatField.getText() + "\n" + player + ": " + message);
+		chatField.setText(String.format("%s%s: %s\n", chatField.getText(), player, message ));
 	}
 	
 	private void updateServerLabel() {
 		serverLabel.setText(getConnectionStatus());
 	}
 	
+	private boolean isOpenMatchSelected() {
+		if (matchTable.getSelectedRowCount() == 1) {
+			int index = matchTable.getSelectedRow();
+			if (index >= 0 && index < connection.getOpenMatches().getSize()) {
+				Match match = connection.getOpenMatches().getElementAt(index);
+				return match.getState() == MatchState.OPEN;
+			}
+		}
+		return false;
+	}
+	
+	private void updateButtonsEnabled() {
+		Match currentMatch = connection.getPlayer().getCurrentMatch();
+		newMatchButton.setEnabled(currentMatch == null);
+		joinMatchButton.setEnabled(currentMatch == null && isOpenMatchSelected());
+		leaveMatchButton.setEnabled(currentMatch != null);
+		startMatchButton.setEnabled(
+			currentMatch != null && currentMatch.getOwner().equals(connection.getPlayer())
+			&& currentMatch.getState() == MatchState.OPEN);
+		cancelMatchButton.setEnabled(currentMatch != null && currentMatch.getOwner().equals(connection.getPlayer()));
+	}
+	
+	private class UpdateObserver implements Observer {
+		public void update(Observable o, Object arg) {
+			updateButtonsEnabled();
+		}
+	}
+	
 	private String getConnectionStatus() {
 		switch (connection.getState()) {
 		case CONNECTED:
-			return "Connected to " + connection.getHost();
+			return String.format("At %s as %s", connection.getHost(), connection.getPlayer().getName());
 		case CONNECTING:
 			return "Connecting to " + connection.getHost() + "...";
 		case CLOSING:
@@ -313,7 +348,7 @@ public class NetworkFrame extends JFrame {
 	 * 
 	 * @author Yogu
 	 */
-	private static class PlayersModel implements ListModel {
+	private static class PlayersModel implements ListModel<String> {
 		private Players players;
 		
 		public PlayersModel(Players players) {
@@ -326,7 +361,7 @@ public class NetworkFrame extends JFrame {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public String getElementAt(int index) {
 			if (index < players.getSize())
 				return players.getElementAt(index).getName();
 			else
@@ -407,6 +442,7 @@ public class NetworkFrame extends JFrame {
 		@Override
 		public void contentsChanged(ListDataEvent e) {
 			fireTableRowsUpdated(e.getIndex0(), e.getIndex1());
+			
 		}
 
 		@Override
