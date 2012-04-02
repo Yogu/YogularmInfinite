@@ -8,6 +8,9 @@ import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 
+import de.yogularm.MultiPlayerWorld;
+import de.yogularm.World;
+
 public class Match extends Observable {
 	@Expose
 	private int id;
@@ -19,6 +22,8 @@ public class Match extends Observable {
 	private MatchState state = MatchState.OPEN;
 	@Expose
 	private String comment;
+	
+	public MultiPlayerWorld world;
 	
 	private static final Object idLock = new Object();
 	private static int NEXT_ID = 1;
@@ -107,6 +112,10 @@ public class Match extends Observable {
 	
 	public MatchState getState() {
 		return state;
+	}
+	
+	public boolean isStarted() {
+		return state == MatchState.RUNNING || state == MatchState.PAUSED;
 	}
 	
 	public Set<Player> getPlayers() {

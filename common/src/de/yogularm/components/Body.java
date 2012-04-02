@@ -15,29 +15,31 @@ import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
 public class Body extends Component {
+	private static final long serialVersionUID = -7544119212446194556L;
+	
 	private Rect bounds;
 	private float mass = 1.0f;
 	private Vector momentum;
-	private Vector actualSpeed; // cached
-	private Vector collectedForce;
-	private Vector totalForce;
+	private transient Vector actualSpeed; // cached
+	private transient Vector collectedForce;
+	private transient Vector totalForce;
 	private boolean isGravityAffected = false;
 	private boolean isSolid = true;
 	private boolean isShiftable = false;
 	private boolean isClimbable = false;
 	private boolean canClimb = false;
-	private float walkSpeed = 0;
-	private float climbSpeed = 0;
-	private boolean hasWalkSpeed = false;
-	private List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
-	private Boolean standsOnGround; // cache
-	private boolean isClimbing;
-	private float massCache = mass;
-	private boolean walkSpeedApplied = false;
-	private Vector shiftSpeed;
-	private Vector actualShiftSpeed;
-	private List<Vector> collectedForces; // debug
-	private List<Vector> forces; // debug
+	private transient float walkSpeed = 0;
+	private transient float climbSpeed = 0;
+	private transient boolean hasWalkSpeed = false;
+	private transient List<ForceToSpeed> forceToSpeed = new ArrayList<ForceToSpeed>();
+	private transient Boolean standsOnGround; // cache
+	private transient boolean isClimbing;
+	private float originalMass = mass;
+	private transient boolean walkSpeedApplied = false;
+	private transient Vector shiftSpeed;
+	private transient Vector actualShiftSpeed;
+	private transient List<Vector> collectedForces; // debug
+	private transient List<Vector> forces; // debug
 
 	private static final float UNSHIFTABLE_MASS = 1e15f;
 
@@ -124,7 +126,7 @@ public class Body extends Component {
 
 	public void setIsShiftable(boolean value) {
 		if (value)
-			mass = massCache;
+			mass = originalMass;
 		else
 			mass = UNSHIFTABLE_MASS;
 		// isShiftable = value;
@@ -157,7 +159,7 @@ public class Body extends Component {
 	public void setMass(float mass) {
 		if (!isShiftable)
 			this.mass = mass;
-		massCache = mass;
+		originalMass = mass;
 	}
 
 	public void setSpeed(Vector speed) {

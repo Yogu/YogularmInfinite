@@ -1,15 +1,19 @@
 package de.yogularm.components;
 
+import java.io.Serializable;
+
 import de.yogularm.drawing.AnimatedImage;
 import de.yogularm.drawing.Animation;
 import de.yogularm.drawing.Drawable;
 import de.yogularm.event.Event;
 import de.yogularm.geometry.Vector;
 
-public class Component implements Locatable {
+public class Component implements Locatable, Serializable {
+	private static final long serialVersionUID = -4415003540921445039L;
+	
 	private Vector position;
-	private ComponentCollection collection;
-	private boolean isRemoved = false;
+	private transient ComponentCollection collection;
+	private transient boolean isRemoved = false;
 	private Drawable drawable;
 
 	/**

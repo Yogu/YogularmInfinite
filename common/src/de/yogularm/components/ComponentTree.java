@@ -11,13 +11,18 @@ import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
-public class ComponentTree implements ComponentCollection {
+public class ComponentTree implements ObservableComponentCollection {
 	private int sectorWidth;
 	private int sectorHeight;
 	private int minX, maxX, minY, maxY; // absolutely ranges of the world
 	private Map<Point, List<Component>> tree = new HashMap<Point, List<Component>>();
 	private int count;
+	private List<ComponentCollectionListener> listeners = new ArrayList<ComponentCollectionListener>();
 	
+	/**
+	 * The fraction of a sector dimension that is added to a rectangle when receiving components in
+	 * that sector
+	 */
 	private static final float BUFFER_FRACTION = 0.1f;
 	
 	public ComponentTree(int sectorWidth, int sectorHeight) {
@@ -25,19 +30,23 @@ public class ComponentTree implements ComponentCollection {
 		this.sectorHeight = sectorHeight;
 	}
 	
+	private Point getSector(Vector position) {
+		return new Point(
+				(int)(position.getX() / sectorWidth),
+		  	(int)(position.getY() / sectorHeight));
+	}
+	
 	private List<Component> getListOfPosition(Vector position, boolean createIfMissing) {
-		Point point = new Point(
-			(int)(position.getX() / sectorWidth),
-	  	(int)(position.getY() / sectorHeight));
-	  if (tree.containsKey(point))
-	  	return tree.get(point);
+		Point sector = getSector(position);
+	  if (tree.containsKey(sector))
+	  	return tree.get(sector);
 	  else if (createIfMissing) {
 	  	List<Component> list = new ArrayList<Component>();
-	  	minX = Math.min(minX, point.getX());
-	  	maxX = Math.max(maxX, point.getX());
-	  	minY = Math.min(minY, point.getY());
-	  	maxY = Math.max(maxY, point.getY());
-	  	tree.put(point, list);
+	  	minX = Math.min(minX, sector.getX());
+	  	maxX = Math.max(maxX, sector.getX());
+	  	minY = Math.min(minY, sector.getY());
+	  	maxY = Math.max(maxY, sector.getY());
+	  	tree.put(sector, list);
 	  	return list;
 	  } else
 	  	return null;
@@ -61,9 +70,6 @@ public class ComponentTree implements ComponentCollection {
 				}
 			}
 		}
-
-		//System.out.println(minX + " - " + maxX + "; " + minY + " - " + maxY);
-		//System.out.println(Thread.currentThread().getStackTrace()[2] + ": " + (maxX - minX + 1) * (maxY - minY + 1));
 		
 	  return result;
   }
@@ -74,6 +80,19 @@ public class ComponentTree implements ComponentCollection {
 			return new ArrayList<Component>(list);
 		else
 			return new ArrayList<Component>(0);
+	}
+	
+	/**
+	 * Gets a list of all components in the given sector
+	 * 
+	 * @param sector The sector whose components to receive
+	 * @return
+	 */
+	public List<Component> getComponentsOfSector(Point sector) {
+		if (tree.containsKey(sector))
+			return new ArrayList<Component>(tree.get(sector));
+		else
+			return new ArrayList<Component>();
 	}
 
 	@Override
@@ -89,17 +108,39 @@ public class ComponentTree implements ComponentCollection {
 		  list.add(component);
 		  count++;
 		  
+		  synchronized (listeners) {
+		  	Point sector = getSector(component.getPosition());
+		  	for (ComponentCollectionListener listener : listeners) {
+		  		listener.componentAdded(this, component, sector);
+		  	}
+		  }
+		  
 		  // Track changes
 		  component.onMoved.addListener(new EventListener<Vector>() {
 				public void call(Object sender, Vector oldPosition) {
-					List<Component> oldList = getListOfPosition(oldPosition, false);
-					List<Component> newList = getListOfPosition(component.getPosition(), true);
-					if (newList != oldList) {
-						if (oldList != null && oldList.remove(component))
-							newList.add(component);
-						else // the component must have been removed
-							component.onMoved.removeListener(this);
-					}
+			  	Point oldSector = getSector(oldPosition);
+			  	Point newSector = getSector(component.getPosition());
+			  	boolean sectorChanged = !oldSector.equals(newSector);
+			  	
+			  	if (sectorChanged) {
+						List<Component> oldList = getListOfPosition(oldPosition, false);
+						List<Component> newList = getListOfPosition(component.getPosition(), true);
+						if (newList != oldList) {
+							if (oldList != null && oldList.remove(component)) {
+								newList.add(component);
+							} else {
+								 // the component must have been removed
+								component.onMoved.removeListener(this);
+								return;
+							}
+						}
+			  	}
+
+				  synchronized (listeners) {
+				  	for (ComponentCollectionListener listener : listeners) {
+				  		listener.componentMoved(ComponentTree.this, component, oldSector, newSector, sectorChanged);
+				  	}
+				  }
 				}
 			});
 		}
@@ -109,8 +150,16 @@ public class ComponentTree implements ComponentCollection {
   public void remove(Component component) {
 		List<Component> list = getListOfPosition(component.getPosition(), false);
 	  if (list != null) {
-	  	if (list.remove(component))
+	  	if (list.remove(component)) {
 	  		count--;
+			  
+			  synchronized (listeners) {
+			  	Point sector = getSector(component.getPosition());
+			  	for (ComponentCollectionListener listener : listeners) {
+			  		listener.componentRemoved(this, component, sector);
+			  	}
+			  }
+	  	}
 	  }
   }
 	
@@ -120,5 +169,19 @@ public class ComponentTree implements ComponentCollection {
 	 */
 	public int getCount() {
 		return count;
+	}
+
+	@Override
+	public void addListener(ComponentCollectionListener listener) {
+		synchronized (listeners) {
+			listeners.add(listener);
+		}
+	}
+
+	@Override
+	public void removeListener(ComponentCollectionListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
 	}
 }

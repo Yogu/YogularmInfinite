@@ -1,5 +1,6 @@
 package de.yogularm.server.meta;
 
+import de.yogularm.MultiPlayerWorld;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.Match;
 import de.yogularm.network.MatchState;
@@ -19,6 +20,7 @@ public class StartCommand extends CommandHandlerUtils implements CommandHandler 
 			return err(CommunicationError.INVALID_STATE, "Match already started");
 		
 		match.start();
+		match.world = new MultiPlayerWorld();
 		
 		data.serverData.notifyClients(NetworkInformation.MATCH_STARTED, match.getID() + "");
 		
