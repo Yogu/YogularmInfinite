@@ -4,14 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import de.yogularm.event.Event;
 import de.yogularm.event.EventArgs;
@@ -19,9 +20,12 @@ import de.yogularm.event.ExceptionEventArgs;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.CommunicationException;
 import de.yogularm.network.Match;
+import de.yogularm.network.Matches;
 import de.yogularm.network.NetworkCommand;
 import de.yogularm.network.NetworkInformation;
 import de.yogularm.network.Player;
+import de.yogularm.network.Players;
+import de.yogularm.utils.GsonFactory;
 
 public class GameConnection {
 	private Socket activeSocket;
@@ -32,8 +36,8 @@ public class GameConnection {
 	private String host;
 	private int port;
 	private Player player;
-	private Map<Integer, Match> matches = new HashMap<Integer, Match>();
-	private Map<String, Player> players = new HashMap<String, Player>();
+	private Matches openMatches = new Matches();
+	private Players otherPlayers = new Players();
 
 	private ConnectionState state = ConnectionState.IDLE;
 
@@ -62,6 +66,11 @@ public class GameConnection {
 	 */
 	public final Event<EventArgs> onStateChanged = new Event<EventArgs>(this);
 
+	/**
+	 * An event that is called when a player sends a message
+	 */
+	public final Event<MessageEventArgs> onMessageReceived = new Event<MessageEventArgs>(this);
+
 	public void start() {
 		if (state != ConnectionState.IDLE)
 			throw new IllegalStateException("Start can only be called in IDLE state");
@@ -84,11 +93,69 @@ public class GameConnection {
 	public String getHost() {
 		return host;
 	}
+	
+	public Matches getOpenMatches() {
+		return openMatches;
+	}
+	
+	public Players getOtherPlayers() {
+		return otherPlayers;
+	}
 
 	public void sendMessage(final String message) {
 		networkActions.add(new NetworkAction() {
 			public void run(BufferedReader in, PrintStream out) throws IOException {
 				sendCommand(NetworkCommand.SAY, message);
+			}
+		});
+	}
+
+	public void createMatch(final String comment) {
+		networkActions.add(new NetworkAction() {
+			public void run(BufferedReader in, PrintStream out) throws IOException {
+				if (player.getCurrentMatch() == null) {
+					sendCommand(NetworkCommand.CREATE, comment);
+				}
+			}
+		});
+	}
+
+	public void joinMatch(final Match match) {
+		networkActions.add(new NetworkAction() {
+			public void run(BufferedReader in, PrintStream out) throws IOException {
+				if (player.getCurrentMatch() == null) {
+					sendCommand(NetworkCommand.JOIN, match.getID() + "");
+				}
+			}
+		});
+	}
+
+	public void leaveMatch() {
+		networkActions.add(new NetworkAction() {
+			public void run(BufferedReader in, PrintStream out) throws IOException {
+				if (player.getCurrentMatch() != null) {
+					sendCommand(NetworkCommand.LEAVE);
+				}
+			}
+		});
+	}
+
+	public void startMatch() {
+		networkActions.add(new NetworkAction() {
+			public void run(BufferedReader in, PrintStream out) throws IOException {
+				if (player.getCurrentMatch() != null) {
+					sendCommand(NetworkCommand.START);
+				}
+			}
+		});
+	}
+
+	public void cancelMatch() {
+		networkActions.add(new NetworkAction() {
+			public void run(BufferedReader in, PrintStream out) throws IOException {
+				if (player.getCurrentMatch() != null) {
+					sendCommand(NetworkCommand.CANCEL);
+				}
 			}
 		});
 	}
@@ -110,6 +177,7 @@ public class GameConnection {
 						System.out.println("connected, session: " + sessionKey);
 						initPassiveMode();
 						receiveMatchList();
+						receivePlayerList();
 
 						while (state == ConnectionState.CONNECTED) {
 							Thread.sleep(20); // in this stream, there are no time-critical
@@ -168,32 +236,47 @@ public class GameConnection {
 	}
 	
 	private void receiveMatchList() throws IOException {
-		String response = sendCommand(NetworkCommand.LIST);
-		matches = Match.deserializeMatches(response);
+		String response = sendCommand(NetworkCommand.LIST_MATCHES);
+		Gson gson = GsonFactory.createGson();
+		Type collectionType = new TypeToken<Map<Integer, Match>>(){}.getType();
+		Map<Integer, Match> matchMap = gson.fromJson(response, collectionType);
+		openMatches.replaceAll(matchMap);
 	}
 	
 	private void receivePlayerList() throws IOException {
-		String response = sendCommand(NetworkCommand.LIST);
-		matches = Match.deserializeMatches(response);
+		String response = sendCommand(NetworkCommand.LIST_PLAYERS);
+		Gson gson = GsonFactory.createGson();
+		Type collectionType = new TypeToken<Map<String, Player>>(){}.getType();
+		Map<String, Player> matchMap = gson.fromJson(response, collectionType);
+		/*if (player != null)
+			matchMap.remove(player.getName());*/
+		otherPlayers.replaceAll(matchMap);
 	}
+	
+	private boolean passiveModeInitialized = false;
 	
 	private void initPassiveMode() {
 		final Object sync = new Object();
+		passiveModeInitialized = false;
 		new Thread(new Runnable() {
 			public void run() {
 				Socket socket = null;
 				try {
 					try {
-						socket = new Socket(host, port);
-						BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-						PrintStream out = new PrintStream(activeSocket.getOutputStream());
-						
-						sendCommand(in, out, NetworkCommand.PASSIVE, sessionKey);
-						sync.notify();
+						BufferedReader passiveIn;
+						synchronized (sync) {
+							socket = new Socket(host, port);
+							passiveIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+							PrintStream passiveOut = new PrintStream(socket.getOutputStream());
+							
+							sendCommand(passiveIn, passiveOut, NetworkCommand.PASSIVE, sessionKey);
+						}
+						passiveModeInitialized = true;
 
-						while (state != ConnectionState.CONNECTED) {
-							String line = in.readLine();
-							String[] parts = in.readLine().split("\\s", 2);
+						while (state == ConnectionState.CONNECTED) {
+							String line = passiveIn.readLine();
+							System.out.println("Information: " + line);
+							String[] parts = line.split("\\s", 2);
 							if (parts.length < 1)
 								throw new IOException("Invalid line in passive mode: " + line);
 							NetworkInformation information = NetworkInformation.fromString(parts[0]);
@@ -207,7 +290,7 @@ public class GameConnection {
 						onNetworkError.call(new ExceptionEventArgs(e));
 					}
 				} finally {
-					sync.notify();
+					passiveModeInitialized = true;
 					if (socket != null) {
 						try {
 							socket.close();
@@ -222,10 +305,8 @@ public class GameConnection {
 		
 		// Wait until passive mode is activated to make sure that list updates are received properly
 		// before receiving lists
-		try {
-			sync.wait();
-		} catch (InterruptedException e) {
-		}
+		while (!passiveModeInitialized)
+			synchronized (sync) {} // Wait until initialization is finished
 	}
 	
 	private void handleNetworkInformation(NetworkInformation information, String parameter) {
@@ -233,36 +314,56 @@ public class GameConnection {
 		Match match;
 		int id;
 		Player player;
+		String[] parts;
 		
 		switch (information) {
 		case MATCH_CREATED:
-			match = Match.deserialize(parameter);
-			matches.put(match.getID(), match);
+			match = GsonFactory.createGson().fromJson(parameter, Match.class);
+			openMatches.add(match);
+			if (match.getPlayers().contains(this.player))
+				this.player.joinMatch(match);
 			break;
 		case MATCH_CANCELLED:
 		case MATCH_PAUSED:
 		case MATCH_RESUMED:
 		case MATCH_STARTED:
 			id = Integer.parseInt(parameter);
-			match = matches.get(id);
+			match = openMatches.getByID(id);
 			if (match != null) {
+				Match playersMatch = null;
+				if (this.player.getCurrentMatch() != null && this.player.getCurrentMatch().equals(match))
+					playersMatch = this.player.getCurrentMatch();
+				if (playersMatch == match)
+					playersMatch = null;
+				
 				switch (information) {
 				case MATCH_CANCELLED:
 					match.cancel();
-					matches.remove(id);
+					openMatches.remove(match); // to be on the safe side...
+					if (playersMatch != null)
+						playersMatch.cancel();
+					this.player.leaveMatch();
 					break;
 				case MATCH_PAUSED:
 					match.pause();
+					if (playersMatch != null)
+						playersMatch.pause();
 					break;
 				case MATCH_RESUMED:
 					match.resume();
+					if (playersMatch != null)
+						playersMatch.resume();
 					break;
 				case MATCH_STARTED:
 					match.start();
+					//openMatches.remove(match.getID());
+					if (playersMatch != null)
+						playersMatch.start();
 					break;
 				}
 			} else {
 				// Something went wrong
+				System.out.println("Unknown match changed state");
 				networkActions.add(new NetworkAction() {
 					public void run(BufferedReader in, PrintStream out) throws IOException {
 						receiveMatchList();
@@ -271,38 +372,51 @@ public class GameConnection {
 			}
 			break;
 		case PLAYER_JOINED_SERVER:
-			player = new Player(parameter);
-			players.put(player.getName(), player);
+			player = GsonFactory.createGson().fromJson(parameter, Player.class);
+			if (!player.equals(this.player))
+				otherPlayers.add(player);
 			break;
 		case PLAYER_LEFT_SERVER:
-			players.remove(parameter);
+			otherPlayers.remove(parameter);
 			break;
 		case PLAYER_JOINED_MATCH:
 		case PLAYER_LEFT_MATCH:
-			String[] parts = parameter.split("\\s", 2);
+			parts = parameter.split("\\s", 2);
 			assert parts.length >= 2;
-			player = players.get(parts[0]);
+			player = otherPlayers.getByName(parts[0]);
 			id = Integer.parseInt(parts[1]);
-			match = matches.get(id);
+			match = openMatches.getByID(id);
 			if (match != null && player != null) {
 				switch (information) {
 				case PLAYER_JOINED_MATCH:
-					match.addPlayer(player);
+					if (player.getCurrentMatch() == null) {
+						player.joinMatch(match);
+						if (this.player.equals(player) && this.player.getCurrentMatch() == null)
+							this.player.joinMatch(match);
+						return;
+					}
 					break;
 				case PLAYER_LEFT_MATCH:
-					match.removePlayer(player);
-					break;
+					player.leaveMatch();
+					if (this.player.equals(player) && this.player.getCurrentMatch() != null)
+						this.player.leaveMatch();
+					return;
 				}
-			} else {
-				// Something went wrong
-				networkActions.add(new NetworkAction() {
-					public void run(BufferedReader in, PrintStream out) throws IOException {
-						receiveMatchList();
-						receivePlayerList();
-					}
-				});
 			}
+			
+			// Something went wrong
+			System.out.println("Unknown match or player");
+			networkActions.add(new NetworkAction() {
+				public void run(BufferedReader in, PrintStream out) throws IOException {
+					receiveMatchList();
+					receivePlayerList();
+				}
+			});
 			break;
+		case MESSAGE:
+			parts = parameter.split("\\s", 2);
+			assert parts.length >= 2;
+			onMessageReceived.call(new MessageEventArgs(parts[0], parts[1]));
 		}
 	}
 
@@ -321,7 +435,12 @@ public class GameConnection {
 		
 		String line = command.toString() + " " + parameter;
 		out.println(line);
-		String[] response = in.readLine().split("\\s", 2);
+		System.out.println("Sent: " + line);
+		String res = in.readLine();
+		if (res == null)
+			throw new IOException("Server has closed the connection");
+		System.out.println("Response: " + res);
+		String[] response = res.split("\\s", 2);
 		if (response.length < 1)
 			throw new IOException("Invalid response format");
 		if ("OK".equals(response[0])) {

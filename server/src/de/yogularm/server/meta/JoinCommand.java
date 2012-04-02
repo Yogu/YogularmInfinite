@@ -3,6 +3,7 @@ package de.yogularm.server.meta;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.Match;
 import de.yogularm.network.MatchState;
+import de.yogularm.network.NetworkInformation;
 import de.yogularm.server.ClientData;
 
 public class JoinCommand extends CommandHandlerUtils implements CommandHandler {
@@ -22,9 +23,14 @@ public class JoinCommand extends CommandHandlerUtils implements CommandHandler {
 			return err(CommunicationError.MATCH_NOT_FOUND);
 		if (match.getState() != MatchState.OPEN)
 			return err(CommunicationError.MATCH_NOT_OPEN);
+		if (data.player.getCurrentMatch() != null)
+			return err(CommunicationError.INVALID_STATE, "You are already assigned to a match");
 		
-		data.match = match;
-		match.addPlayer(data.player);
+		data.player.joinMatch(match);
+		
+		data.serverData.notifyClients(NetworkInformation.PLAYER_JOINED_MATCH, 
+			String.format("%s %s", data.player.getName(), match.getID()));
+		
 		return ok("Joined. Waiting for start");
   }
 }

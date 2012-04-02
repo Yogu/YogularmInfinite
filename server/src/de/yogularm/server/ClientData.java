@@ -11,7 +11,6 @@ public class ClientData {
   
 	public ServerData serverData;
 	public Player player;
-	public Match match;
 	public final String key;
 	
 	public ClientData() {

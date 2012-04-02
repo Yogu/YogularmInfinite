@@ -208,13 +208,18 @@ public class ConnectFrame {
 						}
 					}
 				});
-				connection.onNetworkError.addListener(new EventListener<ExceptionEventArgs>() {
+				EventListener<ExceptionEventArgs> listener = new EventListener<ExceptionEventArgs>() {
 					public void call(Object sender, ExceptionEventArgs param) {
 						enableControls(true);
 						showError(hostField, "Could not reach server. Check hostname, port and internet connection.");
 					}
-				});
-				connection.start();
+				};
+				connection.onNetworkError.addListener(listener);
+				try {
+					connection.start();
+				} finally {
+					connection.onNetworkError.removeListener(listener);
+				}
 			}
 		});
 	}

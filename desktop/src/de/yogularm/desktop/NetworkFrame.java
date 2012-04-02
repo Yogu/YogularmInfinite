@@ -1,7 +1,6 @@
 package de.yogularm.desktop;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,20 +10,39 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 
+import de.yogularm.event.EventArgs;
+import de.yogularm.event.EventListener;
+import de.yogularm.event.ExceptionEventArgs;
+import de.yogularm.network.Match;
+import de.yogularm.network.Matches;
 import de.yogularm.network.Player;
+import de.yogularm.network.Players;
 import de.yogularm.network.client.GameConnection;
+import de.yogularm.network.client.MessageEventArgs;
+
+import javax.swing.ListSelectionModel;
 
 public class NetworkFrame extends JFrame {
 	private GameConnection connection;
@@ -37,15 +55,49 @@ public class NetworkFrame extends JFrame {
 
 	private JLabel serverLabel;
 
+	private JButton newMatchButton;
+
+	private JButton joinMatchButton;
+
+	private JButton leaveMatchButton;
+
+	private JButton startMatchButton;
+
+	private JButton cancelMatchButton;
+
 	/**
 	 * Create the frame.
 	 */
-	public NetworkFrame(GameConnection connection) {
-		setTitle("Yogularm Infinite - Multiplayer Mode");
+	public NetworkFrame(final GameConnection connection) {
 		this.connection = connection;
+		connection.onStateChanged.addListener(new EventListener<EventArgs>() {
+			@Override
+			public void call(Object sender, EventArgs param) {
+				updateServerLabel();
+			}
+		});
+		connection.onNetworkError.addListener(new EventListener<ExceptionEventArgs>() {
+			public void call(Object sender, ExceptionEventArgs param) {
+				JOptionPane.showMessageDialog(NetworkFrame.this, param.getException().getMessage(), "Network Error", JOptionPane.ERROR_MESSAGE);
+				setVisible(false);
+			}
+		});
+		connection.onMessageReceived.addListener(new EventListener<MessageEventArgs>() {
+			@Override
+			public void call(Object sender, MessageEventArgs param) {
+				logChatMessage(param.getPlayer(), param.getMessage());
+			}
+		});
+
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent windowevent) {
+				dispose();
+				connection.close();
+			}
+		});
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 660, 539);
+		setTitle("Yogularm Infinite - Multiplayer Mode");
+		setBounds(100, 100, 767, 556);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -54,13 +106,13 @@ public class NetworkFrame extends JFrame {
 		JSplitPane splitPane = new JSplitPane();
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		JPanel panel = new JPanel();
-		splitPane.setRightComponent(panel);
-		panel.setLayout(new BorderLayout(0, 0));
+		JPanel rightPanel = new JPanel();
+		splitPane.setRightComponent(rightPanel);
+		rightPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_3 = new JPanel();
-		panel.add(panel_3, BorderLayout.SOUTH);
-		panel_3.setLayout(new BorderLayout(0, 0));
+		JPanel rightBottomPanel = new JPanel();
+		rightPanel.add(rightBottomPanel, BorderLayout.SOUTH);
+		rightBottomPanel.setLayout(new BorderLayout(0, 0));
 		
 		chatInputField = new JTextField();
 		chatInputField.addKeyListener(new KeyAdapter() {
@@ -83,7 +135,7 @@ public class NetworkFrame extends JFrame {
 				chatInputField.selectAll();
 			}
 		});
-		panel_3.add(chatInputField, BorderLayout.CENTER);
+		rightBottomPanel.add(chatInputField, BorderLayout.CENTER);
 		chatInputField.setText("Type to compose...");
 		chatInputField.setColumns(10);
 		
@@ -93,52 +145,135 @@ public class NetworkFrame extends JFrame {
 				sendChatMessage();
 			}
 		});
-		panel_3.add(sendChatMessageButton, BorderLayout.EAST);
+		rightBottomPanel.add(sendChatMessageButton, BorderLayout.EAST);
 		
-		JSplitPane splitPane_1 = new JSplitPane();
-		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		panel.add(splitPane_1, BorderLayout.CENTER);
+		JSplitPane rightSplitPane = new JSplitPane();
+		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		rightPanel.add(rightSplitPane, BorderLayout.CENTER);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		splitPane_1.setLeftComponent(scrollPane);
+		JScrollPane playersScrollPane = new JScrollPane();
+		rightSplitPane.setLeftComponent(playersScrollPane);
 		
-		JList playerList = new JList();
-		scrollPane.setViewportView(playerList);
+		JList playerList = new JList(new PlayersModel(connection.getOtherPlayers()));
+		playersScrollPane.setViewportView(playerList);
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		splitPane_1.setRightComponent(scrollPane_1);
+		JScrollPane chatScrollPane = new JScrollPane();
+		rightSplitPane.setRightComponent(chatScrollPane);
 		
 		chatField = new JTextArea();
-		scrollPane_1.setViewportView(chatField);
+		chatField.setEditable(false);
+		chatScrollPane.setViewportView(chatField);
 		
 		JLabel lblNewLabel = new JLabel("Other Players on this server:");
-		panel.add(lblNewLabel, BorderLayout.NORTH);
+		rightPanel.add(lblNewLabel, BorderLayout.NORTH);
 		
-		JPanel panel_1 = new JPanel();
-		splitPane.setLeftComponent(panel_1);
-		panel_1.setLayout(new BorderLayout(0, 0));
+		JPanel leftPanel = new JPanel();
+		splitPane.setLeftComponent(leftPanel);
+		leftPanel.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scrollPane_2 = new JScrollPane();
-		panel_1.add(scrollPane_2, BorderLayout.CENTER);
+		JScrollPane matchesScrollPane = new JScrollPane();
+		leftPanel.add(matchesScrollPane, BorderLayout.CENTER);
 		
-		JList matchList = new JList();
-		scrollPane_2.setViewportView(matchList);
+		final JTable matchTable = new JTable(new MatchesModel(connection.getOpenMatches()));
+		matchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		matchesScrollPane.setViewportView(matchTable);
+		matchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				boolean selected = matchTable.getSelectedRowCount() > 0;
+				joinMatchButton.setEnabled(connection.getPlayer().getCurrentMatch() == null && selected);
+			}
+		});
 		
-		JPanel panel_2 = new JPanel();
-		panel_1.add(panel_2, BorderLayout.NORTH);
-		panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JPanel leftTopPanel = new JPanel();
+		leftPanel.add(leftTopPanel, BorderLayout.NORTH);
+		leftTopPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
 		serverLabel = new JLabel("Connected to Server");
-		panel_2.add(serverLabel);
+		leftTopPanel.add(serverLabel);
 		updateServerLabel();
-				
-		JButton newMatchButton = new JButton("New Match");
-		panel_2.add(newMatchButton);
 		
 		JButton leaveServerButton = new JButton("Leave Server");
-		panel_2.add(leaveServerButton);
+		leftTopPanel.add(leaveServerButton);
 		
-		initGameConnection();
+		JPanel leftBottomPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) leftBottomPanel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		leftPanel.add(leftBottomPanel, BorderLayout.SOUTH);
+		
+		newMatchButton = new JButton("New Match");
+		newMatchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String comment = JOptionPane.showInputDialog(NetworkFrame.this, "You may enter a comment on the new match:", "Create New Match", JOptionPane.QUESTION_MESSAGE);
+				if (comment != null) {
+					connection.createMatch(comment);
+					newMatchButton.setEnabled(false);
+					joinMatchButton.setEnabled(false);
+					leaveMatchButton.setEnabled(true);
+					startMatchButton.setEnabled(true);
+					cancelMatchButton.setEnabled(true);
+				}
+			}
+		});
+		leftBottomPanel.add(newMatchButton);
+		
+		joinMatchButton = new JButton("Join Match");
+		joinMatchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = matchTable.getSelectedRow();
+				if (index >= 0 && index < connection.getOpenMatches().getSize()) {
+					Match match = connection.getOpenMatches().getElementAt(index);
+					connection.joinMatch(match);
+					joinMatchButton.setEnabled(false);
+					newMatchButton.setEnabled(false);
+					leaveMatchButton.setEnabled(true);
+					startMatchButton.setEnabled(match.getOwner().equals(connection.getPlayer()));
+					cancelMatchButton.setEnabled(match.getOwner().equals(connection.getPlayer()));
+				}
+			}
+		});
+		joinMatchButton.setEnabled(false);
+		leftBottomPanel.add(joinMatchButton);
+		
+		leaveMatchButton = new JButton("Leave Match");
+		leaveMatchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (connection.getPlayer().getCurrentMatch() != null) {
+					connection.leaveMatch();
+					joinMatchButton.setEnabled(matchTable.getSelectedRowCount() > 0);
+					leaveMatchButton.setEnabled(false);
+					newMatchButton.setEnabled(true);
+					startMatchButton.setEnabled(false);
+					cancelMatchButton.setEnabled(false);
+				}
+			}
+		});
+		leaveMatchButton.setEnabled(false);
+		leftBottomPanel.add(leaveMatchButton);
+		
+		startMatchButton = new JButton("Start Match");
+		startMatchButton.setEnabled(false);
+		startMatchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				connection.startMatch();
+				startMatchButton.setEnabled(false);
+			}
+		});
+		leftBottomPanel.add(startMatchButton);
+		
+		cancelMatchButton = new JButton("Cancel Match");
+		cancelMatchButton.setEnabled(false);
+		cancelMatchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				connection.cancelMatch();
+				startMatchButton.setEnabled(false);
+				cancelMatchButton.setEnabled(false);
+				newMatchButton.setEnabled(true);
+				joinMatchButton.setEnabled(matchTable.getSelectedRowCount() > 0);
+				leaveMatchButton.setEnabled(false);
+			}
+		});
+		leftBottomPanel.add(cancelMatchButton);
 	}
 	
 	private void sendChatMessage() {
@@ -146,12 +281,12 @@ public class NetworkFrame extends JFrame {
 		if (!text.trim().equals("")) {
 			connection.sendMessage(text);
 			chatInputField.setText("");
-			logChatMessage(connection.getPlayer(), text);
+			// message is logged when back-received via passive socket
 		}
 	}
 		
-	private void logChatMessage(Player player, String message) {
-		chatField.setText(chatField.getText() + "\n" + player.getName() + ": " + message);
+	private void logChatMessage(String player, String message) {
+		chatField.setText(chatField.getText() + "\n" + player + ": " + message);
 	}
 	
 	private void updateServerLabel() {
@@ -173,7 +308,115 @@ public class NetworkFrame extends JFrame {
 		}
 	}
 	
-	private void initGameConnection() {
+	/**
+	 * A list model that translates players given by a Players object to their names
+	 * 
+	 * @author Yogu
+	 */
+	private static class PlayersModel implements ListModel {
+		private Players players;
 		
+		public PlayersModel(Players players) {
+			this.players = players;
+		}
+
+		@Override
+		public void addListDataListener(ListDataListener l) {
+			players.addListDataListener(l);
+		}
+
+		@Override
+		public Object getElementAt(int index) {
+			if (index < players.getSize())
+				return players.getElementAt(index).getName();
+			else
+				return "";
+		}
+
+		@Override
+		public int getSize() {
+			return players.getSize();
+		}
+
+		@Override
+		public void removeListDataListener(ListDataListener l) {
+			players.removeListDataListener(l);
+		}
+	}
+	
+	/**
+	 * A table model that translates matches given by a Matches object to information interesting for
+	 * the user
+	 * 
+	 * @author Yogu
+	 */
+	private static class MatchesModel extends AbstractTableModel implements ListDataListener {
+		private static final long serialVersionUID = -1626476931065129495L;
+		private static final String[] columns = new String[] { "ID", "Creator", "Comment", "Players", "State" };
+		private Matches matches;
+		
+		public MatchesModel(Matches matches) {
+			this.matches = matches;
+			matches.addListDataListener(this);
+		}
+		
+		@Override
+		public int getColumnCount() {
+			return columns.length;
+		}
+		
+		@Override
+		public String getColumnName(int column) {
+			return columns[column];
+		}
+
+		@Override
+		public int getRowCount() {
+			return matches.getSize();
+		}
+
+		@Override
+		public Object getValueAt(int row, int column) {
+			if (row >= matches.getSize())
+				return "";
+			Match match = (Match) matches.getElementAt(row);
+			if (match == null)
+				return "";
+			switch (column) {
+			case 0:
+				return match.getID();
+			case 1:
+				return match.getOwner().getName();
+			case 2:
+				return match.getComment();
+			case 3:
+				String text = "";
+				for (Player player : match.getPlayers()) {
+					if (text != "")
+						text += ", ";
+					text += player.getName();
+				}
+				return text;
+			case 4:
+				return match.getState().toString();
+			default:
+					return "";
+			}
+		}
+
+		@Override
+		public void contentsChanged(ListDataEvent e) {
+			fireTableRowsUpdated(e.getIndex0(), e.getIndex1());
+		}
+
+		@Override
+		public void intervalAdded(ListDataEvent e) {
+			fireTableRowsInserted(e.getIndex0(), e.getIndex1());
+		}
+
+		@Override
+		public void intervalRemoved(ListDataEvent e) {
+			fireTableRowsDeleted(e.getIndex0(), e.getIndex1());
+		}
 	}
 }

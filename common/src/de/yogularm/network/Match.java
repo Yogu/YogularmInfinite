@@ -1,19 +1,28 @@
 package de.yogularm.network;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Observable;
 import java.util.Set;
 
-public class Match {
+import com.google.gson.annotations.Expose;
+
+public class Match extends Observable {
+	@Expose
 	private int id;
+	@Expose
 	private Player owner;
+	@Expose
 	private Set<Player> players = new HashSet<Player>();
+	@Expose
 	private MatchState state = MatchState.OPEN;
+	@Expose
+	private String comment;
 	
 	private static final Object idLock = new Object();
 	private static int NEXT_ID = 1;
 	
+	// only for deserialization purpose
+	@SuppressWarnings("unused")
 	private Match() {
 		
 	}
@@ -27,39 +36,69 @@ public class Match {
 	}
 	
 	public void addPlayer(Player player) {
-		players.add(player);
+		if (players.add(player)) {
+			setChanged();
+			notifyObservers();
+		}
 	}
 	
 	public void removePlayer(Player player) {
-		players.remove(player);
+		if (players.remove(player)) {
+			setChanged();
+			notifyObservers();
+		}
 	}
 	
 	public void start() {
-		if (state == MatchState.OPEN)
-			state = MatchState.RUNNING;
-		else
+		if (state == MatchState.OPEN) {
+			setState(MatchState.RUNNING);
+		} else
 			throw new IllegalStateException();
 	}
 	
 	public void pause() {
 		if ((state == MatchState.RUNNING) || (state == MatchState.PAUSED))
-			state = MatchState.PAUSED;
+			setState(MatchState.PAUSED);
 		else
 			throw new IllegalStateException();
 	}
 	
 	public void resume() {
 		if ((state == MatchState.RUNNING) || (state == MatchState.PAUSED))
-			state = MatchState.RUNNING;
+			setState(MatchState.RUNNING);
 		else
 			throw new IllegalStateException();
 	}
 	
 	public void cancel() {
-		if ((state == MatchState.RUNNING) || (state == MatchState.PAUSED))
-			state = MatchState.CANCELLED;
-		else
+		if ((state != MatchState.CANCELLED) && (state != MatchState.FINISHED)) {
+			setState(MatchState.CANCELLED);
+			
+			for (Player player: getPlayers()) {
+				player.leaveMatch();
+			}
+		} else
 			throw new IllegalStateException();
+	}
+	
+	private void setState(MatchState state) {
+		this.state = state;
+		setChanged();
+		notifyObservers();
+	}
+	
+	public void setComment(String comment) {
+		this.comment = comment;
+		setChanged();
+		notifyObservers();
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public Player getOwner() {
+		return owner;
 	}
 	
 	public MatchState getState() {
@@ -70,70 +109,24 @@ public class Match {
 		return players;
 	}
 	
-	public int getID() {
+	public String getComment() {
+		return comment;
+	}
+	
+	public boolean equals(Match other) {
+		return other != null && other.id == id;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Match)
+			return equals((Match)other);
+		else
+			return false;
+	}
+	
+	@Override
+	public int hashCode() {
 		return id;
-	}
-	
-	public String serialize() {
-		String str = id + ":";
-		boolean isFirst = true;
-		for (Player player : players) {
-			if (!isFirst)
-				str += ",";
-			else
-				isFirst = false;
-			str += player.getName();
-		}
-		return str;
-	}
-	
-	public static Match deserialize(String str) {
-		String[] parts = str.split("\\:", 2);
-		if (parts.length < 2)
-			return null;
-
-		Match match = new Match();
-		
-		int id;
-		try {
-			id = Integer.parseInt(parts[0]);
-		} catch (NumberFormatException e) {
-			return null;
-		}
-		if (id <= 0)
-			return null;
-		match.id = id;
-		
-		String[] players = parts[1].split("\\,");
-		for (String playerName : players) {
-			Player player = new Player(playerName);
-			if (!Player.isValidName(playerName))
-				return null;
-			
-			match.players.add(player);
-		}
-		
-		return match;
-	}
-	
-	public static String serializeMatches(Iterable<Match> matches) {
-		String str = "";
-		for (Match match : matches) {
-			if (match.getState() == MatchState.OPEN) {
-				if (str != "")
-					str += ";";
-				str += match.serialize();
-			}
-		}
-		return str;
-	}
-	
-	public static Map<Integer, Match> deserializeMatches(String str) {
-		Map<Integer, Match> matches = new HashMap<Integer, Match>();
-		for (String matchStr : str.split(";")) {
-			Match match = Match.deserialize(matchStr);
-			matches.put(match.getID(), match);
-		}
-		return matches;
 	}
 }

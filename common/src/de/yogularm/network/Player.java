@@ -1,9 +1,26 @@
 package de.yogularm.network;
 
-public class Player {
+import java.util.Observable;
+
+import com.google.gson.annotations.Expose;
+
+public class Player extends Observable {
+	@Expose
 	private String name;
 	
+	private transient Match currentMatch;
+	
 	private static final String NAME_REGEX = "[a-zA-Z0-9_-]+";
+	
+	/**
+	 * Creates a player with no name.
+	 * 
+	 * This method is designed only for deserialization
+	 */
+	@SuppressWarnings("unused")
+	private Player() {
+		
+	}
 	
 	public Player(String name) {
 		if (name == null)
@@ -31,7 +48,7 @@ public class Player {
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof Player)
-			return equals(other);
+			return equals((Player)other);
 		else
 			return false;
 	}
@@ -39,5 +56,28 @@ public class Player {
 	@Override
 	public int hashCode() {
 		return name.hashCode();
+	}
+	
+	public void joinMatch(Match match) {
+		if (currentMatch != null)
+			throw new IllegalStateException("This player is already assigned to a match");
+		
+		match.addPlayer(this);
+		currentMatch = match;
+		setChanged();
+		notifyObservers();
+	}
+	
+	public void leaveMatch() {
+		if (currentMatch != null) {
+			currentMatch.removePlayer(this);
+			currentMatch = null;
+			setChanged();
+			notifyObservers();
+		}
+	}
+	
+	public Match getCurrentMatch() {
+		return currentMatch;
 	}
 }
