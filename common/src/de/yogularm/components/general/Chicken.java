@@ -1,7 +1,7 @@
 package de.yogularm.components.general;
 
 import de.yogularm.Res;
-import de.yogularm.components.Body;
+import de.yogularm.components.Component;
 import de.yogularm.components.Bot;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.drawing.AnimatedImage;
@@ -47,7 +47,7 @@ public class Chicken extends Bot {
 		}
 	}
 
-	protected void onCollision(Body other, Direction direction, boolean isCauser) {
+	protected void onCollision(Component other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
 		if (other instanceof Arrow)
 			dropHeart();

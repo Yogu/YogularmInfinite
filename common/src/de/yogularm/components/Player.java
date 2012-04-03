@@ -29,7 +29,7 @@ public class Player extends Character {
 		updateDrawable(elapsedTime);
 	}
 
-	protected void onCollision(Body other, Direction direction, boolean isCauser) {
+	protected void onCollision(Component other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
 		
 		if (other instanceof Coin)

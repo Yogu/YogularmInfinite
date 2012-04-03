@@ -1,14 +1,14 @@
 package de.yogularm.components.general;
 
 import de.yogularm.Res;
-import de.yogularm.components.Block;
+import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.drawing.CombinedDrawable;
 import de.yogularm.drawing.RenderTransformation;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
-public class Platform extends Block {
+public class Platform extends Component {
 	private static final float DEFAULT_SPEED = 3;
 	private static final float DEFAULT_ACCELERATION = 10;
 	private static final float DEFAULT_PAUSE_TIME = 0.4f;

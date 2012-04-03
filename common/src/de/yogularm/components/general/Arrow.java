@@ -1,7 +1,7 @@
 package de.yogularm.components.general;
 
 import de.yogularm.Res;
-import de.yogularm.components.Body;
+import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.Entity;
 import de.yogularm.components.Item;
@@ -11,7 +11,7 @@ import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
 public class Arrow extends Entity {
-	private Body sender;
+	private Component sender;
 	private RenderTransformation transformation;
 	
 	public Arrow(ComponentCollection collection) {
@@ -24,7 +24,7 @@ public class Arrow extends Entity {
 		setIsSolid(false);
 	}
 	
-	public Arrow(ComponentCollection collection, Body sender) {
+	public Arrow(ComponentCollection collection, Component sender) {
 		this(collection);
 		this.sender = sender;
 	}
@@ -35,7 +35,7 @@ public class Arrow extends Entity {
 		transformation.setAngle(angle);
 	}
 
-	protected void onCollision(Body other, Direction direction, boolean isCauser) {
+	protected void onCollision(Component other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
 		
 		if ((other.isSolid() || other instanceof Item) && other != sender)

@@ -1,12 +1,13 @@
 package de.yogularm.components.general;
 
 import de.yogularm.Res;
-import de.yogularm.components.Block;
+import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
+import de.yogularm.components.StaticRenderer;
 
-public class Stone extends Block {
+public class Stone extends Component {
 	public Stone(ComponentCollection collection) {
 		super(collection);
-		setDrawable(Res.images.stone);
+		setRenderer(new StaticRenderer(this, Res.images.stone));
 	}
 }
