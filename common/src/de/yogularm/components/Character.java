@@ -41,7 +41,7 @@ public abstract class Character extends Entity {
 			onDeathFall();
 	}
 
-	protected void onCollision(Component other, Direction direction, boolean isCauser) {
+	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
 
 		if (other instanceof Arrow)
@@ -118,9 +118,9 @@ public abstract class Character extends Entity {
 
 	protected float getHeightOverGround() {
 		Vector v = getPosition().changeX((float) Math.floor(getPosition().getX()));
-		Component blockBelowLeft = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
+		Body blockBelowLeft = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
 		v = getPosition().changeX((float) Math.ceil(getPosition().getX()));
-		Component blockBelowRight = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
+		Body blockBelowRight = ComponentCollectionUtils.getBlockBelow(getCollection(), v);
 		float height = Float.POSITIVE_INFINITY;
 		if (blockBelowLeft != null)
 			height = Math.min(height, getOuterBounds().getBottom() - blockBelowLeft.getOuterBounds().getTop());

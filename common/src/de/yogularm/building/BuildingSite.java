@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import de.yogularm.components.Component;
+import de.yogularm.components.Body;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.components.general.Platform;
@@ -120,8 +120,8 @@ public class BuildingSite {
 		boolean isPlatform = component instanceof Platform;
 		boolean isCharacter = component instanceof de.yogularm.components.Character;
 		boolean isBlock = !isPlatform && !isCharacter
-			&& component instanceof Component && ((Component)component).isSolid();
-		boolean isClimbable = component instanceof Component && ((Component)component).isClimbable();
+			&& component instanceof Body && ((Body)component).isSolid();
+		boolean isClimbable = component instanceof Body && ((Body)component).isClimbable();
 
 		Collection<Point> platformCells = null;
 		

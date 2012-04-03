@@ -31,10 +31,10 @@ public class ComponentCollectionUtils {
 	 * @param components The component collection to use
 	 * @return The blocks at the grid position
 	 */
-	public static Component getBlockAt(ComponentCollection components, Vector position) {
+	public static Block getBlockAt(ComponentCollection components, Vector position) {
 		for (Component component : getComponentsAt(components, position))
-			if (component instanceof Component)
-				return (Component) component;
+			if (component instanceof Block)
+				return (Block) component;
 		return null;
 	}
 
@@ -46,7 +46,7 @@ public class ComponentCollectionUtils {
 	 */
 	public static boolean hasSolidAt(ComponentCollection components, Vector position) {
 		for (Component component : getComponentsAt(components, position))
-			if (component instanceof Component && ((Component) component).isSolid())
+			if (component instanceof Body && ((Body) component).isSolid())
 				return true;
 		return false;
 	}
@@ -58,12 +58,14 @@ public class ComponentCollectionUtils {
 	 * @param components The component collection to use
 	 * @return The bodies overlapping the rectangle
 	 */
-	public static Iterable<Component> getOverlappingBodies(ComponentCollection components, Rect range) {
-		List<Component> list = new ArrayList<Component>();
+	public static Iterable<Body> getOverlappingBodies(ComponentCollection components, Rect range) {
+		List<Body> list = new ArrayList<Body>();
 		for (Component component : components.getComponentsAround(range)) {
-			Component body = (Component)component;
-			if (body.getOuterBounds().overlaps(range))
-				list.add(body);
+			if (component instanceof Body) {
+				Body body = (Body)component;
+				if (body.getOuterBounds().overlaps(range))
+						list.add(body);
+			}
 		}
 		return list;
 	}
@@ -74,17 +76,19 @@ public class ComponentCollectionUtils {
 	 * @param components The component collection to use
 	 * @return The block below, or null, if there is no block below
 	 */
-	public static Component getBlockBelow(ComponentCollection components, Vector position) {
+	public static Block getBlockBelow(ComponentCollection components, Vector position) {
 		// This rectangle reaches from the position downward 
 		Rect range = new Rect(position.changeY(Float.NEGATIVE_INFINITY), position);
 		
 		Vector rounded = position.round();
 		for (Component component : components.getComponentsAround(range)) {
-			Component block = (Component) component;
-			if ((Math.round(component.getPosition().getX()) == rounded
-					.getX())
-					&& (block.getPosition().getY() <= position.getY()))
-				return block;
+			if (component instanceof Block) {
+				Block block = (Block) component;
+				if ((Math.round(component.getPosition().getX()) == rounded
+						.getX())
+						&& (block.getPosition().getY() <= position.getY()))
+					return block;
+			}
 		}
 		return null;
 	}

@@ -2,12 +2,12 @@ package de.yogularm.components.general;
 
 import de.yogularm.Config;
 import de.yogularm.Res;
-import de.yogularm.components.Component;
+import de.yogularm.components.Block;
 import de.yogularm.components.ComponentCollection;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
-public class Shooter extends Component {
+public class Shooter extends Block {
 	private float rechargeTime = 0;
 	 
 	public static final float MIN_RECHARGE_TIME = 2;

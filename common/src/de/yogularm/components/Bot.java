@@ -71,7 +71,7 @@ public abstract class Bot extends Character {
 			&& !hasBlockBelow(getPosition().add(new Vector(direction * 2, -1)));
 	}
 
-	protected void onCollision(Component other, Direction direction, boolean isCauser) {
+	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 		super.onCollision(other, direction, isCauser);
 		/*if (other.isSolid()) {
 			if (standsOnGround()) {
