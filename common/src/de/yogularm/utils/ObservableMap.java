@@ -11,7 +11,7 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-public class ObservableMap<K, V extends Observable> extends Observable implements ListModel {
+public class ObservableMap<K, V extends Observable> extends Observable implements ListModel<V> {
 	private List<ListDataListener> listeners1 = new ArrayList<ListDataListener>();
 	private List<ListListener<V>> listeners2 = new ArrayList<ListListener<V>>();
 	private Map<K, V> map = new HashMap<K, V>();

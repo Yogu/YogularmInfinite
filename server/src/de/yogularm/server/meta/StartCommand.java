@@ -1,6 +1,6 @@
 package de.yogularm.server.meta;
 
-import de.yogularm.MultiPlayerWorld;
+import de.yogularm.components.MultiPlayerWorld;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.Match;
 import de.yogularm.network.MatchState;

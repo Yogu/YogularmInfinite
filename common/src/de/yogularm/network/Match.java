@@ -8,8 +8,7 @@ import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 
-import de.yogularm.MultiPlayerWorld;
-import de.yogularm.World;
+import de.yogularm.components.MultiPlayerWorld;
 
 public class Match extends Observable {
 	@Expose

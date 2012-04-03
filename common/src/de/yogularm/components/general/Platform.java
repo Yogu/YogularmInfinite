@@ -100,7 +100,7 @@ public class Platform extends Block {
 	public void update(float elapsedTime)  {
 		super.update(elapsedTime);
 		
-		if (targets.length > 1) {
+		if (!isNetworkComponent() && targets.length > 1) {
 			Vector target = targets[currentTarget].add(origin);
 			Vector source = currentTarget < 1 ? targets[targets.length - 1] : targets[currentTarget - 1];
 			source = source.add(origin);

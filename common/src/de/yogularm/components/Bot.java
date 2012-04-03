@@ -22,7 +22,8 @@ public abstract class Bot extends Character {
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
 
-		walk(elapsedTime);
+		if (!isNetworkComponent())
+			walk(elapsedTime);
 	}
 	
 	public int getDirection() {

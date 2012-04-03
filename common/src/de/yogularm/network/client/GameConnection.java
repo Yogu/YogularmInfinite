@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

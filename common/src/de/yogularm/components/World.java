@@ -1,12 +1,10 @@
-package de.yogularm;
+package de.yogularm.components;
 
+import de.yogularm.Camera;
+import de.yogularm.Config;
 import de.yogularm.building.Builder2;
 import de.yogularm.building.BuildingSite;
 import de.yogularm.building.test.TestBuilder;
-import de.yogularm.components.Component;
-import de.yogularm.components.ComponentCollection;
-import de.yogularm.components.ComponentTree;
-import de.yogularm.components.Player;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.Renderable;

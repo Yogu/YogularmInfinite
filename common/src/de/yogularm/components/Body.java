@@ -1,5 +1,8 @@
 package de.yogularm.components;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,8 +18,6 @@ import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 
 public class Body extends Component {
-	private static final long serialVersionUID = -7544119212446194556L;
-	
 	private Rect bounds;
 	private float mass = 1.0f;
 	private Vector momentum;
@@ -517,5 +518,18 @@ public class Body extends Component {
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 
+	}
+	
+	@Override
+	protected void write(DataOutputStream stream, int length) throws IOException {
+		super.write(stream, length + 2 * 4);
+		stream.writeFloat(momentum.getX());
+		stream.writeFloat(momentum.getY());
+	}
+	
+	@Override
+	protected void read(DataInputStream stream, int length) throws IOException {
+		super.read(stream, length + 2 * 4);
+		momentum = new Vector(stream.readFloat(), stream.readFloat());
 	}
 }

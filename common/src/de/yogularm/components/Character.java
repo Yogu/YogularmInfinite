@@ -1,5 +1,9 @@
 package de.yogularm.components;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import de.yogularm.Config;
 import de.yogularm.components.general.Arrow;
 import de.yogularm.drawing.Color;
@@ -22,23 +26,27 @@ public abstract class Character extends Entity {
 	}
 
 	public void update(float elapsedTime) {
-		boolean climbing = isClimbing() && climbSpeed > 0;
-		super.update(elapsedTime);
-		if (climbing && !isClimbing())
-			jump(true);
-
-		applyWalkSpeed(walkSpeed);
-		applyClimbSpeed(climbSpeed);
-
-		if (immuneTime > 0)
-			immuneTime -= elapsedTime;
-
-		if (life <= 0)
-			die();
-
-		if (-getSpeed().getY() > Config.DEATH_FALL_SPEED)
-		//if (getPosition().getY() < Config.DEATH_Y_POS)
-			onDeathFall();
+		if (isNetworkComponent())  {
+			super.update(elapsedTime);
+		} else {
+			boolean climbing = isClimbing() && climbSpeed > 0;
+			super.update(elapsedTime);
+			if (climbing && !isClimbing())
+				jump(true);
+	
+			applyWalkSpeed(walkSpeed);
+			applyClimbSpeed(climbSpeed);
+	
+			if (immuneTime > 0)
+				immuneTime -= elapsedTime;
+	
+			if (life <= 0)
+				die();
+	
+			if (-getSpeed().getY() > Config.DEATH_FALL_SPEED)
+			//if (getPosition().getY() < Config.DEATH_Y_POS)
+				onDeathFall();
+		}
 	}
 
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
@@ -131,5 +139,17 @@ public abstract class Character extends Entity {
 
 	protected void onDeathFall() {
 		die();
+	}
+	
+	@Override
+	protected void write(DataOutputStream stream, int length) throws IOException {
+		super.write(stream, length + 4);
+		stream.writeFloat(life);
+	}
+	
+	@Override
+	protected void read(DataInputStream stream, int length) throws IOException {
+		super.read(stream, length + 2 * 4);
+		life = stream.readInt();
 	}
 }

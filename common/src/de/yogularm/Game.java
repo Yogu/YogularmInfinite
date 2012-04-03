@@ -2,6 +2,7 @@ package de.yogularm;
 
 import java.util.EnumSet;
 
+import de.yogularm.components.World;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
 import de.yogularm.drawing.FontStyle;

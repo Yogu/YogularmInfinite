@@ -1,5 +1,9 @@
 package de.yogularm.components;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import de.yogularm.Config;
 import de.yogularm.Res;
 import de.yogularm.components.general.Checkpoint;
@@ -41,7 +45,7 @@ public class Player extends Character {
 	}
 	
 	protected void onDie() {
-		// do not remove
+		// do not remove, so don't call super.update()
 		setDrawable(Res.images.yoguFalling);
 	}
 	
@@ -70,5 +74,20 @@ public class Player extends Character {
 	protected void onDeathFall() {
 		setPosition(checkpoint);
 		decLife(1);
+	}
+	
+	@Override
+	protected void write(DataOutputStream stream, int length) throws IOException {
+		super.write(stream, length + 3 * 4);
+		stream.writeFloat(checkpoint.getX());
+		stream.writeFloat(checkpoint.getY());
+		stream.writeInt(collectedCoins);
+	}
+	
+	@Override
+	protected void read(DataInputStream stream, int length) throws IOException {
+		super.read(stream, length + 3 * 4);
+		checkpoint = new Vector(stream.readFloat(), stream.readFloat());
+		collectedCoins = stream.readInt();
 	}
 }

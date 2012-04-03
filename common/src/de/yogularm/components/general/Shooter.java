@@ -25,10 +25,12 @@ public class Shooter extends Block {
 	public void update(float elapsedTime) {
 		super.update(elapsedTime);
 		
-		if (rechargeTime > 0)
-			rechargeTime -= elapsedTime;
-		if (rechargeTime <= 0)
-			shoot();
+		if (!isNetworkComponent()) {
+			if (rechargeTime > 0)
+				rechargeTime -= elapsedTime;
+			if (rechargeTime <= 0)
+				shoot();
+		}
 	}
 	
 	private void shoot() {
