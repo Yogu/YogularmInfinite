@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.yogularm.ServerGame;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollectionListener;
 import de.yogularm.components.MultiPlayerWorld;
@@ -25,6 +26,7 @@ public class BinaryHandler {
 	private DataOutputStream out;
 	private Player player;
 	private Match match;
+	private ServerGame game;
 	private MultiPlayerWorld world;
 	private Thread receiveThread;
 	private IOException writeException;
@@ -38,7 +40,8 @@ public class BinaryHandler {
 		this.out = new DataOutputStream(out);
 		this.player = player;
 		match = player.getCurrentMatch();
-		world = match.world;
+		game = match.game;
+		world = game.getWorld();
 
 		world.getComponents().addListener(new TheComponentCollectionListener());
 		world.addListener(new TheMultiPlayerWorldListener());

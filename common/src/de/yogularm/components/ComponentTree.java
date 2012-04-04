@@ -94,6 +94,17 @@ public class ComponentTree implements ObservableComponentCollection {
 		else
 			return new ArrayList<Component>();
 	}
+	
+	/**
+	 * Removes all components in the given sector and adds the given components to that sector.
+	 * 
+	 * Before calling this method, make sure that the components really are in the specified sector.
+	 * 
+	 * @param sector The sector whose components to replace
+	 */
+	public List<Component> replaceComponentsOfSector(Point sector, Collection<Component> components) {
+		tree.put(sector, new ArrayList<Component>(components));
+	}
 
 	@Override
   public boolean contains(Component component) {

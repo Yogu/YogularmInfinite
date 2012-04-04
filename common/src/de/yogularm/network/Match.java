@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 
-import de.yogularm.components.MultiPlayerWorld;
+import de.yogularm.ServerGame;
 
 public class Match extends Observable {
 	@Expose
@@ -22,7 +22,7 @@ public class Match extends Observable {
 	@Expose
 	private String comment;
 	
-	public MultiPlayerWorld world;
+	public ServerGame game;
 	
 	private static final Object idLock = new Object();
 	private static int NEXT_ID = 1;
@@ -85,6 +85,9 @@ public class Match extends Observable {
 			for (Player player : players) {
 				player.leaveMatch();
 			}
+			
+			if (game != null)
+				game.stop();
 		} else
 			throw new IllegalStateException();
 	}

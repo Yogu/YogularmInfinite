@@ -277,6 +277,9 @@ public class GameConnection {
 
 						while (state == ConnectionState.CONNECTED) {
 							String line = passiveIn.readLine();
+							if (line == null)
+								throw new IOException("Server closed passive connection");
+							
 							System.out.println("Information: " + line);
 							String[] parts = line.split("\\s", 2);
 							if (parts.length < 1)
@@ -354,6 +357,9 @@ public class GameConnection {
 					break;
 				case MATCH_STARTED:
 					match.start();
+					if (match.equals(this.player.getCurrentMatch())) {
+						startGame();
+					}
 					break;
 				}
 			} else {
@@ -466,5 +472,9 @@ public class GameConnection {
 			return player;
 		else
 			return otherPlayers.getByName(name);
+	}
+	
+	private void startGame() {
+		
 	}
 }
