@@ -4,8 +4,11 @@ import java.awt.Image;
 import java.awt.SystemColor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +39,21 @@ public class SwingLauncher {
 	}
 
 	public void run() {
+		try {
+			System.setOut(new PrintStream("yogularm.log"));
+		} catch (FileNotFoundException e) {
+			handleException(e);
+		}
+		
 		GLProfile.initSingleton(true);
 		initUI();
 		createWindow();
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				handleException(e);
+			}
+		});
 		
 		setPage(new StartFrame(this));
 
@@ -126,8 +141,7 @@ public class SwingLauncher {
 	
 	private void replacePage(Page page) {
 		frame.setContentPane(page);
-		frame.pack();
-		frame.repaint();
+		frame.validate();
 		frame.requestFocus();
 	}
 

@@ -51,8 +51,13 @@ public class BinaryHandler {
 	}
 
 	public void run() throws IOException {
-		receiveThread = Thread.currentThread();
 		initWorld();
+		int i = 0;
+		while (!receiveThread.isInterrupted()) {
+			out.write(i++);
+			out.flush();
+		}
+		
 		while (!receiveThread.isInterrupted()) {
 			if (in.available() > 0)
 				receivePacket();
@@ -88,11 +93,16 @@ public class BinaryHandler {
 			world.observeSectors(observedSectors);
 			sendSectors();
 			break;
+		case PLAYER_POSITION:
+			Vector position = new Vector(in.readFloat(), in.readFloat());
+			Vector momentum = new Vector(in.readFloat(), in.readFloat());
+			player.playerComponent.pushTo(position, momentum);
+			break;
 		default:
 			throw new IOException("Invalid packet id: " + id);
 		}
 		
-		//System.out.println("Received packet " + packet);
+		System.out.println("Received packet " + packet);
 	}
 
 	private void initWorld() throws IOException {
@@ -100,7 +110,7 @@ public class BinaryHandler {
 			initPacket(NetworkPacket.INIT_WORLD/* , 8 */);
 			out.writeInt(MultiPlayerWorld.SECTOR_WIDTH);
 			out.writeInt(MultiPlayerWorld.SECTOR_HEIGHT);
-			out.writeInt(player.playerComponent.getID());
+			sendComponent(player.playerComponent);
 			out.flush();
 		}
 	}
@@ -193,7 +203,7 @@ public class BinaryHandler {
 
 	private void initPacket(NetworkPacket packet) throws IOException {
 		out.writeInt(packet.ordinal());
-		//System.out.println("Sending packet " + packet);
+		System.out.println("Sending packet " + packet);
 	}
 
 	private void recalculateObservedSectors() {

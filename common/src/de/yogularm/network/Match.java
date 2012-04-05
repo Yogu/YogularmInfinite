@@ -76,6 +76,7 @@ public class Match extends Observable {
 			x--;
 			player.playerComponent = component;
 		}
+		game.start();
 	}
 	
 	public void pause() {

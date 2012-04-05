@@ -79,6 +79,10 @@ public class Vector {
 	public boolean equals(Vector other) {
 		return x == other.x && y == other.y;
 	}
+
+	public boolean equals(Vector other, float epsilon) {
+		return Math.abs(x - other.x) < epsilon && Math.abs(y - other.y) < epsilon;
+	}
 	
 	public boolean equals(Object other) {
 		if (other instanceof Vector)

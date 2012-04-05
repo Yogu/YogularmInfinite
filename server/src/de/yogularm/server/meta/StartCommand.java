@@ -19,9 +19,7 @@ public class StartCommand extends CommandHandlerUtils implements CommandHandler 
 		if (match.getState() != MatchState.OPEN)
 			return err(CommunicationError.INVALID_STATE, "Match already started");
 		
-		match.start();
-		match.game = new ServerGame();
-		match.game.start();
+		match.startOnServer();
 		
 		data.serverData.notifyClients(NetworkInformation.MATCH_STARTED, match.getID() + "");
 		

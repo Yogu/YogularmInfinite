@@ -443,10 +443,15 @@ public class GameConnection {
 						socket = new Socket();
 						socket.connect(new InetSocketAddress(host, port), CONNECTION_TIMEOUT);
 						InputStream in = socket.getInputStream();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+						// Buffer with size 1 because otherwise, bytes from the binary protocol might be read
+						// out into the buffer and be missing in the binary handler
+						BufferedReader reader = new BufferedReader(new InputStreamReader(in), 1);
 						final OutputStream out = socket.getOutputStream();
 						PrintStream writer = new PrintStream(out);
 						sendCommand(reader, writer, NetworkCommand.BINARY, sessionKey);
+						System.out.println("Binary stream established");
+						System.out.println("Next byte:");
+						System.out.println(in.read());
 						
 						new Thread(new Runnable() {
 							public void run() {

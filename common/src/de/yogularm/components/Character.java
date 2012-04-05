@@ -150,6 +150,6 @@ public abstract class Character extends Entity {
 	@Override
 	protected void read(DataInputStream stream, int length) throws IOException {
 		super.read(stream, length + 4);
-		life = stream.readInt();
+		life = stream.readFloat();
 	}
 }

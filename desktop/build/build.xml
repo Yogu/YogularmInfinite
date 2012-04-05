@@ -7,6 +7,8 @@
 		<!-- Copy JOGL jar files, native jar files and the Java WebStart JNLP files -->
 		<copy todir="../bin/">
 			<fileset dir="../lib/jogl/jar" includes="*.jar" />
+			<fileset dir="../lib/forms" includes="*.jar" />
+			<fileset dir="../../common/lib/gson" includes="gson-2.1.jar" />
 			<fileset dir="./" includes="*.jnlp" />
 		</copy>
 
@@ -44,4 +46,5 @@
 	</target>
 
 	<target name="build" depends="jar, sign" />
+	<target name="default" depends="build" />
 </project>

@@ -12,7 +12,6 @@ import java.util.Map;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
 import de.yogularm.network.NetworkInformation;
-import de.yogularm.network.Player;
 import de.yogularm.server.ClientData;
 import de.yogularm.server.ServerData;
 import de.yogularm.server.binary.BinaryHandler;
@@ -117,7 +116,7 @@ public class GameClient extends Thread {
 				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
 				System.out.println("Client tried to authenticate with invalid session key");
 			} else {
-				writer.println("OK");
+				writer.println(new CommandHandlerUtils().ok());
 				clientData = data;
 				
 				switch (command) {
@@ -154,6 +153,7 @@ public class GameClient extends Thread {
 	
 	private void doBinary() throws IOException {
 		isPrimary = false;
+		writer.flush();
 		BinaryHandler handler = new BinaryHandler(in, out, clientData.player);
 		handler.run();
 		// Handler has closed, nothing more to do here

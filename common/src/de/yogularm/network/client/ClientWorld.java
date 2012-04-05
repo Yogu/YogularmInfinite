@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.yogularm.Config;
 import de.yogularm.building.BuildingSite;
 import de.yogularm.components.AbstractWorld;
 import de.yogularm.components.Body;
@@ -28,14 +29,16 @@ import de.yogularm.network.NetworkPacket;
 public class ClientWorld extends AbstractWorld {
 	private ObservableComponentCollection components;
 	private Player player;
+	private boolean firstSectorReceived = false;
 	private boolean isStopped;
 	private IntRect lastObservedRange = null;
 	private IntRect observedRange = new IntRect(-1, -1, 0, 0);
 	private int sectorWidth;
 	private int sectorHeight;
+	private Vector lastPlayerPosition;
+	private Vector lastPlayerMomentum;
 
 	public final Event<Void> onWorldInitialized = new Event<Void>(this);
-	private int playerID;
 
 	public ClientWorld() {
 	}
@@ -50,14 +53,12 @@ public class ClientWorld extends AbstractWorld {
 	public void handleInput(InputStream in) throws IOException {
 		DataInputStream dataIn = new DataInputStream(in);
 		while (!isStopped) {
-			if (dataIn.available() > 0)
-				receivePacket(dataIn);
-			else {
-				try {
-					Thread.sleep(5);
-				} catch (InterruptedException e) {
-					return;
-				}
+			System.out.println("handleInput loop");
+			receivePacket(dataIn);
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				return;
 			}
 		}
 	}
@@ -65,7 +66,12 @@ public class ClientWorld extends AbstractWorld {
 	public void handleOutput(OutputStream out) throws IOException {
 		DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
 		while (!isStopped) {
-			sendObservedRange(dataOut);
+			// Don't send these commands when components is null because their responses could not be
+			// handled otherwise 
+			if (components != null) { 
+				sendObservedRange(dataOut);
+				sendPlayerPosition(dataOut);
+			}
 
 			try {
 				Thread.sleep(5);
@@ -96,6 +102,7 @@ public class ClientWorld extends AbstractWorld {
 
 	private void receivePacket(DataInputStream in) throws IOException {
 		int id = in.readInt();
+		//System.out.println("Receiving packet " + id);
 		if (id < 0 || id >= NetworkPacket.values().length)
 			throw new IOException("Invalid packet id: " + id);
 
@@ -108,76 +115,77 @@ public class ClientWorld extends AbstractWorld {
 		case INIT_WORLD:
 			sectorWidth = in.readInt();
 			sectorHeight = in.readInt();
-			playerID = in.readInt();
 			components = new ComponentTree(sectorWidth, sectorHeight);
+			player = (Player) receiveComponent(in);
+			player.setNetworkComponent(false);
+			components.add(player);
 			break;
 		case COMPLETE_SECTOR:
-			if (components != null) {
-				Point sector = new Point(in.readInt(), in.readInt());
-				int count = in.readInt();
-				List<Component> list = new ArrayList<Component>(count);
-				for (int i = 0; i < count; i++) {
-					list.add(receiveComponent(in));
-				}
-				List<Component> oldComponents = components.getComponentsOfSector(sector);
-				for (Component comp : oldComponents) {
-					if (comp != player)
-						components.remove(comp);
-				}
-				for (Component comp : list) {
+			assert components != null;
+			Point sector = new Point(in.readInt(), in.readInt());
+			int count = in.readInt();
+			List<Component> list = new ArrayList<Component>(count);
+			for (int i = 0; i < count; i++) {
+				list.add(receiveComponent(in));
+			}
+			List<Component> oldComponents = components.getComponentsOfSector(sector);
+			for (Component comp : oldComponents) {
+				if (comp != player)
+					components.remove(comp);
+			}
+			for (Component comp : list) {
+				if (comp.getID() != player.getID())
 					components.add(comp);
-				}
-				System.out.println(String.format("Replaced %d components by %d in sector %s",
-						oldComponents.size(), list.size(), sector));
-				
-				if (player == null) {
-					player = (Player)components.getByID(playerID);
-					onWorldInitialized.call(null);
-				}
+			}
+			System.out.println(String.format("Replaced %d components by %d in sector %s",
+					oldComponents.size(), list.size(), sector));
+
+			if (!firstSectorReceived) {
+				firstSectorReceived = true;
+				onWorldInitialized.call(null);
 			}
 			break;
 		case ADDED:
-			if (components != null) {
-				component = receiveComponent(in);
+			assert components != null;
+			component = receiveComponent(in);
+			if (component.getID() != player.getID()) {
 				components.add(component);
 			}
 			break;
 		case REMOVED:
-			if (components != null) {
-				componentID = in.readInt();
-				component = components.getByID(componentID);
-				if (component != null && component != player)
-					components.remove(component);
-			}
+			assert components != null;
+			componentID = in.readInt();
+			component = components.getByID(componentID);
+			if (component != null && component != player)
+				components.remove(component);
 			break;
 		case CHANGED:
-			if (components != null) {
-				componentID = in.readInt();
-				component = components.getByID(componentID);
-				if (component != null && component != player) {
-					components.remove(component);
-					Component newComponent = component = receiveComponent(in);
-					components.add(newComponent);
-				}
+			assert components != null;
+			componentID = in.readInt();
+			component = components.getByID(componentID);
+			if (component != null && component != player) {
+				components.remove(component);
+				Component newComponent = component = receiveComponent(in);
+				components.add(newComponent);
 			}
 			break;
 		case QUICK_CHANGE:
-			if (components != null) {
-				componentID = in.readInt();
-				component = components.getByID(componentID);
-				if (component != null) {
-					//System.out.println("Quick change: " + component.getID() + " (" + component.getClass().getSimpleName() + ")");
-					if (component instanceof Body) {
-						Vector position = new Vector(in.readFloat(), in.readFloat());
-						Vector momentum = new Vector(in.readFloat(), in.readFloat());
-						((Body)component).pushTo(position, momentum);
-					} else {
-						component.setPosition(new Vector(in.readFloat(), in.readFloat()));
-						in.skip(2 * 4);
-					}
+			assert components != null;
+			componentID = in.readInt();
+			component = components.getByID(componentID);
+			if (component != null && component != player) {
+				// System.out.println("Quick change: " + component.getID() + " (" +
+				// component.getClass().getSimpleName() + ")");
+				if (component instanceof Body) {
+					Vector position = new Vector(in.readFloat(), in.readFloat());
+					Vector momentum = new Vector(in.readFloat(), in.readFloat());
+					((Body) component).pushTo(position, momentum);
 				} else {
-					in.skip(4 * 4);
+					component.setPosition(new Vector(in.readFloat(), in.readFloat()));
+					in.skip(2 * 4);
 				}
+			} else {
+				in.skip(4 * 4);
 			}
 			break;
 		default:
@@ -211,6 +219,22 @@ public class ClientWorld extends AbstractWorld {
 			out.writeInt(observedRange.getMax().getY());
 			lastObservedRange = observedRange;
 			out.flush();
+		}
+	}
+
+	private void sendPlayerPosition(DataOutputStream out) throws IOException {
+		if (player != null
+				&& ((lastPlayerPosition == null || !lastPlayerPosition.equals(player.getPosition(),
+						Config.EPSILON)) || (lastPlayerMomentum == null || !lastPlayerMomentum.equals(
+						player.getMomentum(), Config.EPSILON)))) {
+			initPacket(out, NetworkPacket.PLAYER_POSITION);
+			out.writeFloat(player.getPosition().getX());
+			out.writeFloat(player.getPosition().getY());
+			out.writeFloat(player.getMomentum().getY());
+			out.writeFloat(player.getMomentum().getY());
+			out.flush();
+			lastPlayerPosition = player.getPosition();
+			lastPlayerMomentum = player.getMomentum();
 		}
 	}
 
