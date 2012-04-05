@@ -30,11 +30,12 @@ public class ClientWorld extends AbstractWorld {
 	private Player player;
 	private boolean isStopped;
 	private IntRect lastObservedRange = null;
-	private IntRect observedRange = new IntRect(0, 0, 0, 0);
+	private IntRect observedRange = new IntRect(-1, -1, 0, 0);
 	private int sectorWidth;
 	private int sectorHeight;
 
 	public final Event<Void> onWorldInitialized = new Event<Void>(this);
+	private int playerID;
 
 	public ClientWorld() {
 	}
@@ -107,10 +108,8 @@ public class ClientWorld extends AbstractWorld {
 		case INIT_WORLD:
 			sectorWidth = in.readInt();
 			sectorHeight = in.readInt();
+			playerID = in.readInt();
 			components = new ComponentTree(sectorWidth, sectorHeight);
-			player = new Player(components);
-			components.add(player);
-			onWorldInitialized.call(null);
 			break;
 		case COMPLETE_SECTOR:
 			if (components != null) {
@@ -130,6 +129,11 @@ public class ClientWorld extends AbstractWorld {
 				}
 				System.out.println(String.format("Replaced %d components by %d in sector %s",
 						oldComponents.size(), list.size(), sector));
+				
+				if (player == null) {
+					player = (Player)components.getByID(playerID);
+					onWorldInitialized.call(null);
+				}
 			}
 			break;
 		case ADDED:

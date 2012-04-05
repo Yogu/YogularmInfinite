@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.gson.annotations.Expose;
 
 import de.yogularm.ServerGame;
+import de.yogularm.geometry.Vector;
 
 public class Match extends Observable {
 	@Expose
@@ -60,6 +61,21 @@ public class Match extends Observable {
 			setState(MatchState.RUNNING);
 		} else
 			throw new IllegalStateException();
+	}
+	
+	public void startOnServer() {
+		start();
+		
+		game = new ServerGame();
+		int x = 0;
+		for (Player player : players) {
+			de.yogularm.components.Player component =
+				new de.yogularm.components.Player(game.getWorld().getComponents());
+			game.getWorld().getComponents().add(component);
+			component.setPosition(new Vector(x, 0));
+			x--;
+			player.playerComponent = component;
+		}
 	}
 	
 	public void pause() {

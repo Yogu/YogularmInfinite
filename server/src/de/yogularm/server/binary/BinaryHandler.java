@@ -100,6 +100,7 @@ public class BinaryHandler {
 			initPacket(NetworkPacket.INIT_WORLD/* , 8 */);
 			out.writeInt(MultiPlayerWorld.SECTOR_WIDTH);
 			out.writeInt(MultiPlayerWorld.SECTOR_HEIGHT);
+			out.writeInt(player.playerComponent.getID());
 			out.flush();
 		}
 	}

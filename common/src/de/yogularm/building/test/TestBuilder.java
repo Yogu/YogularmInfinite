@@ -17,6 +17,7 @@ public class TestBuilder extends GuidedBuilder {
 
 	@Override
   protected void makeOriginSafe() {
-		getBuildingSite().place(new Stone(getComponents()), new Point(0, -1));
+		for (int i = -5; i <= 0; i++)
+			getBuildingSite().place(new Stone(getComponents()), new Point(i, -1));
   }
 }

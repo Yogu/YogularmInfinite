@@ -12,6 +12,8 @@ public class Player extends Observable {
 	
 	private static final String NAME_REGEX = "[a-zA-Z0-9_-]+";
 	
+	public de.yogularm.components.Player playerComponent;
+	
 	/**
 	 * Creates a player with no name.
 	 * 
