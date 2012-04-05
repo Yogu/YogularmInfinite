@@ -2,7 +2,9 @@ package de.yogularm.network.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
@@ -18,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 
 import de.yogularm.event.Event;
 import de.yogularm.event.EventArgs;
+import de.yogularm.event.EventListener;
 import de.yogularm.event.ExceptionEventArgs;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.CommunicationException;
@@ -40,9 +43,10 @@ public class GameConnection {
 	private Player player;
 	private Matches openMatches = new Matches();
 	private Players otherPlayers = new Players();
+	private ClientWorld world;
 
 	private ConnectionState state = ConnectionState.IDLE;
-	
+
 	private static final int CONNECTION_TIMEOUT = 5000;
 
 	private interface NetworkAction {
@@ -75,6 +79,11 @@ public class GameConnection {
 	 */
 	public final Event<MessageEventArgs> onMessageReceived = new Event<MessageEventArgs>(this);
 
+	/**
+	 * An event that is called when the player's match has started
+	 */
+	public final Event<MatchStartedEventArgs> onMatchStarted = new Event<MatchStartedEventArgs>(this);
+
 	public void start() {
 		if (state != ConnectionState.IDLE)
 			throw new IllegalStateException("Start can only be called in IDLE state");
@@ -97,11 +106,11 @@ public class GameConnection {
 	public String getHost() {
 		return host;
 	}
-	
+
 	public Matches getOpenMatches() {
 		return openMatches;
 	}
-	
+
 	public Players getOtherPlayers() {
 		return otherPlayers;
 	}
@@ -235,27 +244,29 @@ public class GameConnection {
 				throw e;
 		}
 	}
-	
+
 	private void receiveMatchList() throws IOException {
 		String response = sendCommand(NetworkCommand.LIST_MATCHES);
 		Gson gson = GsonFactory.createGson();
-		Type collectionType = new TypeToken<Map<Integer, Match>>(){}.getType();
+		Type collectionType = new TypeToken<Map<Integer, Match>>() {
+		}.getType();
 		Map<Integer, Match> matchMap = gson.fromJson(response, collectionType);
 		openMatches.replaceAll(matchMap);
 	}
-	
+
 	private void receivePlayerList() throws IOException {
 		String response = sendCommand(NetworkCommand.LIST_PLAYERS);
 		Gson gson = GsonFactory.createGson();
-		Type collectionType = new TypeToken<Map<String, Player>>(){}.getType();
+		Type collectionType = new TypeToken<Map<String, Player>>() {
+		}.getType();
 		Map<String, Player> matchMap = gson.fromJson(response, collectionType);
 		if (player != null)
 			matchMap.remove(player.getName());
 		otherPlayers.replaceAll(matchMap);
 	}
-	
+
 	private boolean passiveModeInitialized = false;
-	
+
 	private void initPassiveMode() {
 		final Object sync = new Object();
 		passiveModeInitialized = false;
@@ -270,7 +281,7 @@ public class GameConnection {
 							socket.connect(new InetSocketAddress(host, port), CONNECTION_TIMEOUT);
 							passiveIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 							PrintStream passiveOut = new PrintStream(socket.getOutputStream());
-							
+
 							sendCommand(passiveIn, passiveOut, NetworkCommand.PASSIVE, sessionKey);
 						}
 						passiveModeInitialized = true;
@@ -279,7 +290,7 @@ public class GameConnection {
 							String line = passiveIn.readLine();
 							if (line == null)
 								throw new IOException("Server closed passive connection");
-							
+
 							System.out.println("Information: " + line);
 							String[] parts = line.split("\\s", 2);
 							if (parts.length < 1)
@@ -307,25 +318,28 @@ public class GameConnection {
 				}
 			}
 		}).start();
-		
-		// Wait until passive mode is activated to make sure that list updates are received properly
+
+		// Wait until passive mode is activated to make sure that list updates are
+		// received properly
 		// before receiving lists
 		while (!passiveModeInitialized)
-			synchronized (sync) {} // Wait until initialization is finished
+			synchronized (sync) {
+			} // Wait until initialization is finished
 	}
-	
+
 	private void handleNetworkInformation(NetworkInformation information, String parameter) {
 		// used several times
 		Match match;
 		int id;
 		Player player;
 		String[] parts;
-		
+
 		switch (information) {
 		case MATCH_CREATED:
 			match = GsonFactory.createGson().fromJson(parameter, Match.class);
 
-			// the players in the match are created by deserialization and thus are not identical to
+			// the players in the match are created by deserialization and thus are
+			// not identical to
 			// the players used by this GameConnection object.
 			List<Player> players = new ArrayList<Player>(match.getPlayers());
 			match.getPlayers().clear();
@@ -348,6 +362,9 @@ public class GameConnection {
 				case MATCH_CANCELLED:
 					match.cancel();
 					openMatches.remove(match);
+					if (match.equals(this.player.getCurrentMatch())) {
+						stopGame();
+					}
 					break;
 				case MATCH_PAUSED:
 					match.pause();
@@ -400,7 +417,7 @@ public class GameConnection {
 					return;
 				}
 			}
-			
+
 			// Something went wrong
 			System.out.println("Unknown match or player");
 			networkActions.add(new NetworkAction() {
@@ -417,8 +434,51 @@ public class GameConnection {
 		}
 	}
 
-	private String sendCommand(NetworkCommand command)
-			throws IOException {
+	private void initBinaryStream() {
+		new Thread(new Runnable() {
+			public void run() {
+				Socket socket = null;
+				try {
+					try {
+						socket = new Socket();
+						socket.connect(new InetSocketAddress(host, port), CONNECTION_TIMEOUT);
+						InputStream in = socket.getInputStream();
+						BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+						final OutputStream out = socket.getOutputStream();
+						PrintStream writer = new PrintStream(out);
+						sendCommand(reader, writer, NetworkCommand.BINARY, sessionKey);
+						
+						new Thread(new Runnable() {
+							public void run() {
+								try {
+									world.handleOutput(out);
+								} catch (IOException e) {
+									setState(ConnectionState.NETWORK_ERROR);
+									onNetworkError.call(new ExceptionEventArgs(e));
+								}
+							}
+						}).start();
+						
+						world.handleInput(in);
+					} catch (IOException e) {
+						setState(ConnectionState.NETWORK_ERROR);
+						onNetworkError.call(new ExceptionEventArgs(e));
+					}
+				} finally {
+					if (socket != null) {
+						try {
+							socket.close();
+						} catch (IOException e) {
+							System.out.println("Failed to close passive socket");
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}).start();
+	}
+
+	private String sendCommand(NetworkCommand command) throws IOException {
 		return sendCommand(command, "");
 	}
 
@@ -426,10 +486,11 @@ public class GameConnection {
 		return sendCommand(in, out, command, parameter);
 	}
 
-	private String sendCommand(BufferedReader in, PrintStream out, NetworkCommand command, String parameter) throws IOException {
+	private String sendCommand(BufferedReader in, PrintStream out, NetworkCommand command,
+			String parameter) throws IOException {
 		// Sanitize parameter
 		parameter = parameter.replace("\n", "");
-		
+
 		String line = command.toString() + " " + parameter;
 		out.println(line);
 		System.out.println("Sent: " + line);
@@ -452,7 +513,8 @@ public class GameConnection {
 				error = CommunicationError.valueOf(parts[0]);
 			} catch (IllegalArgumentException e) {
 				throw new IOException(
-						"Invalid error identifier, maybe server and client versions are not compatible");
+					"Invalid error identifier, maybe server and client versions are not compatible (" + 
+						res + ")");
 			}
 
 			if (parts.length == 2)
@@ -466,15 +528,28 @@ public class GameConnection {
 		this.state = state;
 		onStateChanged.call(EventArgs.EMPTY);
 	}
-	
+
 	private Player findPlayer(String name) {
 		if (player != null && player.getName().equals(name))
 			return player;
 		else
 			return otherPlayers.getByName(name);
 	}
-	
+
 	private void startGame() {
-		
+		world = new ClientWorld();
+		world.onWorldInitialized.addListener(new EventListener<Void>() {			
+			@Override
+			public void call(Object sender, Void param) {
+				onMatchStarted.call(new MatchStartedEventArgs(world));
+			}
+		});
+		initBinaryStream();
+	}
+	
+	private void stopGame() {
+		if (world != null) {
+			world.stop();
+		}
 	}
 }

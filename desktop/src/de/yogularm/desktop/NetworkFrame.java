@@ -40,6 +40,7 @@ import de.yogularm.network.Matches;
 import de.yogularm.network.Player;
 import de.yogularm.network.Players;
 import de.yogularm.network.client.GameConnection;
+import de.yogularm.network.client.MatchStartedEventArgs;
 import de.yogularm.network.client.MessageEventArgs;
 import javax.swing.border.TitledBorder;
 
@@ -173,6 +174,7 @@ public class NetworkFrame extends Page {
 		leaveServerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				connection.close();
 				launcher.back();
 			}
 		});
@@ -273,6 +275,13 @@ public class NetworkFrame extends Page {
 			@Override
 			public void call(Object sender, MessageEventArgs param) {
 				logChatMessage(param.getPlayer(), param.getMessage());
+			}
+		});
+		
+		connection.onMatchStarted.addListener(new EventListener<MatchStartedEventArgs>() {
+			@Override
+			public void call(Object sender, MatchStartedEventArgs param) {
+				getLauncher().setPage(new GameFrame(launcher, param.getWorld()));
 			}
 		});
 		

@@ -183,7 +183,8 @@ public class Body extends Component {
 	}
 
 	/**
-	 * Gets the speed with that other bodies shift this body (cached from last frame)
+	 * Gets the speed with that other bodies shift this body (cached from last
+	 * frame)
 	 * 
 	 * @return the shift speed
 	 */
@@ -263,8 +264,8 @@ public class Body extends Component {
 		List<Drawable> drawables = new ArrayList<Drawable>();
 		for (Vector force : forces) {
 			if (force.getLength() > 0) {
-				drawables.add(new RenderTransformation(new SimpleArrow(),
-					center, new Vector(force.getLength() / mass, 1), force.getAngleToXAxis()));
+				drawables.add(new RenderTransformation(new SimpleArrow(), center, new Vector(force
+						.getLength() / mass, 1), force.getAngleToXAxis()));
 			}
 		}
 		return drawables;
@@ -279,12 +280,14 @@ public class Body extends Component {
 		climbSpeed = 0;
 
 		momentum = momentum.add(collectedForce.multiply(elapsedTime));
-		for (ForceToSpeed info : forceToSpeed) {
-			Vector force = info.getForce(elapsedTime);
-			applyForce(force);
-			momentum = momentum.add(force.multiply(elapsedTime));
+		synchronized (forceToSpeed) {
+			for (ForceToSpeed info : forceToSpeed) {
+				Vector force = info.getForce(elapsedTime);
+				applyForce(force);
+				momentum = momentum.add(force.multiply(elapsedTime));
+			}
+			forceToSpeed.clear();
 		}
-		forceToSpeed.clear();
 		totalForce = collectedForce;
 		collectedForce = Vector.getZero();
 		actualShiftSpeed = shiftSpeed;
@@ -313,9 +316,9 @@ public class Body extends Component {
 
 	private void checkClimbing() {
 		if (canClimb) {
-			Iterable<Body> overlaps = 
-				ComponentCollectionUtils.getOverlappingBodies(getCollection(), getOuterBounds());
-			
+			Iterable<Body> overlaps = ComponentCollectionUtils.getOverlappingBodies(getCollection(),
+					getOuterBounds());
+
 			for (Body body : overlaps) {
 				if (body.isClimbable) {
 					isClimbing = true;
@@ -329,11 +332,12 @@ public class Body extends Component {
 	public boolean canMoveTo(Vector targetPosition) {
 		Rect source = bounds.add(getPosition());
 		Rect target = bounds.add(targetPosition);
-		Rect path = new Rect(Math.min(source.getLeft(), target.getLeft()),
-			Math.min(source.getBottom(), target.getBottom()), Math.max(source.getRight(), target.getRight()), Math.max(
+		Rect path = new Rect(Math.min(source.getLeft(), target.getLeft()), Math.min(source.getBottom(),
+				target.getBottom()), Math.max(source.getRight(), target.getRight()), Math.max(
 				source.getTop(), target.getTop()));
 		for (Component component : getCollection().getComponentsAround(path)) {
-			if ((component != this) && !component.isToRemove() && (component instanceof Body) && ((Body) component).isSolid()) {
+			if ((component != this) && !component.isToRemove() && (component instanceof Body)
+					&& ((Body) component).isSolid()) {
 				Body body = (Body) component;
 				Rect obstacle = body.getOuterBounds();
 				// Ignore Bodies already colliding with this body (otherwise this body
@@ -357,8 +361,8 @@ public class Body extends Component {
 	private Vector getImpactOnMove(Vector targetPosition, boolean calledOnMove, Axis axis) {
 		Rect source = bounds.add(getPosition());
 		Rect target = bounds.add(targetPosition);
-		Rect path = new Rect(Math.min(source.getLeft(), target.getLeft()),
-			Math.min(source.getBottom(), target.getBottom()), Math.max(source.getRight(), target.getRight()), Math.max(
+		Rect path = new Rect(Math.min(source.getLeft(), target.getLeft()), Math.min(source.getBottom(),
+				target.getBottom()), Math.max(source.getRight(), target.getRight()), Math.max(
 				source.getTop(), target.getTop()));
 
 		float x = target.getLeft();
@@ -366,7 +370,7 @@ public class Body extends Component {
 		Vector delta = targetPosition.subtract(getPosition());
 		Direction direction = delta.getDirection();
 
-		//List<Body> collidedBodies = null;
+		// List<Body> collidedBodies = null;
 
 		for (Component component : getCollection().getComponentsAround(path)) {
 			if ((component instanceof Body) && !component.isToRemove() && (component != this)) {
@@ -413,9 +417,8 @@ public class Body extends Component {
 							// Parallel force (when collided in y direction, apply y force)
 							// (momentum-based, delayed)
 							/*
-							 * if (collidedBodies == null)
-							 * collidedBodies = new ArrayList<Body>();
-							 * collidedBodies.add(body);
+							 * if (collidedBodies == null) collidedBodies = new
+							 * ArrayList<Body>(); collidedBodies.add(body);
 							 */
 
 							// parallel force (momentum-based, instantly applied)
@@ -435,8 +438,10 @@ public class Body extends Component {
 								b.momentum = b.momentum.changeComponent(axis, currentMomentum);
 							}
 
-							shiftSpeed = shiftSpeed.changeComponent(axis, body.getActualSpeed().getComponent(axis));
-							body.shiftSpeed = body.shiftSpeed.changeComponent(axis, getActualSpeed().getComponent(axis));
+							shiftSpeed = shiftSpeed.changeComponent(axis, body.getActualSpeed()
+									.getComponent(axis));
+							body.shiftSpeed = body.shiftSpeed.changeComponent(axis, getActualSpeed()
+									.getComponent(axis));
 
 							// Orthogonal force (when pressed to ground, apply x force
 							if (axis == Axis.VERTICAL) {
@@ -465,30 +470,19 @@ public class Body extends Component {
 
 		// Parallel force (when collided in y direction, apply y force)
 		/*
-		 * if (calledOnMove && collidedBodies != null) {
-		 * collidedBodies.add(this);
-		 * float totalMomentum = 0;
-		 * float totalMass = 0;
-		 * for (Body body : collidedBodies) {
-		 * totalMass += body.mass;
-		 * totalMomentum += body.momentum.getComponent(axis);
-		 * }
+		 * if (calledOnMove && collidedBodies != null) { collidedBodies.add(this);
+		 * float totalMomentum = 0; float totalMass = 0; for (Body body :
+		 * collidedBodies) { totalMass += body.mass; totalMomentum +=
+		 * body.momentum.getComponent(axis); }
 		 * 
-		 * if (totalMass > 0) {
-		 * for (Body body : collidedBodies) {
-		 * // braces to avoid +INF
-		 * float minMomentum = totalMomentum * (body.mass / totalMass);
+		 * if (totalMass > 0) { for (Body body : collidedBodies) { // braces to
+		 * avoid +INF float minMomentum = totalMomentum * (body.mass / totalMass);
 		 * 
-		 * // If body
-		 * //float currentMomentum = body.momentum.getComponent(axis);
-		 * //if (minMomentum) currentMomentum = Math.min(minMomentum,
-		 * // * currentMomentum); else currentMomentum = Math.max(minMomentum,
-		 * // * currentMomentum);
-		 * currentMomentum = minMomentum;
-		 * body.momentum = body.momentum.changeComponent(axis, currentMomentum);
-		 * }
-		 * }
-		 * }
+		 * // If body //float currentMomentum = body.momentum.getComponent(axis);
+		 * //if (minMomentum) currentMomentum = Math.min(minMomentum, // *
+		 * currentMomentum); else currentMomentum = Math.max(minMomentum, // *
+		 * currentMomentum); currentMomentum = minMomentum; body.momentum =
+		 * body.momentum.changeComponent(axis, currentMomentum); } } }
 		 */
 
 		return new Vector(x, y).subtract(bounds.getMinVector());
@@ -519,17 +513,29 @@ public class Body extends Component {
 	protected void onCollision(Body other, Direction direction, boolean isCauser) {
 
 	}
-	
+
 	@Override
 	protected void write(DataOutputStream stream, int length) throws IOException {
 		super.write(stream, length + 2 * 4);
 		stream.writeFloat(momentum.getX());
 		stream.writeFloat(momentum.getY());
 	}
-	
+
 	@Override
 	protected void read(DataInputStream stream, int length) throws IOException {
 		super.read(stream, length + 2 * 4);
 		momentum = new Vector(stream.readFloat(), stream.readFloat());
+	}
+
+	public void pushTo(Vector position, Vector momentum) {
+		// Move
+		tryMoveTo(position.changeY(this.getPosition().getY()), Axis.HORIZONTAL);
+		tryMoveTo(position.changeX(this.getPosition().getX()), Axis.VERTICAL);
+
+		// Speed
+		// TODO: adjust values
+		synchronized (forceToSpeed) {
+			applyForceToSpeed(new Vector(mass * 10, mass * 10), momentum.divide(mass));
+		}
 	}
 }

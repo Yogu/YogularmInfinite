@@ -7,6 +7,8 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
 import de.yogularm.Game;
+import de.yogularm.components.LocalWorld;
+import de.yogularm.components.World;
 import de.yogularm.event.ExceptionHandler;
 
 public class GameFrame extends Page {
@@ -17,12 +19,16 @@ public class GameFrame extends Page {
 	private InputImpl input;
 
 	private GLEventListenerImpl eventListener;
-
+	
 	public GameFrame(final SwingLauncher launcher) {
+		this(launcher, new LocalWorld());
+	}
+
+	public GameFrame(final SwingLauncher launcher, World world) {
 		super(launcher);
 
 		setLayout(new BorderLayout());
-		Game game = new Game();
+		Game game = new Game(world);
 		canvas = createCanvas();
 		add(canvas, BorderLayout.CENTER);
 

@@ -15,5 +15,5 @@ public interface Builder2 {
 	 * 
 	 * @param bounds
 	 */
-	public void build(Rect bounds);
+	public boolean build(Rect bounds);
 }

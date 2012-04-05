@@ -31,7 +31,8 @@ public abstract class GuidedBuilder implements Builder2 {
 
   @SuppressWarnings("unused")
   @Override
-  public void build(Rect bounds) {
+  public boolean build(Rect bounds) {
+  	boolean finished = true;
 		List<PathBuilder> toRemove = null;
 	  for (PathBuilder builder : pathBuilders) {
 	  	int buildCalls = 0;
@@ -41,6 +42,7 @@ public abstract class GuidedBuilder implements Builder2 {
 	  			throw new RuntimeException("Path builder missed to pop");
 	  		buildCalls++;
 	  		if (buildCalls >= MAX_BUILD_CALLS) {
+	  			finished = false;
 	  			//System.out.println("Path builder got stuck!");
 	  			if (REMOVE_WHEN_STUCK) {
 		  			if (toRemove == null)
@@ -53,8 +55,10 @@ public abstract class GuidedBuilder implements Builder2 {
 	  }
 
 	  if (toRemove != null)
-		  for (PathBuilder builder : toRemove)
-		  	pathBuilders.remove(builder);
+			for (PathBuilder builder : toRemove)
+				pathBuilders.remove(builder);
+
+		return finished;
   }
 	
 	public BuildingSite getBuildingSite() {

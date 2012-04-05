@@ -18,6 +18,7 @@ public class ComponentTree implements ObservableComponentCollection {
 	private Map<Point, List<Component>> tree = new HashMap<Point, List<Component>>();
 	private int count;
 	private List<ComponentCollectionListener> listeners = new ArrayList<ComponentCollectionListener>();
+	private Map<Integer, Component> byID = new HashMap<Integer, Component>();
 	
 	/**
 	 * The fraction of a sector dimension that is added to a rectangle when receiving components in
@@ -32,8 +33,8 @@ public class ComponentTree implements ObservableComponentCollection {
 	
 	private Point getSector(Vector position) {
 		return new Point(
-				(int)(position.getX() / sectorWidth),
-		  	(int)(position.getY() / sectorHeight));
+				(int)Math.floor(position.getX() / sectorWidth),
+		  	(int)Math.floor(position.getY() / sectorHeight));
 	}
 	
 	private List<Component> getListOfPosition(Vector position, boolean createIfMissing) {
@@ -58,10 +59,10 @@ public class ComponentTree implements ObservableComponentCollection {
 
 		// Limit to this.max/minX/Y because there are no components outside these limits
 		// No Math.ceil()! Reason: e.g. tree[0, 0] reaches from (0,0) to (1, 1)
-		int minX = Math.max(this.minX, (int)(range.getLeft() / sectorWidth - BUFFER_FRACTION));
-		int maxX = Math.min(this.maxX, (int)(range.getRight() / sectorWidth + BUFFER_FRACTION));
-		int minY = Math.max(this.minY, (int)(range.getBottom() / sectorHeight - BUFFER_FRACTION));
-		int maxY = Math.min(this.maxY, (int)(range.getTop() / sectorHeight + BUFFER_FRACTION));
+		int minX = Math.max(this.minX, (int)Math.floor(range.getLeft() / sectorWidth - BUFFER_FRACTION));
+		int maxX = Math.min(this.maxX, (int)Math.floor(range.getRight() / sectorWidth + BUFFER_FRACTION));
+		int minY = Math.max(this.minY, (int)Math.floor(range.getBottom() / sectorHeight - BUFFER_FRACTION));
+		int maxY = Math.min(this.maxY, (int)Math.floor(range.getTop() / sectorHeight + BUFFER_FRACTION));
 		for (int x = minX; x <= maxX; x++) {
 			for (int y = minY; y <= maxY; y++) {
 				List<Component> list = tree.get(new Point(x, y));
@@ -93,17 +94,6 @@ public class ComponentTree implements ObservableComponentCollection {
 			return new ArrayList<Component>(tree.get(sector));
 		else
 			return new ArrayList<Component>();
-	}
-	
-	/**
-	 * Removes all components in the given sector and adds the given components to that sector.
-	 * 
-	 * Before calling this method, make sure that the components really are in the specified sector.
-	 * 
-	 * @param sector The sector whose components to replace
-	 */
-	public List<Component> replaceComponentsOfSector(Point sector, Collection<Component> components) {
-		tree.put(sector, new ArrayList<Component>(components));
 	}
 
 	@Override
@@ -155,6 +145,8 @@ public class ComponentTree implements ObservableComponentCollection {
 				}
 			});
 		}
+	  
+	  byID.put(component.getID(), component);
   }
 
 	@Override
@@ -172,6 +164,8 @@ public class ComponentTree implements ObservableComponentCollection {
 			  }
 	  	}
 	  }
+	  
+	  byID.remove(component.getID());
   }
 	
 	/**
@@ -194,5 +188,10 @@ public class ComponentTree implements ObservableComponentCollection {
 		synchronized (listeners) {
 			listeners.remove(listener);
 		}
+	}
+
+	@Override
+	public Component getByID(int id) {
+		return byID.get(id);
 	}
 }

@@ -111,6 +111,7 @@ public class GameClient extends Thread {
 		switch (command) {
 		case PASSIVE:
 		case RENEW:
+		case BINARY:
 			ClientData data = serverData.clientData.get(parameter);
 			if (data == null) {
 				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
@@ -137,7 +138,7 @@ public class GameClient extends Thread {
 		default:
 			CommandHandler handler = command == null ? null : commandHandlers.get(command);
 			if (handler == null)
-				writer.println("ERR INVALID_COMMAND");
+				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_COMMAND));
 			else
 				writer.println(handler.handle(clientData, parameter));
 		}

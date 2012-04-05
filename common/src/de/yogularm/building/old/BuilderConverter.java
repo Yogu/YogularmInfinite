@@ -18,9 +18,10 @@ public class BuilderConverter implements Builder2 {
   }
 
 	@Override
-  public void build(Rect bounds) {
+  public boolean build(Rect bounds) {
   	while (bounds.contains(builder.getBuildingPosition())) {
   		builder.build();
   	}
+  	return true;
   }
 }

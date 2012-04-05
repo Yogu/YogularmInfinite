@@ -9,6 +9,8 @@ public class ServerGame {
 	private boolean isSuspended;
 	private long lastFrameTime;
 	private float frameTime;
+	
+	private static final float TARGET_FPS = 30;
 
 	public ServerGame() {
 		world = new MultiPlayerWorld();
@@ -71,6 +73,15 @@ public class ServerGame {
 			
 			captureFrameTime();
 			world.update(frameTime);
+			
+			float sleepTime = (1f / TARGET_FPS) - frameTime;
+			if (sleepTime > 0) {
+				try {
+					Thread.sleep((int)(sleepTime * 1000));
+				} catch (InterruptedException e) {
+					return;
+				}
+			}
 		}
 	}
 

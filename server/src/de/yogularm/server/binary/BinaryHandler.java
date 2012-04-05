@@ -1,5 +1,6 @@
 package de.yogularm.server.binary;
 
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,12 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 import de.yogularm.ServerGame;
+import de.yogularm.components.Body;
 import de.yogularm.components.Component;
 import de.yogularm.components.ComponentCollectionListener;
 import de.yogularm.components.MultiPlayerWorld;
 import de.yogularm.components.MultiPlayerWorldListener;
 import de.yogularm.components.ObservableComponentCollection;
 import de.yogularm.geometry.Point;
+import de.yogularm.geometry.Vector;
 import de.yogularm.network.Components;
 import de.yogularm.network.Match;
 import de.yogularm.network.NetworkPacket;
@@ -37,7 +40,7 @@ public class BinaryHandler {
 
 	public BinaryHandler(InputStream in, OutputStream out, Player player) {
 		this.in = new DataInputStream(in);
-		this.out = new DataOutputStream(out);
+		this.out = new DataOutputStream(new BufferedOutputStream(out));
 		this.player = player;
 		match = player.getCurrentMatch();
 		game = match.game;
@@ -49,7 +52,7 @@ public class BinaryHandler {
 
 	public void run() throws IOException {
 		receiveThread = Thread.currentThread();
-		sendInfo();
+		initWorld();
 		while (!receiveThread.isInterrupted()) {
 			if (in.available() > 0)
 				receivePacket();
@@ -70,13 +73,9 @@ public class BinaryHandler {
 
 	private void receivePacket() throws IOException {
 		int id = in.readInt();
-		/* int length = in.readInt(); */
-		if (id < 0 || id >= NetworkPacket.values().length) {
-			/* in.skip(length); */
+		if (id < 0 || id >= NetworkPacket.values().length)
 			throw new IOException("Invalid packet id: " + id);
-		}
 
-		// int read = 0;
 		NetworkPacket packet = NetworkPacket.values()[id];
 		switch (packet) {
 		case OBSERVE:
@@ -88,18 +87,20 @@ public class BinaryHandler {
 			recalculateObservedSectors();
 			world.observeSectors(observedSectors);
 			sendSectors();
-			// read = 4 * 4;
 			break;
+		default:
+			throw new IOException("Invalid packet id: " + id);
 		}
-
-		// in.skip(length - read);
+		
+		//System.out.println("Received packet " + packet);
 	}
 
-	private void sendInfo() throws IOException {
+	private void initWorld() throws IOException {
 		synchronized (out) {
-			initPacket(NetworkPacket.WORLD_INFO/* , 8 */);
-			out.write(MultiPlayerWorld.SECTOR_WIDTH);
-			out.write(MultiPlayerWorld.SECTOR_HEIGHT);
+			initPacket(NetworkPacket.INIT_WORLD/* , 8 */);
+			out.writeInt(MultiPlayerWorld.SECTOR_WIDTH);
+			out.writeInt(MultiPlayerWorld.SECTOR_HEIGHT);
+			out.flush();
 		}
 	}
 
@@ -115,6 +116,7 @@ public class BinaryHandler {
 			try {
 				initPacket(NetworkPacket.ADDED);
 				sendComponent(component);
+				out.flush();
 			} catch (IOException e) {
 				delegateWriteException(e);
 			}
@@ -126,6 +128,7 @@ public class BinaryHandler {
 			try {
 				initPacket(NetworkPacket.REMOVED);
 				out.writeInt(component.getID());
+				out.flush();
 			} catch (IOException e) {
 				delegateWriteException(e);
 			}
@@ -137,6 +140,29 @@ public class BinaryHandler {
 			try {
 				initPacket(NetworkPacket.CHANGED);
 				sendComponent(component);
+				out.flush();
+			} catch (IOException e) {
+				delegateWriteException(e);
+			}
+		}
+	}
+
+	private void sendQuickChange(Component component) {
+		synchronized (out) {
+			try {
+				initPacket(NetworkPacket.QUICK_CHANGE);
+				out.writeInt(component.getID());
+				out.writeFloat(component.getPosition().getX());
+				out.writeFloat(component.getPosition().getY());
+				if (component instanceof Body) {
+					Vector momentum = ((Body)component).getMomentum();
+					out.writeFloat(momentum.getX());
+					out.writeFloat(momentum.getY());
+				} else {
+					out.writeFloat(0);
+					out.writeFloat(0);
+				}
+				out.flush();
 			} catch (IOException e) {
 				delegateWriteException(e);
 			}
@@ -146,26 +172,27 @@ public class BinaryHandler {
 	private void sendSector(Point sector) throws IOException {
 		synchronized (out) {
 			List<Component> components = world.getComponents().getComponentsOfSector(sector);
-			// int length = 4 + components.size() * 2 * 4;
-			initPacket(NetworkPacket.COMPLETE_SECTOR/* , length */);
-			out.write(sector.getX());
-			out.write(sector.getY());
+			initPacket(NetworkPacket.COMPLETE_SECTOR);
+			out.writeInt(sector.getX());
+			out.writeInt(sector.getY());
+			out.writeInt(components.size());
 			for (Component component : components) {
 				sendComponent(component);
 			}
+			out.flush();
 		}
 	}
 
 	private void sendComponent(Component component) throws IOException {
 		Class<? extends Component> type = component.getClass();
 		int id = Components.getID(type);
-		out.write(id);
+		out.writeInt(id);
 		component.write(out);
 	}
 
-	private void initPacket(NetworkPacket packet/* , int length */) throws IOException {
-		out.write(packet.ordinal());
-		// out.write(length);
+	private void initPacket(NetworkPacket packet) throws IOException {
+		out.writeInt(packet.ordinal());
+		//System.out.println("Sending packet " + packet);
 	}
 
 	private void recalculateObservedSectors() {
@@ -207,12 +234,19 @@ public class BinaryHandler {
 			}
 		}
 	}
-	
+
 	private class TheMultiPlayerWorldListener implements MultiPlayerWorldListener {
 		@Override
 		public void componentChanged(MultiPlayerWorld world, Component component, Point sector) {
 			if (observedSectors.contains(sector)) {
 				sendChangedComponent(component);
+			}
+		}
+
+		@Override
+		public void quickChange(MultiPlayerWorld world, Component component, Point sector) {
+			if (observedSectors.contains(sector)) {
+				sendQuickChange(component);
 			}
 		}
 	}

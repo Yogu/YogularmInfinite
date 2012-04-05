@@ -2,13 +2,19 @@ package de.yogularm;
 
 import java.util.EnumSet;
 
+import de.yogularm.building.BuildingSite;
+import de.yogularm.components.Component;
+import de.yogularm.components.LocalWorld;
 import de.yogularm.components.World;
 import de.yogularm.drawing.Color;
 import de.yogularm.drawing.Font;
 import de.yogularm.drawing.FontStyle;
 import de.yogularm.drawing.RenderContext;
 import de.yogularm.drawing.RenderTransformation;
+import de.yogularm.drawing.Renderable;
+import de.yogularm.drawing.Renderer;
 import de.yogularm.drawing.TextDrawable;
+import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;
 import de.yogularm.input.Input;
@@ -16,6 +22,7 @@ import de.yogularm.utils.ValueSmoothener;
 
 public class Game {
 	private World world;
+	private Camera camera;
 	private Input input;
 	private Vector viewSize = new Vector(1, 1);
 	private int width;
@@ -30,14 +37,20 @@ public class Game {
 	private ValueSmoothener smoothFrameTime = new ValueSmoothener(SMOOTH_TIME);
 	private ValueSmoothener smoothUpdateTime = new ValueSmoothener(SMOOTH_TIME);
 	private ValueSmoothener smoothRenderTime = new ValueSmoothener(SMOOTH_TIME);
+	private int renderCount;
+	private int updateCount;
 
 	private static final Color CLEAR_COLOR = new Color(0.8f, 0.8f, 1, 1);
 	private static final double SMOOTH_TIME = 0.33f; // [second]
+	private static final int RENDER_RANGE_BUFFER = 4;
 	
 	public static final String VERSION = "0.4";
 	
+	public Game(World world) {
+		startWorld(world);
+	}
+	
 	public Game() {
-		// Init world
 		restart();
 	}
 
@@ -55,7 +68,7 @@ public class Game {
 
 		context.setProjection(w, h);
 		viewSize = new Vector(w, h);
-		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
+		camera.setBounds(camera.getBounds().changeSize(viewSize));
 		this.width = width;
 		this.height = height;
 	}
@@ -77,7 +90,7 @@ public class Game {
 	public void render(RenderContext context) {
 		long time = System.nanoTime();
 		context.clear(Config.DEBUG_BUILDING ? Color.white : CLEAR_COLOR);
-		world.render(context);
+		renderWorld(context);
 		renderGUI(context);
 		smoothRenderTime.set((System.nanoTime() - time) / 1000000000.0); // ns to s
 	}
@@ -85,7 +98,10 @@ public class Game {
 	private void doTick() {
 		long time = System.nanoTime();
 
-		world.update(frameTime);
+		Rect actionRange = camera.getBounds().changeSize(camera.getBounds().getSize().multiply(2));
+		world.update(frameTime, actionRange);
+		camera.scroll(world.getPlayer().getOuterBounds().getCenter(), frameTime);
+		
 		if (input != null)
 			applyInput();
 		if (world.getPlayer().isDead()) {
@@ -136,8 +152,8 @@ public class Game {
 					smoothUpdateTime.getSmooth() * 1000,
 					smoothRenderTime.getSmooth() * 1000));
 			context.drawText(new Vector(10, 25), font2, String.format(
-					"Components: %d;     Rendered: %d;     Updated: %d;     Checked: %d", world.getComponents()
-							.getCount(), world.renderCount, world.updateCount, world.inRangeCount));
+					"Components: %d;     Rendered: %d;     Updated: %d", world.getComponents()
+							.getCount(), renderCount, updateCount));
 			context.drawText(new Vector(10, 10), font2, "Player: " + world.getPlayer().getPosition());
 		}
 
@@ -155,8 +171,13 @@ public class Game {
 	}
 
 	private void restart() {
-		world = new World();
-		world.getCamera().setBounds(world.getCamera().getBounds().changeSize(viewSize));
+		startWorld(new LocalWorld());
+	}
+	
+	private void startWorld(World world) {
+		this.world = world;
+		camera = new Camera();
+		camera.setBounds(camera.getBounds().changeSize(viewSize));
 		gameoverTime = 0;
 		isGameover = false;
 		System.gc();
@@ -172,6 +193,76 @@ public class Game {
 		if (world.getPlayer().isClimbing()) {
 			direction = input.getYControl();
 			world.getPlayer().setClimbSpeed(direction * Config.PLAYER_CLIMB_SPEED);
+		}
+	}
+
+	public void renderWorld(RenderContext context) {
+		camera.applyMatrix(context);
+		
+		Vector renderRangeBuffer = new Vector(RENDER_RANGE_BUFFER, RENDER_RANGE_BUFFER);
+		Rect renderRange = camera.getBounds();
+		renderRange = renderRange.changeSize(renderRange.getSize().add(renderRangeBuffer));
+
+		renderCount = 0;
+		for (Component component : world.getComponents().getComponentsAround(renderRange)) {
+			if (component instanceof Renderable && component != world.getPlayer()) {
+				if (renderRange.contains(component.getPosition())) {
+					Renderer.render(context, (Renderable) component);
+					renderCount++;
+				}
+			}
+		}
+		
+		if (Config.DEBUG_BUILDING)
+			renderFlagMap(context, renderRange);
+		
+		// To show it above all other components
+		Renderer.render(context, world.getPlayer());
+	}
+	
+	private void renderFlagMap(RenderContext context, Rect renderRange) {
+		BuildingSite buildingSite = world.getBuildingSite();
+		if (buildingSite == null)
+			return;
+		
+		context.unbindTexture();
+		int minX = (int)Math.floor(renderRange.getLeft());
+		int maxX = (int)Math.ceil(renderRange.getRight());
+		int minY = (int)Math.floor(renderRange.getBottom());
+		int maxY = (int)Math.ceil(renderRange.getTop());
+		Color keepFreeColor = new Color(0, 0, 0.5f, 0.12f);
+		Color freeColor = new Color(0, 1, 0, 0.2f);
+		Color temporarilyBlockedColor = new Color(1, 0.5f, 0, 0.5f);
+		Color blockedColor = new Color(1, 0, 0, 0.5f);
+		
+		//Color takenColor = new Color(1, 0.5f, 0, 0.5f);
+		Color safeColor = new Color(0, 0, 1, 0.2f);
+		for (int x = minX; x <= maxX; x++) {
+			for (int y = minY; y <= maxY; y++) {
+				Point p = new Point(x, y);
+				Rect r = new Rect(x, y, x + 1, y + 1);
+				if (buildingSite.isKeptFree(p))
+					context.setColor(keepFreeColor);
+				else if (buildingSite.isAlwaysFree(p))
+					context.setColor(freeColor);
+				else if (buildingSite.isFree(p))
+					context.setColor(temporarilyBlockedColor);
+				else
+					context.setColor(blockedColor);
+				context.drawRect(r);
+				
+				if (buildingSite.isSafe(p)) {
+					r = new Rect(x, y, x + 1, y + 0.25f);
+					context.setColor(safeColor);
+					context.drawRect(r);
+				}
+				
+				/*if (buildingSite.isFree(p) && !buildingSite.canPlace(p)) {
+					r = new Rect(x + 0.75f, y + 0.75f, x + 1, y + 1);
+					context.setColor(takenColor);
+					context.drawRect(r);
+				}*/
+			}
 		}
 	}
 }

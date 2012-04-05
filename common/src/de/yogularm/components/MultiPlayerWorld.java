@@ -13,6 +13,7 @@ import de.yogularm.building.BuildingSite;
 import de.yogularm.building.test.TestBuilder;
 import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
+import de.yogularm.geometry.Vector;
 
 public class MultiPlayerWorld {
 	private ObservableComponentCollection components;
@@ -30,7 +31,6 @@ public class MultiPlayerWorld {
 		buildingSite = new BuildingSite(components);
 		builder = new TestBuilder();
 		builder.init(buildingSite);
-		// TODO: only for testing
 		builder.build(new Rect(0, 0, SECTOR_WIDTH, SECTOR_HEIGHT));
 	}
 	
@@ -47,36 +47,54 @@ public class MultiPlayerWorld {
 		}
 		
 		for (Point sector : sectors) {
-			List<Component> components = this.components.getComponentsOfSector(sector);
-			for (Component component : components) {
+			List<Component> list = components.getComponentsOfSector(sector);
+			for (Component component : list) {
+				Vector position = component.getPosition();
+				Vector momentum = component instanceof Body ? ((Body)component).getMomentum() : null;
+				
 				if (!component.isToRemove())
 					component.update(elapsedTime);
 				if (component.isToRemove())
 					components.remove(component);
 				
-				if (component.hasChanged()) {
-					component.clearChanged();
-					
+				boolean quickChange =
+					!component.getPosition().equals(position) 
+					|| (momentum != null && !((Body)component).getMomentum().equals(momentum));
+				
+				if (component.hasChanged() || quickChange) {
 					synchronized (listeners) {
 						for (MultiPlayerWorldListener listener : listeners) {
-							listener.componentChanged(this, component, sector);
+							if (component.hasChanged())
+								listener.componentChanged(this, component, sector);
+							else
+								listener.quickChange(this, component, sector);
 						}
 					}
+
+					component.clearChanged();
 				}
 			}
 		}
 	}
 
 	public void build() {
-		Set<Point> newSectors;
-		synchronized (newlyObservedSectors) {
+		List<Point> newSectors;
+		/*synchronized (newlyObservedSectors) {
 			if (newlyObservedSectors.size() == 0)
 				return;
 			newSectors = new HashSet<Point>(newlyObservedSectors);
 			newlyObservedSectors.clear();
+		}*/
+		synchronized (observedSectors) {
+			newSectors = new ArrayList<Point>(observedSectors.keySet());
 		}
 		for (Point sector : newSectors) {
-			builder.build(getRectOfSector(sector));
+			if (!builder.build(getRectOfSector(sector))) {
+				// builder has not finished yet, so go on building the next time
+				/*synchronized (newlyObservedSectors) {
+					newlyObservedSectors.add(sector);
+				}*/
+			}
 		}
 	}
 	

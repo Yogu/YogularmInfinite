@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
 
 import de.yogularm.drawing.AnimatedImage;
 import de.yogularm.drawing.Animation;
@@ -22,7 +23,7 @@ public class Component implements Locatable {
 	private boolean isNetworkComponent;
 	private boolean hasChanged;
 	
-	private static int nextID;
+	private static int nextID = new Random().nextInt(0x10000);
 
 	/**
 	 * An event that is called when this component is moved
@@ -127,7 +128,7 @@ public class Component implements Locatable {
 	 * @param length The count of bytes used plus the count of bytes used by subclasses
 	 */
 	protected void write(DataOutputStream stream, int length) throws IOException {
-		length += 2 * 4;
+		length += 3 * 4;
 		stream.writeInt(length);
 		
 		stream.writeInt(id);

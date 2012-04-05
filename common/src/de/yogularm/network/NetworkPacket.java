@@ -2,7 +2,7 @@ package de.yogularm.network;
 
 public enum NetworkPacket {
 	/* server */
-	WORLD_INFO, COMPLETE_SECTOR, ADDED, REMOVED, CHANGED,
+	INIT_WORLD, COMPLETE_SECTOR, ADDED, REMOVED, CHANGED, QUICK_CHANGE,
 	
 	/* client */
 	OBSERVE
