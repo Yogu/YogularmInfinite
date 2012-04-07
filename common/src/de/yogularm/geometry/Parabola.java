@@ -1,5 +1,7 @@
 package de.yogularm.geometry;
 
+import de.yogularm.Config;
+
 public class Parabola implements NumericFunction {
 	// y = a * (x - d)^2 + e
 	private float a;
@@ -53,14 +55,14 @@ public class Parabola implements NumericFunction {
 		return a * (x - d) * (x - d) + e;
 	}
 	
-	public float min() {
+	public float getMin() {
 		if (a < 0)
 			return Float.NEGATIVE_INFINITY;
 		else
 			return e;
 	}
 	
-	public float max() {
+	public float getMax() {
 		if (a > 0)
 			return Float.POSITIVE_INFINITY;
 		else
@@ -109,5 +111,29 @@ public class Parabola implements NumericFunction {
 	
 	public Parabola changeApex(Vector newApex) {
 		return new Parabola(a, newApex);
+	}
+
+	public boolean equals(Parabola other, float epsilon) {
+		return other != null
+			&& Math.abs(a - other.a) < epsilon
+			&& Math.abs(d - other.d) < epsilon
+			&& Math.abs(e - other.e) < epsilon;
+	}
+
+	public boolean equals(Parabola other) {
+		return equals(other, Config.EPSILON);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return other instanceof Parabola && equals((Parabola)other);
+	}
+	
+	@Override
+	public int hashCode() {
+    long bits = Double.doubleToLongBits(a);
+    bits ^= Double.doubleToLongBits(e) * 31;
+    bits ^= Double.doubleToLongBits(e) * 31;
+    return (((int) bits) ^ ((int) (bits >> 32)));
 	}
 }

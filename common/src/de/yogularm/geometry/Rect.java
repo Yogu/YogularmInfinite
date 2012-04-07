@@ -113,14 +113,21 @@ public class Rect {
 	
 	public boolean overlaps(Rect other) {
 		return
-			   other.getMaxVector().getX() > minVector.getX() + Config.EPSILON
-			&& other.getMinVector().getX() < maxVector.getX() - Config.EPSILON
-			&& other.getMaxVector().getY() > minVector.getY() + Config.EPSILON
-			&& other.getMinVector().getY() < maxVector.getY() - Config.EPSILON;
+			   other.maxVector.getX() > minVector.getX() + Config.EPSILON
+			&& other.minVector.getX() < maxVector.getX() - Config.EPSILON
+			&& other.maxVector.getY() > minVector.getY() + Config.EPSILON
+			&& other.minVector.getY() < maxVector.getY() - Config.EPSILON;
 	}
 	
 	public boolean equals(Rect other) {
-		return minVector.equals(other.minVector) && maxVector.equals(other.maxVector);
+		return other != null && minVector.equals(other.minVector) && maxVector.equals(other.maxVector);
+	}
+	
+	public boolean equals(Object other) {
+		if (other instanceof Rect)
+			return equals((Rect)other);
+		else
+			return super.equals(other);
 	}
 	
 	public Rect add(Vector offset) {
@@ -128,8 +135,11 @@ public class Rect {
 	}
 	
 	public boolean contains(Vector point) {
-		return point.getX() >= getLeft() && point.getX() <= getRight()
-			&& point.getY() >= getBottom() && point.getY() <= getTop();
+		return
+				 point.getX() >= getLeft() - Config.EPSILON
+			&& point.getX() <= getRight() + Config.EPSILON
+			&& point.getY() >= getBottom() - Config.EPSILON
+			&& point.getY() <= getTop() + Config.EPSILON;
 	}
 	
 	@Override

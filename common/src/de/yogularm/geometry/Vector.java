@@ -1,5 +1,7 @@
 package de.yogularm.geometry;
 
+import de.yogularm.Config;
+
 
 public class Vector {
 	private final float x;
@@ -77,7 +79,7 @@ public class Vector {
 	}
 
 	public boolean equals(Vector other) {
-		return x == other.x && y == other.y;
+		return equals(other, Config.EPSILON);
 	}
 
 	public boolean equals(Vector other, float epsilon) {

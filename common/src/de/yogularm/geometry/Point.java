@@ -44,10 +44,13 @@ public class Point {
 	}
 	
 	public boolean equals(Object other) {
-		return other instanceof Point && equals((Point)other);
+		if (other instanceof Point)
+			return equals((Point)other);
+		else
+			return super.equals(other);
 	}
 	
 	public int hashCode() {
-		return x ^ y;
+		return x ^ (y * 31);
 	}
 }

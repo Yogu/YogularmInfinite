@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Describes a rectangle following the 
+ * Describes a rectangle following the graph of a numeric function
  * @author jan
  *
  */

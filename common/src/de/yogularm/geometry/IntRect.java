@@ -86,7 +86,11 @@ public class IntRect {
 	}
 
 	public boolean equals(IntRect other) {
-		return min.equals(other.min) && max.equals(other.max);
+		return other != null && min.equals(other.min) && max.equals(other.max);
+	}
+	
+	public boolean equals(Object other) {
+		return other instanceof IntRect && equals((IntRect)other);
 	}
 
 	public IntRect add(Point offset) {
@@ -100,7 +104,7 @@ public class IntRect {
 
 	@Override
 	public int hashCode() {
-		return min.hashCode() ^ max.hashCode();
+		return min.hashCode() ^ (max.hashCode() * 31);
 	}
 
 	public String toString() {
