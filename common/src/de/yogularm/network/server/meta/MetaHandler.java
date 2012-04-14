@@ -2,27 +2,21 @@ package de.yogularm.network.server.meta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
 import de.yogularm.network.NetworkInformation;
-import de.yogularm.network.server.BinaryHandler;
+import de.yogularm.network.server.AbstractServerHandler;
 import de.yogularm.network.server.ClientData;
 import de.yogularm.network.server.ServerData;
-import de.yogularm.utils.Exceptions;
+import de.yogularm.network.server.ServerHandlerFactory;
 
-public class GameClient extends Thread {
-	private InputStream in;
-	private OutputStream out;
-	private Runnable closedHandler;
-	private BufferedReader reader;
-	private PrintStream writer;
+public class MetaHandler extends AbstractServerHandler {
+	private BufferedReader in;
+	private PrintWriter out;
 	private ServerData serverData;
 	private ClientData clientData;
 
@@ -51,31 +45,25 @@ public class GameClient extends Thread {
 		commandHandlers.put(NetworkCommand.SAY, new SayCommand());
 	}
 
-	public GameClient(InputStream in, OutputStream out, ServerData serverData) throws IOException {
+	public MetaHandler(BufferedReader in, PrintWriter out, ServerData serverData,
+			ServerHandlerFactory handlerFactory) throws IOException {
+		super(handlerFactory);
 		this.in = in;
 		this.out = out;
 		this.serverData = serverData;
 		this.clientData = new ClientData();
 		serverData.clientData.put(clientData.key, clientData);
 		clientData.serverData = serverData;
-		reader = new BufferedReader(new InputStreamReader(in));
-		writer = new PrintStream(out);
 	}
 
-	public void run() {
+	public void run() throws IOException {
 		try {
 			while (!isInterrupted()) {
-				try {
-					String line = reader.readLine();
-					if (line == null)
-						break; // socket closed
-					else
-						executeCommand(line);
-				} catch (Exception e) {
-					log("Exception in GameClient thread: " + Exceptions.formatException(e));
-					e.printStackTrace();
-					break;
-				}
+				String line = in.readLine();
+				if (line == null)
+					break; // socket closed
+				else
+					executeCommand(line);
 			}
 		} finally {
 			if (isPrimary && clientData.player != null) {
@@ -88,14 +76,7 @@ public class GameClient extends Thread {
 						.notifyClients(NetworkInformation.PLAYER_LEFT_SERVER, clientData.player.getName());
 				serverData.clientData.remove(clientData.key);
 			}
-
-			if (closedHandler != null)
-				closedHandler.run();
 		}
-	}
-
-	public void setClosedHandler(Runnable handler) {
-		this.closedHandler = handler;
 	}
 
 	private void executeCommand(String line) throws IOException {
@@ -110,54 +91,27 @@ public class GameClient extends Thread {
 		switch (command) {
 		case PASSIVE:
 		case RENEW:
-		case BINARY:
 			ClientData data = serverData.clientData.get(parameter);
 			if (data == null) {
-				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
-				System.out.println("Client tried to authenticate with invalid session key");
+				out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
+				log("Client tried to authenticate with invalid session key");
 			} else {
-				writer.println(new CommandHandlerUtils().ok());
+				out.println(new CommandHandlerUtils().ok());
 				clientData = data;
-				
-				switch (command) {
-				case PASSIVE:
-					doPassive();
-					break;
-				case BINARY:
-					if (clientData.player.getCurrentMatch() == null)
-						System.out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_STATE, "Join match first"));
-					else if (!clientData.player.getCurrentMatch().isStarted())
-						System.out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_STATE, "Match is not started"));
-					else {	
-						doBinary();
-					}
+
+				if (command == NetworkCommand.PASSIVE) {
+					runNested(getHandlerFactory().createPassiveHandler(out, clientData));
+					interrupt();
 					break;
 				}
 			}
 		default:
 			CommandHandler handler = command == null ? null : commandHandlers.get(command);
 			if (handler == null)
-				writer.println(new CommandHandlerUtils().err(CommunicationError.INVALID_COMMAND));
+				out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_COMMAND));
 			else
-				writer.println(handler.handle(clientData, parameter));
+				out.println(handler.handle(clientData, parameter));
 		}
-	}
-
-	private void doPassive() {
-		isPrimary = false;
-		PassiveHandler handler = new PassiveHandler(serverData, clientData, writer);
-		handler.run();
-		// Handler has closed, nothing more to do here
-		interrupt();
-	}
-	
-	private void doBinary() throws IOException {
-		isPrimary = false;
-		writer.flush();
-		BinaryHandler handler = new BinaryHandler(in, out, clientData.player);
-		handler.run();
-		// Handler has closed, nothing more to do here
-		interrupt();
 	}
 
 	private void log(String message) {

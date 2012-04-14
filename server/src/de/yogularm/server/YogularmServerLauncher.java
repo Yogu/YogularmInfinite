@@ -3,7 +3,7 @@ package de.yogularm.server;
 import java.io.IOException;
 
 import de.yogularm.network.ServerGlobals;
-import de.yogularm.network.server.meta.GameServer;
+import de.yogularm.network.server.GameServer;
 
 public class YogularmServerLauncher {
 	public static void main(String[] arguments) {
