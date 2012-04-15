@@ -528,6 +528,8 @@ public class Body extends Component {
 	}
 
 	public void pushTo(Vector position, Vector momentum) {
+		// TODO: make this method thread-safe
+		
 		// Move
 		tryMoveTo(position.changeY(this.getPosition().getY()), Axis.HORIZONTAL);
 		tryMoveTo(position.changeX(this.getPosition().getX()), Axis.VERTICAL);

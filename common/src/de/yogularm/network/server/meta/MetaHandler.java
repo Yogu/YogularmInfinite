@@ -6,19 +6,19 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.yogularm.multiplayer.Player;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
-import de.yogularm.network.NetworkInformation;
 import de.yogularm.network.server.AbstractServerHandler;
-import de.yogularm.network.server.ClientData;
-import de.yogularm.network.server.ServerData;
+import de.yogularm.network.server.ClientContext;
+import de.yogularm.network.server.ServerContext;
 import de.yogularm.network.server.ServerHandlerFactory;
 
 public class MetaHandler extends AbstractServerHandler {
-	private BufferedReader in;
-	private PrintWriter out;
-	private ServerData serverData;
-	private ClientData clientData;
+	private final BufferedReader in;
+	private final PrintWriter out;
+	private final ServerContext serverContext;
+	private ClientContext clientContext;
 
 	/**
 	 * Specifies whether a player is assumed as disconnected when this socket is
@@ -45,15 +45,13 @@ public class MetaHandler extends AbstractServerHandler {
 		commandHandlers.put(NetworkCommand.SAY, new SayCommand());
 	}
 
-	public MetaHandler(BufferedReader in, PrintWriter out, ServerData serverData,
-			ServerHandlerFactory handlerFactory) throws IOException {
+	public MetaHandler(BufferedReader in, PrintWriter out, ServerContext context,
+			ServerHandlerFactory handlerFactory) {
 		super(handlerFactory);
 		this.in = in;
 		this.out = out;
-		this.serverData = serverData;
-		this.clientData = new ClientData();
-		serverData.clientData.put(clientData.key, clientData);
-		clientData.serverData = serverData;
+		this.serverContext = context;
+		clientContext = context.createClientContext();
 	}
 
 	public void run() throws IOException {
@@ -66,15 +64,11 @@ public class MetaHandler extends AbstractServerHandler {
 					executeCommand(line);
 			}
 		} finally {
-			if (isPrimary && clientData.player != null) {
-				if (clientData.player != null && clientData.player.getCurrentMatch() != null) {
-					new LeaveCommand().handle(clientData, "");
-				}
-
-				serverData.players.remove(clientData.player);
-				serverData
-						.notifyClients(NetworkInformation.PLAYER_LEFT_SERVER, clientData.player.getName());
-				serverData.clientData.remove(clientData.key);
+			if (isPrimary) {
+				Player player = clientContext.getPlayer();
+				if (player != null)
+					serverContext.getManager().removePlayer(player);
+				serverContext.removeClientContext(clientContext);
 			}
 		}
 	}
@@ -91,16 +85,16 @@ public class MetaHandler extends AbstractServerHandler {
 		switch (command) {
 		case PASSIVE:
 		case RENEW:
-			ClientData data = serverData.clientData.get(parameter);
-			if (data == null) {
+			ClientContext context = serverContext.getClientContext(parameter);
+			if (context == null) {
 				out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_SESSION_KEY));
 				log("Client tried to authenticate with invalid session key");
 			} else {
 				out.println(new CommandHandlerUtils().ok());
-				clientData = data;
+				clientContext = context;
 
 				if (command == NetworkCommand.PASSIVE) {
-					runNested(getHandlerFactory().createPassiveHandler(out, clientData));
+					runNested(getHandlerFactory().createPassiveHandler(out, clientContext));
 					interrupt();
 					break;
 				}
@@ -110,7 +104,7 @@ public class MetaHandler extends AbstractServerHandler {
 			if (handler == null)
 				out.println(new CommandHandlerUtils().err(CommunicationError.INVALID_COMMAND));
 			else
-				out.println(handler.handle(clientData, parameter));
+				out.println(handler.handle(clientContext, parameter));
 		}
 	}
 

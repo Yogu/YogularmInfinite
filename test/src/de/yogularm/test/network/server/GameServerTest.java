@@ -13,7 +13,7 @@ import java.net.Socket;
 import org.junit.Test;
 
 import de.yogularm.network.server.GameServer;
-import de.yogularm.network.server.ServerData;
+import de.yogularm.network.server.ServerContext;
 import de.yogularm.network.server.ServerHandler;
 import de.yogularm.network.server.ServerHandlerFactory;
 
@@ -23,7 +23,7 @@ public class GameServerTest {
 
 	@Test
 	public void testConstructor() {
-		new GameServer(new MockServerHandlerFactory());
+		new GameServer(new MockServerHandlerFactory(), new MockServerManager());
 	}
 
 	private boolean handlerCreated;
@@ -41,7 +41,7 @@ public class GameServerTest {
 		handlerCreated = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			public ServerHandler createStartHandler(InputStream in, OutputStream out,
-					ServerData serverData) {
+					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertNotNull(serverData);
@@ -56,7 +56,7 @@ public class GameServerTest {
 				};
 			}
 		};
-		GameServer server = new GameServer(factory);
+		GameServer server = new GameServer(factory, new MockServerManager());
 		server.open(PORT);
 		try {
 			Socket clientSocket = new Socket(InetAddress.getLoopbackAddress(), PORT);
@@ -87,7 +87,7 @@ public class GameServerTest {
 		interruptCalled = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			public ServerHandler createStartHandler(InputStream in, OutputStream out,
-					ServerData serverData) {
+					ServerContext serverData) {
 				return new ServerHandler() {
 					public void run() throws IOException {
 						runCalled = true;
@@ -101,7 +101,7 @@ public class GameServerTest {
 				};
 			}
 		};
-		GameServer server = new GameServer(factory);
+		GameServer server = new GameServer(factory, new MockServerManager());
 		server.open(PORT);
 		try {
 			Socket clientSocket = new Socket(InetAddress.getLoopbackAddress(), PORT);
@@ -136,7 +136,7 @@ public class GameServerTest {
 		interruptCalled = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			public ServerHandler createStartHandler(InputStream in, OutputStream out,
-					ServerData serverData) {
+					ServerContext serverData) {
 				return new ServerHandler() {
 					public void run() throws IOException {
 						runCalled = true;
@@ -148,7 +148,7 @@ public class GameServerTest {
 				};
 			}
 		};
-		GameServer server = new GameServer(factory);
+		GameServer server = new GameServer(factory, new MockServerManager());
 		server.open(PORT);
 		try {
 			Socket clientSocket = new Socket(InetAddress.getLoopbackAddress(), PORT);
@@ -182,7 +182,7 @@ public class GameServerTest {
 	 */
 	@Test
 	public void testConnectAfterClose() throws IOException {
-		GameServer server = new GameServer(new MockServerHandlerFactory());
+		GameServer server = new GameServer(new MockServerHandlerFactory(), new MockServerManager());
 		server.open(PORT);
 		server.close();
 

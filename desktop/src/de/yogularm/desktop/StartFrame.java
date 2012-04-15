@@ -26,7 +26,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import de.yogularm.event.EventArgs;
 import de.yogularm.event.EventListener;
 import de.yogularm.event.ExceptionEventArgs;
-import de.yogularm.network.Player;
+import de.yogularm.multiplayer.Player;
 import de.yogularm.network.ServerGlobals;
 import de.yogularm.network.client.GameConnection;
 

@@ -1,64 +1,59 @@
 package de.yogularm.network.server;
 
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import de.yogularm.ServerGame;
 import de.yogularm.components.Body;
 import de.yogularm.components.Component;
-import de.yogularm.components.ComponentCollectionListener;
-import de.yogularm.components.MultiPlayerWorld;
-import de.yogularm.components.MultiPlayerWorldListener;
-import de.yogularm.components.ObservableComponentCollection;
 import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Vector;
+import de.yogularm.multiplayer.Match;
+import de.yogularm.multiplayer.MatchListener;
+import de.yogularm.multiplayer.MatchManager;
+import de.yogularm.multiplayer.MatchState;
+import de.yogularm.multiplayer.MultiPlayerWorld;
+import de.yogularm.multiplayer.Player;
 import de.yogularm.network.Components;
-import de.yogularm.network.Match;
 import de.yogularm.network.NetworkPacket;
-import de.yogularm.network.Player;
 
-public class BinaryHandler {
+public class BinaryHandler extends AbstractServerHandler {
 	private DataInputStream in;
 	private DataOutputStream out;
+	private ClientContext context;
 	private Player player;
 	private Match match;
-	private ServerGame game;
-	private MultiPlayerWorld world;
-	private Thread receiveThread;
+	private MatchManager manager;
 	private IOException writeException;
+	private TheListener listener = new TheListener();
 
 	private Point firstObservedSector = Point.ZERO;
 	private Point lastObservedSector = Point.ZERO;
 	private Collection<Point> observedSectors = new ArrayList<Point>();
 
-	public BinaryHandler(InputStream in, OutputStream out, Player player) {
-		this.in = new DataInputStream(in);
-		this.out = new DataOutputStream(new BufferedOutputStream(out));
-		this.player = player;
+	public BinaryHandler(DataInputStream in, DataOutputStream out, ClientContext clientContext,
+			ServerHandlerFactory handlerFactory) {
+		super(handlerFactory);
+		this.in = in;
+		this.out = out;
+		context = clientContext;
+		player = context.getPlayer();
 		match = player.getCurrentMatch();
-		game = match.game;
-		world = game.getWorld();
-
-		world.getComponents().addListener(new TheComponentCollectionListener());
-		world.addListener(new TheMultiPlayerWorldListener());
+		manager = context.getManager().getMatchManager(match);
+		manager.addListener(listener);
 	}
 
 	public void run() throws IOException {
 		initWorld();
 		int i = 0;
-		while (!receiveThread.isInterrupted()) {
+		while (!isInterrupted()) {
 			out.write(i++);
 			out.flush();
 		}
-		
-		while (!receiveThread.isInterrupted()) {
+
+		while (!isInterrupted()) {
 			if (in.available() > 0)
 				receivePacket();
 			else {
@@ -84,24 +79,24 @@ public class BinaryHandler {
 		NetworkPacket packet = NetworkPacket.values()[id];
 		switch (packet) {
 		case OBSERVE:
-			world.stopObservation(observedSectors);
+			manager.stopObservation(observedSectors);
 			synchronized (firstObservedSector) {
 				firstObservedSector = new Point(in.readInt(), in.readInt());
 				lastObservedSector = new Point(in.readInt(), in.readInt());
 			}
 			recalculateObservedSectors();
-			world.observeSectors(observedSectors);
+			manager.observeSectors(observedSectors);
 			sendSectors();
 			break;
 		case PLAYER_POSITION:
-			Vector position = new Vector(in.readFloat(), in.readFloat());
-			Vector momentum = new Vector(in.readFloat(), in.readFloat());
-			player.playerComponent.pushTo(position, momentum);
+			Vector newPosition = new Vector(in.readFloat(), in.readFloat());
+			Vector newMomentum = new Vector(in.readFloat(), in.readFloat());
+			manager.setPlayerPosition(player, newPosition, newMomentum);
 			break;
 		default:
 			throw new IOException("Invalid packet id: " + id);
 		}
-		
+
 		System.out.println("Received packet " + packet);
 	}
 
@@ -110,7 +105,7 @@ public class BinaryHandler {
 			initPacket(NetworkPacket.INIT_WORLD/* , 8 */);
 			out.writeInt(MultiPlayerWorld.SECTOR_WIDTH);
 			out.writeInt(MultiPlayerWorld.SECTOR_HEIGHT);
-			sendComponent(player.playerComponent);
+			sendComponent(manager.getPlayerComponent(player));
 			out.flush();
 		}
 	}
@@ -123,6 +118,8 @@ public class BinaryHandler {
 	}
 
 	private void sendAddedComponent(Component component) {
+		assert component != null;
+		
 		synchronized (out) {
 			try {
 				initPacket(NetworkPacket.ADDED);
@@ -135,6 +132,8 @@ public class BinaryHandler {
 	}
 
 	private void sendRemovedComponent(Component component) {
+		assert component != null;
+		
 		synchronized (out) {
 			try {
 				initPacket(NetworkPacket.REMOVED);
@@ -147,6 +146,8 @@ public class BinaryHandler {
 	}
 
 	private void sendChangedComponent(Component component) {
+		assert component != null;
+		
 		synchronized (out) {
 			try {
 				initPacket(NetworkPacket.CHANGED);
@@ -159,6 +160,8 @@ public class BinaryHandler {
 	}
 
 	private void sendQuickChange(Component component) {
+		assert component != null;
+		
 		synchronized (out) {
 			try {
 				initPacket(NetworkPacket.QUICK_CHANGE);
@@ -166,7 +169,7 @@ public class BinaryHandler {
 				out.writeFloat(component.getPosition().getX());
 				out.writeFloat(component.getPosition().getY());
 				if (component instanceof Body) {
-					Vector momentum = ((Body)component).getMomentum();
+					Vector momentum = ((Body) component).getMomentum();
 					out.writeFloat(momentum.getX());
 					out.writeFloat(momentum.getY());
 				} else {
@@ -181,8 +184,10 @@ public class BinaryHandler {
 	}
 
 	private void sendSector(Point sector) throws IOException {
+		assert sector != null;
+		
 		synchronized (out) {
-			List<Component> components = world.getComponents().getComponentsOfSector(sector);
+			Collection<Component> components = manager.getComponentsOfSector(sector);
 			initPacket(NetworkPacket.COMPLETE_SECTOR);
 			out.writeInt(sector.getX());
 			out.writeInt(sector.getY());
@@ -195,6 +200,8 @@ public class BinaryHandler {
 	}
 
 	private void sendComponent(Component component) throws IOException {
+		assert component != null;
+		
 		Class<? extends Component> type = component.getClass();
 		int id = Components.getID(type);
 		out.writeInt(id);
@@ -216,54 +223,52 @@ public class BinaryHandler {
 		observedSectors = sectors;
 	}
 
-	private class TheComponentCollectionListener implements ComponentCollectionListener {
+	private class TheListener implements MatchListener {
 		@Override
-		public void componentAdded(ObservableComponentCollection collection, Component component,
-				Point sector) {
+		public void componentAdded(Component component, Point sector) {
 			if (observedSectors.contains(sector)) {
 				sendAddedComponent(component);
 			}
 		}
 
 		@Override
-		public void componentRemoved(ObservableComponentCollection collection, Component component,
-				Point sector) {
+		public void componentRemoved(Component component, Point sector) {
 			if (observedSectors.contains(sector)) {
 				sendRemovedComponent(component);
 			}
 		}
 
 		@Override
-		public void componentMoved(ObservableComponentCollection collection, Component component,
-				Point lastSector, Point newSector, boolean sectorHasChanged) {
-			if (sectorHasChanged) {
-				if (observedSectors.contains(lastSector) && !observedSectors.contains(newSector)) {
-					sendRemovedComponent(component);
-				} else if (observedSectors.contains(newSector) && !observedSectors.contains(lastSector)) {
-					sendAddedComponent(component);
-				}
+		public void componentChangedSector(Component component, Point lastSector, Point newSector) {
+			if (observedSectors.contains(lastSector) && !observedSectors.contains(newSector)) {
+				sendRemovedComponent(component);
+			} else if (observedSectors.contains(newSector) && !observedSectors.contains(lastSector)) {
+				sendAddedComponent(component);
 			}
 		}
-	}
 
-	private class TheMultiPlayerWorldListener implements MultiPlayerWorldListener {
 		@Override
-		public void componentChanged(MultiPlayerWorld world, Component component, Point sector) {
+		public void componentChanged(Component component, Point sector) {
 			if (observedSectors.contains(sector)) {
 				sendChangedComponent(component);
 			}
 		}
 
 		@Override
-		public void quickChange(MultiPlayerWorld world, Component component, Point sector) {
+		public void quickChange(Component component, Point sector) {
 			if (observedSectors.contains(sector)) {
 				sendQuickChange(component);
 			}
+		}
+
+		@Override
+		public void stateChanged(MatchState oldState, MatchState newState) {
+			
 		}
 	}
 
 	private void delegateWriteException(IOException e) {
 		writeException = e;
-		receiveThread.interrupt();
+		interrupt();
 	}
 }

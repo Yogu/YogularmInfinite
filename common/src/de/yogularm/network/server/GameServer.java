@@ -6,17 +6,21 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.yogularm.multiplayer.ServerManager;
 import de.yogularm.utils.Exceptions;
 
 public class GameServer {
 	private boolean isRunning = false;
 	private ServerSocket socket;
-	private List<ServerHandler> clients = new ArrayList<ServerHandler>();
-	private ServerData data = new ServerData();
-	private ServerHandlerFactory handlerFactory;
+	private final List<ServerHandler> clients = new ArrayList<ServerHandler>();
+	private final ServerManager manager;
+	private ServerContext context;
+	private final ServerHandlerFactory handlerFactory;
 
-	public GameServer(ServerHandlerFactory handlerFactory) {
+	public GameServer(ServerHandlerFactory handlerFactory, ServerManager manager) {
 		this.handlerFactory = handlerFactory;
+		this.manager = manager;
+		context = new ServerContext(manager);
 	}
 
 	public void open(int port) throws IOException {
@@ -39,7 +43,7 @@ public class GameServer {
 				}
 				clients.clear();
 			}
-			data = new ServerData();
+			context = new ServerContext(manager);
 			socket = null;
 			log("Server closed");
 		}
@@ -66,7 +70,7 @@ public class GameServer {
 		log("Accepted client: " + address);
 
 		final ServerHandler handler = handlerFactory.createStartHandler(clientSocket.getInputStream(),
-				clientSocket.getOutputStream(), data);
+				clientSocket.getOutputStream(), context);
 
 		synchronized (clients) {
 			clients.add(handler);

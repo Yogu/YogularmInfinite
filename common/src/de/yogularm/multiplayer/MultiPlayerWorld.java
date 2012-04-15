@@ -1,4 +1,4 @@
-package de.yogularm.components;
+package de.yogularm.multiplayer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,10 @@ import java.util.Set;
 import de.yogularm.building.Builder2;
 import de.yogularm.building.BuildingSite;
 import de.yogularm.building.test.TestBuilder;
+import de.yogularm.components.Body;
+import de.yogularm.components.Component;
+import de.yogularm.components.ComponentTree;
+import de.yogularm.components.ObservableComponentCollection;
 import de.yogularm.geometry.Point;
 import de.yogularm.geometry.Rect;
 import de.yogularm.geometry.Vector;

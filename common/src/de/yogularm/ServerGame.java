@@ -1,6 +1,6 @@
 package de.yogularm;
 
-import de.yogularm.components.MultiPlayerWorld;
+import de.yogularm.multiplayer.MultiPlayerWorld;
 
 public class ServerGame {
 	private MultiPlayerWorld world;

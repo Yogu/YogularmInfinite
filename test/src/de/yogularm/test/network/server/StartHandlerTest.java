@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import org.junit.Test;
 
 import de.yogularm.network.StreamModeIdentifiers;
-import de.yogularm.network.server.ServerData;
+import de.yogularm.network.server.ServerContext;
 import de.yogularm.network.server.ServerHandler;
 import de.yogularm.network.server.ServerHandlerFactory;
 import de.yogularm.network.server.StartHandler;
@@ -27,10 +27,10 @@ public class StartHandlerTest {
 
 	@Test
 	public void testTextMode() throws IOException {
-		final ServerData data = new ServerData();
+		final ServerContext data = new ServerContext(new MockServerManager());
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			public ServerHandler createMetaHandler(BufferedReader in, PrintWriter out,
-					ServerData serverData) {
+					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertThat(serverData, is(data));
@@ -60,11 +60,11 @@ public class StartHandlerTest {
 
 	@Test
 	public void testBinaryMode() throws IOException {
-		final ServerData data = new ServerData();
+		final ServerContext data = new ServerContext(new MockServerManager());
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			@Override
-			public ServerHandler createBinaryHandler(DataInputStream in, DataOutputStream out,
-					ServerData serverData) {
+			public ServerHandler createBinaryStartHandler(DataInputStream in, DataOutputStream out,
+					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertThat(serverData, is(data));

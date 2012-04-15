@@ -22,14 +22,14 @@ import de.yogularm.event.Event;
 import de.yogularm.event.EventArgs;
 import de.yogularm.event.EventListener;
 import de.yogularm.event.ExceptionEventArgs;
+import de.yogularm.multiplayer.Match;
+import de.yogularm.multiplayer.Matches;
+import de.yogularm.multiplayer.Player;
+import de.yogularm.multiplayer.Players;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.CommunicationException;
-import de.yogularm.network.Match;
-import de.yogularm.network.Matches;
 import de.yogularm.network.NetworkCommand;
 import de.yogularm.network.NetworkInformation;
-import de.yogularm.network.Player;
-import de.yogularm.network.Players;
 import de.yogularm.utils.GsonFactory;
 
 public class GameConnection {
@@ -448,7 +448,8 @@ public class GameConnection {
 						BufferedReader reader = new BufferedReader(new InputStreamReader(in), 1);
 						final OutputStream out = socket.getOutputStream();
 						PrintStream writer = new PrintStream(out);
-						sendCommand(reader, writer, NetworkCommand.BINARY, sessionKey);
+						// TODO
+						//sendCommand(reader, writer, NetworkCommand.BINARY, sessionKey);
 						System.out.println("Binary stream established");
 						System.out.println("Next byte:");
 						System.out.println(in.read());

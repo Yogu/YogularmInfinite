@@ -1,31 +1,25 @@
 package de.yogularm.network.server.meta;
 
+import de.yogularm.multiplayer.Match;
+import de.yogularm.multiplayer.Player;
 import de.yogularm.network.CommunicationError;
-import de.yogularm.network.Match;
-import de.yogularm.network.NetworkInformation;
-import de.yogularm.network.server.ClientData;
+import de.yogularm.network.server.ClientContext;
 
 
 public class LeaveCommand extends CommandHandlerUtils implements CommandHandler {
-  public String handle(ClientData data, String parameter) {
-  	if (data.player == null)
+  public String handle(ClientContext context, String parameter) {
+  	Player player = context.getPlayer();
+  	if (player == null)
   		return err(CommunicationError.INVALID_STATE, "Say hello first");
-  	Match match = data.player.getCurrentMatch();
+  	Match match = player.getCurrentMatch();
   	if (match == null)
 			return err(CommunicationError.INVALID_STATE, "You have not joined any match.");
 		
-  	data.player.leaveMatch();
-		
-		data.serverData.notifyClients(NetworkInformation.PLAYER_LEFT_MATCH, 
-			String.format("%s %s", data.player.getName(), match.getID()));
-		
-		// No more players left?
-		if (match.getPlayers().size()== 0) {
-			data.serverData.matches.remove(match.getID());
-			match.cancel();
-			
-			data.serverData.notifyClients(NetworkInformation.MATCH_CANCELLED, match.getID() + "");
-		}
+  	try {
+  		player.leaveMatch();
+  	} catch (IllegalStateException e) {
+  		return err(CommunicationError.INVALID_STATE, e.getMessage());
+  	}
 		
 		return ok();
   }

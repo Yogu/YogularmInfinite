@@ -1,7 +1,7 @@
 package de.yogularm.network.server.meta;
 
-import de.yogularm.network.server.ClientData;
+import de.yogularm.network.server.ClientContext;
 
 public interface CommandHandler {
-	String handle(ClientData data, String parameter);
+	String handle(ClientContext data, String parameter);
 }

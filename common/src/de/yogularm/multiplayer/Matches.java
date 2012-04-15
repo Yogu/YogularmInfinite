@@ -1,4 +1,4 @@
-package de.yogularm.network;
+package de.yogularm.multiplayer;
 
 import de.yogularm.utils.ObservableMap;
 

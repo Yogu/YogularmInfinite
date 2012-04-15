@@ -1,5 +1,6 @@
-package de.yogularm.components;
+package de.yogularm.multiplayer;
 
+import de.yogularm.components.Component;
 import de.yogularm.geometry.Point;
 
 public interface MultiPlayerWorldListener {

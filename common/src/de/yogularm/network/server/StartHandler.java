@@ -15,14 +15,14 @@ import de.yogularm.network.StreamModeIdentifiers;
 public class StartHandler extends AbstractServerHandler {
 	private InputStream in;
 	private OutputStream out;
-	private ServerData serverData;
+	private ServerContext context;
 
-	public StartHandler(InputStream in, OutputStream out, ServerData serverData,
+	public StartHandler(InputStream in, OutputStream out, ServerContext serverData,
 			ServerHandlerFactory handlerFactory) {
 		super(handlerFactory);
 		this.in = in;
 		this.out = out;
-		this.serverData = serverData;
+		this.context = serverData;
 	}
 
 	@Override
@@ -42,12 +42,12 @@ public class StartHandler extends AbstractServerHandler {
 		case StreamModeIdentifiers.ASCII:
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			PrintWriter writer = new PrintWriter(new BufferedOutputStream(out));
-			runNested(getHandlerFactory().createMetaHandler(reader, writer, serverData));
+			runNested(getHandlerFactory().createMetaHandler(reader, writer, context));
 			return;
 		case StreamModeIdentifiers.BINARY:
 			DataInputStream input = new DataInputStream(in);
 			DataOutputStream output = new DataOutputStream(new BufferedOutputStream(out));
-			runNested(getHandlerFactory().createBinaryHandler(input, output, serverData));
+			runNested(getHandlerFactory().createBinaryStartHandler(input, output, context));
 			return;
 		default:
 			writer = new PrintWriter(new BufferedOutputStream(out));
