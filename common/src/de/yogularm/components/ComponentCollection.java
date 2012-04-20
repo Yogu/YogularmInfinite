@@ -32,7 +32,9 @@ public interface ComponentCollection {
 	public boolean contains(Component component);
 	
 	/**
-	 * Adds the specified component, if it is not contained yet
+	 * Adds the specified component, if it is not contained yet, and assigns this collection to the
+	 * component
+	 * 
 	 * @param component The component to add
 	 */
 	public void add(Component component);

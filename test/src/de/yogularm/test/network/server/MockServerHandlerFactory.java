@@ -8,41 +8,41 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import junit.framework.Assert;
+import de.yogularm.network.BackgroundHandler;
 import de.yogularm.network.server.ClientContext;
 import de.yogularm.network.server.ServerContext;
-import de.yogularm.network.server.ServerHandler;
 import de.yogularm.network.server.ServerHandlerFactory;
 
 public class MockServerHandlerFactory implements ServerHandlerFactory {
 	@Override
-	public ServerHandler
+	public BackgroundHandler
 			createStartHandler(InputStream in, OutputStream out, ServerContext serverData) {
 		Assert.fail();
 		return null;
 	}
 
 	@Override
-	public ServerHandler
+	public BackgroundHandler
 			createMetaHandler(BufferedReader in, PrintWriter out, ServerContext serverData) {
 		Assert.fail();
 		return null;
 	}
 
 	@Override
-	public ServerHandler createPassiveHandler(PrintWriter out, ClientContext clientData) {
+	public BackgroundHandler createPassiveHandler(PrintWriter out, ClientContext clientData) {
 		Assert.fail();
 		return null;
 	}
 
 	@Override
-	public ServerHandler createBinaryStartHandler(DataInputStream in, DataOutputStream out,
+	public BackgroundHandler createBinaryStartHandler(DataInputStream in, DataOutputStream out,
 			ServerContext context) {
 		Assert.fail();
 		return null;
 	}
 
 	@Override
-	public ServerHandler createBinaryHandler(DataInputStream in, DataOutputStream out,
+	public BackgroundHandler createBinaryHandler(DataInputStream in, DataOutputStream out,
 			ClientContext context) {
 		Assert.fail();
 		return null;

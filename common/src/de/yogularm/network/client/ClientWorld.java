@@ -197,7 +197,7 @@ public class ClientWorld extends AbstractWorld {
 
 	private Component receiveComponent(DataInputStream in) throws IOException {
 		int id = in.readInt();
-		Component component = Components.createComponent(id, components);
+		Component component = Components.createComponent(id);
 		if (component == null)
 			throw new IOException("Invalid component class id: " + id);
 		component.read(in);

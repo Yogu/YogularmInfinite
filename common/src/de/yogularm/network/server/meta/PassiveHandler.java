@@ -9,12 +9,12 @@ import de.yogularm.multiplayer.MatchState;
 import de.yogularm.multiplayer.Player;
 import de.yogularm.multiplayer.ServerListener;
 import de.yogularm.network.NetworkInformation;
-import de.yogularm.network.server.AbstractServerHandler;
+import de.yogularm.network.server.BasicServerHandler;
 import de.yogularm.network.server.ClientContext;
 import de.yogularm.network.server.ServerHandlerFactory;
 import de.yogularm.utils.GsonFactory;
 
-public class PassiveHandler extends AbstractServerHandler {
+public class PassiveHandler extends BasicServerHandler {
 	private PrintWriter out;
 	private ClientContext context;
 	private TheListener listener = new TheListener();

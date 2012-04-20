@@ -12,9 +12,9 @@ import java.net.Socket;
 
 import org.junit.Test;
 
+import de.yogularm.network.BackgroundHandler;
 import de.yogularm.network.server.GameServer;
 import de.yogularm.network.server.ServerContext;
-import de.yogularm.network.server.ServerHandler;
 import de.yogularm.network.server.ServerHandlerFactory;
 
 public class GameServerTest {
@@ -40,13 +40,13 @@ public class GameServerTest {
 	public void testAccept() throws IOException {
 		handlerCreated = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
-			public ServerHandler createStartHandler(InputStream in, OutputStream out,
+			public BackgroundHandler createStartHandler(InputStream in, OutputStream out,
 					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertNotNull(serverData);
 				handlerCreated = true;
-				return new ServerHandler() {
+				return new BackgroundHandler() {
 					public void run() throws IOException {
 						runCalled = true;
 					}
@@ -86,9 +86,9 @@ public class GameServerTest {
 		runCalled = false;
 		interruptCalled = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
-			public ServerHandler createStartHandler(InputStream in, OutputStream out,
+			public BackgroundHandler createStartHandler(InputStream in, OutputStream out,
 					ServerContext serverData) {
-				return new ServerHandler() {
+				return new BackgroundHandler() {
 					public void run() throws IOException {
 						runCalled = true;
 						while (!interruptCalled)
@@ -135,9 +135,9 @@ public class GameServerTest {
 		runCalled = false;
 		interruptCalled = false;
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
-			public ServerHandler createStartHandler(InputStream in, OutputStream out,
+			public BackgroundHandler createStartHandler(InputStream in, OutputStream out,
 					ServerContext serverData) {
-				return new ServerHandler() {
+				return new BackgroundHandler() {
 					public void run() throws IOException {
 						runCalled = true;
 					}

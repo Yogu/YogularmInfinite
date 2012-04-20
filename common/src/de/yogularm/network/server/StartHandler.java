@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import de.yogularm.network.StreamModeIdentifiers;
+import de.yogularm.network.NetworkGlobals;
 
-public class StartHandler extends AbstractServerHandler {
+public class StartHandler extends BasicServerHandler {
 	private InputStream in;
 	private OutputStream out;
 	private ServerContext context;
@@ -39,12 +39,12 @@ public class StartHandler extends AbstractServerHandler {
 
 		int firstByte = in.read();
 		switch (firstByte) {
-		case StreamModeIdentifiers.ASCII:
+		case NetworkGlobals.STREAM_MODE_IDENTIFIER_ASCII:
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			PrintWriter writer = new PrintWriter(new BufferedOutputStream(out));
 			runNested(getHandlerFactory().createMetaHandler(reader, writer, context));
 			return;
-		case StreamModeIdentifiers.BINARY:
+		case NetworkGlobals.STREAM_MODE_IDENTIFIER_BINARY:
 			DataInputStream input = new DataInputStream(in);
 			DataOutputStream output = new DataOutputStream(new BufferedOutputStream(out));
 			runNested(getHandlerFactory().createBinaryStartHandler(input, output, context));

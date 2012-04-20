@@ -19,7 +19,7 @@ import de.yogularm.multiplayer.Player;
 import de.yogularm.network.Components;
 import de.yogularm.network.NetworkPacket;
 
-public class BinaryHandler extends AbstractServerHandler {
+public class BinaryHandler extends BasicServerHandler {
 	private DataInputStream in;
 	private DataOutputStream out;
 	private ClientContext context;

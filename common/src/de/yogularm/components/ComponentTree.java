@@ -107,6 +107,7 @@ public class ComponentTree implements ObservableComponentCollection {
 		List<Component> list = getListOfPosition(component.getPosition(), true);
 		if (!list.contains(component)) {
 		  list.add(component);
+		  component.setCollection(this);
 		  count++;
 		  
 		  synchronized (listeners) {

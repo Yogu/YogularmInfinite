@@ -27,7 +27,7 @@ import de.yogularm.event.EventArgs;
 import de.yogularm.event.EventListener;
 import de.yogularm.event.ExceptionEventArgs;
 import de.yogularm.multiplayer.Player;
-import de.yogularm.network.ServerGlobals;
+import de.yogularm.network.NetworkGlobals;
 import de.yogularm.network.client.GameConnection;
 
 public class StartFrame extends Page {
@@ -80,14 +80,14 @@ public class StartFrame extends Page {
 		JLabel hostLabel = new JLabel("Host / IP:");
 		multiPlayerPanel.add(hostLabel, "2, 2, right, default");
 
-		hostField = new JTextField(ServerGlobals.DEFAULT_HOST);
+		hostField = new JTextField(NetworkGlobals.DEFAULT_HOST);
 		multiPlayerPanel.add(hostField, "4, 2, fill, default");
 		hostField.setColumns(10);
 
 		JLabel portLabel = new JLabel("Port:");
 		multiPlayerPanel.add(portLabel, "2, 4, right, default");
 
-		portField = new JTextField(ServerGlobals.DEFAULT_PORT + "");
+		portField = new JTextField(NetworkGlobals.DEFAULT_PORT + "");
 		multiPlayerPanel.add(portField, "4, 4, fill, default");
 		portField.setColumns(10);
 

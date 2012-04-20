@@ -33,8 +33,6 @@ public class Component implements Locatable {
 	public final Event<Vector> onMoved = new Event<Vector>(this);
 
 	public Component(ComponentCollection collection) {
-		if (collection == null)
-			throw new NullPointerException("collection is null");
 		this.collection = collection;
 		position = Vector.getZero();
 		id = nextID;
@@ -47,6 +45,10 @@ public class Component implements Locatable {
 
 	public ComponentCollection getCollection() {
 		return collection;
+	}
+	
+	public void setCollection(ComponentCollection collection) {
+		this.collection = collection;
 	}
 
 	public Vector getPosition() {

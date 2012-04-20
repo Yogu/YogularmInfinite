@@ -46,7 +46,7 @@ public class Components {
 		return componentClasses.indexOf(type);
 	}
 	
-	public static Component createComponent(int id, ComponentCollection components) {
+	public static Component createComponent(int id) {
 		Class<? extends Component> type = getClass(id);
 		if (type != null) {
 			Constructor<? extends Component> constructor;
@@ -59,7 +59,7 @@ public class Components {
 			}
 			Component component;
 			try {
-				component = constructor.newInstance(components);
+				component = constructor.newInstance((Component)null);
 			} catch (Exception e) {
 				// may be InstanciationException, IllegalAccessException, IllegalArgumentException or
 				// InvocationTargetException

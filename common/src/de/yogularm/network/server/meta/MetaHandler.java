@@ -9,12 +9,12 @@ import java.util.Map;
 import de.yogularm.multiplayer.Player;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
-import de.yogularm.network.server.AbstractServerHandler;
+import de.yogularm.network.server.BasicServerHandler;
 import de.yogularm.network.server.ClientContext;
 import de.yogularm.network.server.ServerContext;
 import de.yogularm.network.server.ServerHandlerFactory;
 
-public class MetaHandler extends AbstractServerHandler {
+public class MetaHandler extends BasicServerHandler {
 	private final BufferedReader in;
 	private final PrintWriter out;
 	private final ServerContext serverContext;

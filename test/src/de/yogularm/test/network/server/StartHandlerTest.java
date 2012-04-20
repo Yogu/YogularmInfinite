@@ -15,9 +15,9 @@ import java.io.PrintWriter;
 
 import org.junit.Test;
 
-import de.yogularm.network.StreamModeIdentifiers;
+import de.yogularm.network.BackgroundHandler;
+import de.yogularm.network.NetworkGlobals;
 import de.yogularm.network.server.ServerContext;
-import de.yogularm.network.server.ServerHandler;
 import de.yogularm.network.server.ServerHandlerFactory;
 import de.yogularm.network.server.StartHandler;
 
@@ -29,13 +29,13 @@ public class StartHandlerTest {
 	public void testTextMode() throws IOException {
 		final ServerContext data = new ServerContext(new MockServerManager());
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
-			public ServerHandler createMetaHandler(BufferedReader in, PrintWriter out,
+			public BackgroundHandler createMetaHandler(BufferedReader in, PrintWriter out,
 					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertThat(serverData, is(data));
 				handlerCreated = true;
-				return new ServerHandler() {
+				return new BackgroundHandler() {
 					public void run() throws IOException {
 						handlerRunned = true;
 						return;
@@ -49,7 +49,7 @@ public class StartHandlerTest {
 		PipedInputStream in = new PipedInputStream();
 		PipedOutputStream out = new PipedOutputStream(in);
 
-		out.write(StreamModeIdentifiers.ASCII);
+		out.write(NetworkGlobals.STREAM_MODE_IDENTIFIER_ASCII);
 
 		handlerCreated = false;
 		StartHandler handler = new StartHandler(in, out, data, factory);
@@ -63,13 +63,13 @@ public class StartHandlerTest {
 		final ServerContext data = new ServerContext(new MockServerManager());
 		ServerHandlerFactory factory = new MockServerHandlerFactory() {
 			@Override
-			public ServerHandler createBinaryStartHandler(DataInputStream in, DataOutputStream out,
+			public BackgroundHandler createBinaryStartHandler(DataInputStream in, DataOutputStream out,
 					ServerContext serverData) {
 				assertNotNull(in);
 				assertNotNull(out);
 				assertThat(serverData, is(data));
 				handlerCreated = true;
-				return new ServerHandler() {
+				return new BackgroundHandler() {
 					public void run() throws IOException {
 						handlerRunned = true;
 						return;
@@ -83,7 +83,7 @@ public class StartHandlerTest {
 		PipedInputStream in = new PipedInputStream();
 		PipedOutputStream out = new PipedOutputStream(in);
 
-		out.write(StreamModeIdentifiers.BINARY);
+		out.write(NetworkGlobals.STREAM_MODE_IDENTIFIER_BINARY);
 
 		handlerCreated = false;
 		StartHandler handler = new StartHandler(in, out, data, factory);

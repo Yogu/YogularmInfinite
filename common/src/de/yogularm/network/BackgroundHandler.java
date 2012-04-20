@@ -1,8 +1,8 @@
-package de.yogularm.network.server;
+package de.yogularm.network;
 
 import java.io.IOException;
 
-public interface ServerHandler {
+public interface BackgroundHandler {
 	public void run() throws IOException;
 	public void interrupt();
 }
