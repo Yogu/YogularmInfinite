@@ -39,9 +39,8 @@ How to develop
 6. Open the file de.yogularm.desktop/src/de.yogularm.desktop/SwingLauncher.java
    and run it as a Java Application.
 
-It is recommended to fork the git repository available on
-http://github.com/Yogu/YogularmInfinite. If you do so, please .gitignore the
-Eclipse project files and binaries.
+If you want to contribute to Yogularm, please fork the git repository available on
+http://github.com/Yogu/YogularmInfinite.
 
 Links
 =====
