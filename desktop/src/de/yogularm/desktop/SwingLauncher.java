@@ -33,7 +33,7 @@ public class SwingLauncher {
 	private Deque<Page> pageStack = new ArrayDeque<Page>();
 
 	public static void main(String[] args) {
-		System.out.println("Yoglarm started");
+		System.out.println(String.format("Yoglarm %s started", Game.VERSION));
 		SwingLauncher launcher = new SwingLauncher();
 		launcher.run();
 	}
@@ -42,12 +42,14 @@ public class SwingLauncher {
 		try {
 			System.setOut(new PrintStream("yogularm.log"));
 		} catch (FileNotFoundException e) {
-			handleException(e);
+			System.out.println("Could not write to log file; will print debug messages to default out");
 		}
 		
 		GLProfile.initSingleton(true);
 		initUI();
+		System.out.println("UI initialized");
 		createWindow();
+		System.out.println("Window created");
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
@@ -56,8 +58,8 @@ public class SwingLauncher {
 		});
 		
 		setPage(new StartFrame(this));
-
 		frame.setVisible(true);
+		System.out.println("StartFrame shown");
 	}
 
 	public void initUI() {

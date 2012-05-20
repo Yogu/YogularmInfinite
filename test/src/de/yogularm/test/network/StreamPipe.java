@@ -15,6 +15,10 @@ import java.io.PrintWriter;
 public class StreamPipe {
 	private InputStream in;
 	private OutputStream out;
+	private PrintWriter writer;
+	private BufferedReader reader;
+	private DataInputStream dataIn;
+	private DataOutputStream dataOut;
 	
 	public StreamPipe(boolean buffered) throws IOException {
 		PipedOutputStream pipedOut = new PipedOutputStream();
@@ -35,18 +39,31 @@ public class StreamPipe {
 	}
 	
 	public BufferedReader reader() {
-		return new BufferedReader(new InputStreamReader(in));
+		if (reader == null)
+			reader = new BufferedReader(new InputStreamReader(in));
+		return reader;
 	}
 	
 	public PrintWriter writer() {
-		return new PrintWriter(out);
+		if (writer == null)
+			writer = new PrintWriter(out, true);
+		return writer;
 	}
 	
-	public DataInputStream dataIn() { 
-		return new DataInputStream(in);
+	public DataInputStream dataIn() {
+		if (dataIn == null)
+			dataIn = new DataInputStream(in);
+		return dataIn;
 	}
 	
 	public DataOutputStream dataOut() {
-		return new DataOutputStream(out);
+		if (dataOut == null)
+			dataOut = new DataOutputStream(out);
+		return dataOut;
+	}
+	
+	public void close() throws IOException {
+		in.close();
+		out.close();
 	}
 }

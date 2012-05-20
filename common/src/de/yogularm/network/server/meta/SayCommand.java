@@ -9,8 +9,10 @@ public class SayCommand extends CommandHandlerUtils implements CommandHandler {
 		Player player = context.getPlayer();
 		if (player == null)
 			return err(CommunicationError.INVALID_STATE, "Say hello first");
-
-		context.getManager().sendMessage(player, parameter);
+		
+		parameter = parameter.trim();
+		if (!parameter.isEmpty())
+			context.getManager().sendMessage(player, parameter);
 
 		return ok();
 	}

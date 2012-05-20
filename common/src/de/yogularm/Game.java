@@ -44,7 +44,7 @@ public class Game {
 	private static final double SMOOTH_TIME = 0.33f; // [second]
 	private static final int RENDER_RANGE_BUFFER = 4;
 	
-	public static final String VERSION = "0.4";
+	public static final String VERSION = "0.4.9";
 	
 	public Game(World world) {
 		startWorld(world);

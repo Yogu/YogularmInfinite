@@ -44,6 +44,30 @@ public class MetaProtocolTest {
 		test(clientCode, manager);
 	}
 	
+	@Test
+	public void testCreateNewMatch() throws Exception {
+		final String loginName = "TheLoginName";
+		
+		MockServerManager manager = new MockServerManager() {
+			@Override
+			public Player registerPlayer(String name) {
+				Assert.assertEquals(loginName, name);
+				registerPlayerCalled = true;
+				return new Player(loginName);
+			}
+		};
+		
+		ClientCode clientCode = new ClientCode() {
+			public void run(DefaultMetaHandler client) throws Exception {
+				String key = client.login(loginName);
+				Assert.assertNotNull(key);
+				Assert.assertTrue(registerPlayerCalled);
+			}
+		};
+		
+		test(clientCode, manager);
+	}
+	
 	private void test(final ClientCode clientCode, ServerManager manager) throws Exception {
 		final StreamPipe c2s = new StreamPipe(true);
 		final StreamPipe s2c = new StreamPipe(true);
