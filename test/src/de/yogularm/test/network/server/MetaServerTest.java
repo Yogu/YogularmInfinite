@@ -23,12 +23,15 @@ import de.yogularm.network.server.meta.MetaHandler;
 import de.yogularm.test.network.StreamPipe;
 
 public class MetaServerTest {
+	// test object:
+	protected MetaHandler handler;
+	
+	// helpers
 	protected ServerManager manager;
 	protected ServerHandlerFactory handlerFactory;
 	protected ServerContext context;
 	protected StreamPipe s2c;
 	protected StreamPipe c2s;
-	protected MetaHandler handler;
 	protected ClientContext clientContext;
 	protected Player player;
 	protected Match match;
@@ -38,6 +41,8 @@ public class MetaServerTest {
 	protected static final String PLAYER_NAME = "theplayername";
 	protected static final String INVALID_PLAYER_NAME = "invalid/player/name";
 	protected static final String MATCH_COMMENT = "the match's comment";
+	protected static final String CLIENT_CONTEXT_KEY = "client-context-key";
+	protected static final String WRONG_CLIENT_CONTEXT_KEY = "wrong-client-context-key";
 	
 	@Before
 	public void setUp() throws IOException {
@@ -45,7 +50,11 @@ public class MetaServerTest {
 		handlerFactory = mock(ServerHandlerFactory.class);
 		context = mock(ServerContext.class);
 		when(context.getManager()).thenReturn(manager);
-		clientContext = new ClientContext(manager);
+		
+		// client context
+		clientContext = mock(ClientContext.class);
+		when(clientContext.getManager()).thenReturn(manager);
+		when(clientContext.getKey()).thenReturn(CLIENT_CONTEXT_KEY);
 		when(context.createClientContext()).thenReturn(clientContext);
 
 		s2c = new StreamPipe(true); // server should call flush()
@@ -92,4 +101,6 @@ public class MetaServerTest {
 	protected void verifyResponseOK(String message) throws IOException {
 		assertThat(readResponse(), equalTo(String.format("OK %s", message)));
 	}
+	
+	//TODO: renew, pause and continue commands
 }

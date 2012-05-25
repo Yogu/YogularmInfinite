@@ -77,7 +77,7 @@ public class DefaultServerManager implements ServerManager {
 					}
 					for (ServerListener listener : ls) {
 						switch (event.getAction()) {
-						case PlAYER_JOINED:
+						case PLAYER_JOINED:
 							listener.playerJoinedMatch(event.getPlayer(), event.getMatch());
 							break;
 						case PLAYER_LEFT:

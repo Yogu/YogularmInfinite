@@ -96,9 +96,9 @@ public class MetaHandler extends BasicServerHandler {
 				if (command == NetworkCommand.PASSIVE) {
 					runNested(getHandlerFactory().createPassiveHandler(out, clientContext));
 					interrupt();
-					break;
 				}
 			}
+			break;
 		default:
 			CommandHandler handler = command == null ? null : commandHandlers.get(command);
 			if (handler == null)

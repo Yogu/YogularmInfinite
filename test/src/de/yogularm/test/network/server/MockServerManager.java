@@ -1,5 +1,7 @@
 package de.yogularm.test.network.server;
 
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
 
 import de.yogularm.multiplayer.Match;
@@ -7,8 +9,6 @@ import de.yogularm.multiplayer.MatchManager;
 import de.yogularm.multiplayer.Player;
 import de.yogularm.multiplayer.ServerListener;
 import de.yogularm.multiplayer.ServerManager;
-
-import static org.junit.Assert.*;
 
 public class MockServerManager implements ServerManager {
 

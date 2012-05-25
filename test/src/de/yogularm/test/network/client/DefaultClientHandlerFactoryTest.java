@@ -10,13 +10,7 @@ import org.junit.Test;
 
 import de.yogularm.network.NetworkGlobals;
 import de.yogularm.network.client.DefaultClientHandlerFactory;
-import de.yogularm.network.client.DefaultMetaHandler;
-import de.yogularm.network.server.ServerContext;
-import de.yogularm.network.server.StartHandler;
 import de.yogularm.test.network.PipedConnector;
-import de.yogularm.test.network.StreamPipe;
-import de.yogularm.test.network.server.MockServerHandlerFactory;
-import de.yogularm.test.network.server.MockServerManager;
 
 public class DefaultClientHandlerFactoryTest {
 	@Test

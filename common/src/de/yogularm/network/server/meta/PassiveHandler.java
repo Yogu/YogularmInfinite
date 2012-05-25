@@ -27,13 +27,15 @@ public class PassiveHandler extends BasicServerHandler {
 		super(handlerFactory);
 		this.out = out;
 		this.context = clientContext;
+
+		// unit test requires this statement to be in the constructor rather than in run()
+		context.getManager().addListener(listener);
 	}
 
 	public void run() {
-		context.getManager().addListener(listener);
-
 		try {
-			while (!isInterrupted()) {
+			// do ... while required because unit test expects this method to process at least one information
+			do {
 				try {
 					String line;
 					synchronized (queue) {
@@ -47,7 +49,7 @@ public class PassiveHandler extends BasicServerHandler {
 				} catch (InterruptedException e) {
 					break;
 				}
-			}
+			} while (!isInterrupted());
 		} finally {
 			context.getManager().removeListener(listener);
 		}
@@ -86,7 +88,7 @@ public class PassiveHandler extends BasicServerHandler {
 			assert match != null;
 			switch (newState) {
 			case RUNNING:
-				if (oldState == MatchState.RUNNING)
+				if (oldState == MatchState.PAUSED)
 					enqueue(NetworkInformation.MATCH_RESUMED, match.getID() + "");
 				else
 					enqueue(NetworkInformation.MATCH_STARTED, match.getID() + "");

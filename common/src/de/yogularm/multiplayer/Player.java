@@ -49,8 +49,6 @@ public class Player extends Observable {
 		}
 	}
 	
-	//public de.yogularm.components.Player playerComponent;
-	
 	/**
 	 * Creates a player with no name.
 	 * 
@@ -80,8 +78,16 @@ public class Player extends Observable {
 		return name != null && name.matches(NAME_REGEX);
 	}
 	
+	/**
+	 * Checks if the given player is identical to this one, given that both are on the same server
+	 * 
+	 * Player-names are compared case-insensitive
+	 * 
+	 * @param other the player to compare to this one
+	 * @return true, if the players are identical
+	 */
 	public boolean equals(Player other) {
-		return other != null && other.name != null && other.name.equals(name);
+		return other != null && other.name != null && other.name.equalsIgnoreCase(name);
 	}
 	
 	@Override

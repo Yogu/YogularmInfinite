@@ -37,7 +37,7 @@ public class Match extends Observable {
 
 	public static enum ChangeAction {
 		STATE_CHANGED,
-		PlAYER_JOINED,
+		PLAYER_JOINED,
 		PLAYER_LEFT,
 		COMMENT_CHANGED
 	}
@@ -89,6 +89,7 @@ public class Match extends Observable {
 	private Match() {
 		id = 0;
 		owner = null;
+		comment = "";
 	}
 
 	public Match(Player owner) {
@@ -97,6 +98,8 @@ public class Match extends Observable {
 			NEXT_ID++;
 		}
 		this.owner = owner;
+		comment = "";
+		addPlayer(owner);
 	}
 
 	/**
@@ -118,7 +121,7 @@ public class Match extends Observable {
 				setChanged();
 		}
 
-		notifyObservers(new ChangeEvent(ChangeAction.PlAYER_JOINED, player));
+		notifyObservers(new ChangeEvent(ChangeAction.PLAYER_JOINED, player));
 	}
 
 	/**

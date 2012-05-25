@@ -1,9 +1,10 @@
 package de.yogularm.test.network.server;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ public class MetaServerSayTest extends MetaServerTest {
 	
 	@Test
 	public void testMessageMissing() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		
 		sendCommand(NetworkCommand.SAY, " ");
 		c2s.out().close();
@@ -36,7 +37,7 @@ public class MetaServerSayTest extends MetaServerTest {
 	
 	@Test
 	public void testSay() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		
 		sendCommand(NetworkCommand.SAY, "the message ");
 		c2s.out().close();

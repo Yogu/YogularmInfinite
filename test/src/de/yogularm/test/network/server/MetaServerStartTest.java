@@ -1,5 +1,6 @@
 package de.yogularm.test.network.server;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,7 +26,7 @@ public class MetaServerStartTest extends MetaServerTest {
 	
 	@Test
 	public void testNotJoinedToMatch() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		
 		sendCommand(NetworkCommand.START);
 		c2s.out().close();
@@ -36,7 +37,7 @@ public class MetaServerStartTest extends MetaServerTest {
 
 	@Test
 	public void testNotOwnerOfMatch() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		when(player.getCurrentMatch()).thenReturn(match);
 		when(match.getOwner()).thenReturn(new Player("other"));
 
@@ -50,7 +51,7 @@ public class MetaServerStartTest extends MetaServerTest {
 
 	@Test
 	public void testMatchClosed() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		when(player.getCurrentMatch()).thenReturn(match);
 		when(match.getOwner()).thenReturn(player);
 		when(match.getState()).thenReturn(MatchState.RUNNING);
@@ -65,7 +66,7 @@ public class MetaServerStartTest extends MetaServerTest {
 
 	@Test
 	public void testStartMatch() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		when(player.getCurrentMatch()).thenReturn(match);
 		when(match.getOwner()).thenReturn(player);
 		when(match.getState()).thenReturn(MatchState.OPEN);
@@ -76,6 +77,28 @@ public class MetaServerStartTest extends MetaServerTest {
 		handler.run();
 
 		verifyResponseOK();
+		verify(match).start();
+	}
+	
+	/**
+	 * Tests whether ERR INVALID_STATE is returned when IllegalStateException occurs
+	 * 
+	 * Although the state is checked before, it may change between the check and start() call.
+	 */
+	@Test
+	public void testStartFails() throws IOException {
+		when(clientContext.getPlayer()).thenReturn(player);
+		when(player.getCurrentMatch()).thenReturn(match);
+		when(match.getOwner()).thenReturn(player);
+		when(match.getState()).thenReturn(MatchState.OPEN);
+		when(match.isOpen()).thenReturn(true);
+		doThrow(new IllegalStateException()).when(match).start();
+
+		sendCommand(NetworkCommand.START);
+		c2s.out().close();
+		handler.run();
+		
+		verifyResponse(CommunicationError.INVALID_STATE);
 		verify(match).start();
 	}
 }

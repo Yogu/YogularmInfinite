@@ -27,7 +27,7 @@ public class MetaServerCreateTest extends MetaServerTest {
 
 	@Test
 	public void testCreateMatchWithoutComment() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		when(manager.startNewMatch(player, "")).thenReturn(match);
 
 		sendCommand(NetworkCommand.CREATE);
@@ -40,7 +40,7 @@ public class MetaServerCreateTest extends MetaServerTest {
 
 	@Test
 	public void testCreateMatchWithComment() throws IOException {
-		clientContext.setPlayer(player);
+		when(clientContext.getPlayer()).thenReturn(player);
 		when(manager.startNewMatch(player, MATCH_COMMENT)).thenReturn(match);
 
 		sendCommand(NetworkCommand.CREATE, MATCH_COMMENT);
@@ -49,5 +49,21 @@ public class MetaServerCreateTest extends MetaServerTest {
 
 		verify(manager).startNewMatch(player, MATCH_COMMENT);
 		verifyResponseOK(MATCH_ID + "");
+	}
+	
+	/**
+	 * Tests whether ERR INVALID_STATE is returned when IllegalStateException occurs
+	 * 
+	 * Although the player's state is checked before, it may change between the check and joinMatch() call.
+	 */
+	@Test
+	public void testCreateMatchFails() throws IOException {
+		when(manager.startNewMatch(player, "")).thenThrow(new IllegalStateException());
+
+		sendCommand(NetworkCommand.CREATE, "");
+		c2s.out().close();
+		handler.run();
+
+		verifyResponse(CommunicationError.INVALID_STATE);
 	}
 }

@@ -13,7 +13,7 @@ import de.yogularm.multiplayer.Player;
 import de.yogularm.network.CommunicationError;
 import de.yogularm.network.NetworkCommand;
 
-public class MetaServerHelloTest extends MetaServerTest {
+public class MetaServerHelloTest extends MetaServerTest {	
 	@Test
 	public void testRegisterInvalidName() throws IOException {
 		sendCommand(NetworkCommand.HELLO, INVALID_PLAYER_NAME);
