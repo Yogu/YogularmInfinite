@@ -8,3 +8,7 @@ exe/
 
 # Windows
 Thumbs.db
+
+# Android
+android/gen
+android/bin
