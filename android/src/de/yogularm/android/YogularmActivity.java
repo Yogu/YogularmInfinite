@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -146,5 +147,39 @@ public class YogularmActivity extends Activity {
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		return sw.toString();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		handleKeyEvent(keyCode, true);
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		handleKeyEvent(keyCode, false);
+		return super.onKeyUp(keyCode, event);
+	}
+	
+	private void handleKeyEvent(int keyCode, boolean pressed) {
+		InputImpl input = (InputImpl)Controller.getInput();
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_DPAD_LEFT:
+		case KeyEvent.KEYCODE_A:
+			input.setX(pressed ? -1 : 0);
+			break;
+		case KeyEvent.KEYCODE_DPAD_RIGHT:
+		case KeyEvent.KEYCODE_D:
+			input.setX(pressed ? 1 : 0);
+			break;
+		case KeyEvent.KEYCODE_DPAD_DOWN:
+		case KeyEvent.KEYCODE_S:
+			input.setX(pressed ? -1 : 0);
+			break;
+		case KeyEvent.KEYCODE_DPAD_UP:
+		case KeyEvent.KEYCODE_W:
+			input.setY(pressed ? 1 : 0);
+			break;
+		}
 	}
 }
